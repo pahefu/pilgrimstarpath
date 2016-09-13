@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+	<head>
+		<!-- Plotly.js -->
+		<script src="./js/plotly-latest.min.js"></script>
+		<script src="./js/script.js"></script>
+        <link href="./css/style.css" rel="stylesheet">
+		<link rel="stylesheet" href="./css/pure-min.css">
+		<link rel="stylesheet" href="./css/grids-responsive-min.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+    
+	<body>
+		<div id="atlascontainer">
+			<img id="atlaslogo" src="./img/atlas.gif"/>
+			<h1 id="brand">PILGRIM STAR PATH</h1>
+		</div>
+	  	   
+		<div class="pure-g">
+			<div id="plotparent" class="pure-u-3-5">
+			<div id="plotdiv"></div>
+			</div>
+			<div id="infoparent" class="pure-u-2-5">
+				<div id="info">
+					<form class="pure-form pure-form-stacked">
+						<fieldset>
+							<legend>Check Your Location</legend>
+
+							<p>
+								<label>Remember that this Star is in <strong>Euclid Galaxy</strong></label>
+							</p>
+							
+							<label for="userlocation">Enter your location here in <strong>ABCD:1234:5678:1234:5678</strong> format</label>
+							<input id="userlocation" type="text" placeholder="ABCD:1234:5678:1234:5678">
+							
+							<p>
+								<input type="button" class="pure-button pure-button-primary" value="Set Location" onclick="calculateLocation()"></button>
+							</p>
+						</fieldset>
+					</form>
+					
+					<div id="errorMessage" class="hidden"></div>
+					<div id="locationInfo" class="hidden">
+						<p>Remember that this is <strong>approximate</strong> information.</p>
+						<div> X Coord: <span id="xcoord"></span></div>
+						<div> Y Coord: <span id="ycoord"></span></div>
+						<div> Z Coord: <span id="zcoord"></span></div>
+						<div> Linear distance to center: <span id="cdistance"></span></div>
+						<div> Linear distance to Pilgrim Star: <span id="pdistance"></span></div>
+						<div> Estimated jumps to Pilgrim Star: <span id="pjumps"></span></div>
+					</div>
+					
+				</div>
+
+			</div>
+		</div>
+        
+		<script>plotMap();</script>
+    </body>
+</html>

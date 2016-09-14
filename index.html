@@ -1,23 +1,21 @@
 <!doctype html>
 <html>
 	<head>
-		<!-- Plotly.js -->
-		<script src="./js/plotly-latest.min.js"></script>
-		<script src="./js/script.js"></script>
+		<script src="./js/gdl.js"></script>
         <link href="./css/style.css" rel="stylesheet">
 		<link rel="stylesheet" href="./css/pure-min.css">
 		<link rel="stylesheet" href="./css/grids-responsive-min.css">
+		<title>PILGRIM STAR PATH</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
     
-	<body>
+	<body onload="generateMap()">
 		<div id="atlascontainer">
 			<img id="atlaslogo" src="./img/atlas.gif"/>
 			<h1 id="brand">PILGRIM STAR PATH</h1>
 		</div>
 	  	   
 		<div class="pure-g">
-		
 			<div id="infoparent" class="pure-u-1-1 pure-u-md-2-5">
 				<div id="info">
 					<form class="pure-form pure-form-stacked">
@@ -40,22 +38,24 @@
 					<div id="errorMessage" class="hidden"></div>
 					<div id="locationInfo" class="hidden">
 						<p>Remember that this is <strong>approximate</strong> information.</p>
-						<div> X Coord: <span id="xcoord"></span></div>
-						<div> Y Coord: <span id="ycoord"></span></div>
-						<div> Z Coord: <span id="zcoord"></span></div>
-						<div> Linear distance to center: <span id="cdistance"></span></div>
-						<div> Linear distance to Pilgrim Star: <span id="pdistance"></span></div>
-						<div> Estimated jumps to Pilgrim Star: <span id="pjumps"></span></div>
+						<table class="pure-table">
+						<tr><td><div> X Coord</td><td><span id="xcoord"></span></div></td></tr>
+						<tr><td><div> Y Coord</td><td><span id="ycoord"></span></div></td></tr>
+						<tr><td><div> Z Coord</td><td><span id="zcoord"></span></div></td></tr>
+						<tr><td><div> Linear distance to center</td><td><span id="cdistance"></span></div></td></tr>
+						<tr><td><div> Linear distance to Pilgrim Star</td><td><span id="pdistance"></span></div></td></tr>
+						<tr><td><div> Estimated jumps to Pilgrim Star</td><td><span id="pjumps"></span></div></td></tr>
+						</table>
 					</div>
 					
 				</div>
 
 			</div>
 			<div id="plotparent" class="pure-u-1-1 pure-u-md-3-5">
-				<div id="plotdiv"></div>
+				<div id="canvasp">
+					<canvas id="plotc"></canvas>
+				</div>
 			</div>
 		</div>
-        
-		<script>plotMap();</script>
     </body>
 </html>

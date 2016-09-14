@@ -44,7 +44,7 @@ var layout = {
 		}
 	],
 	xaxis: {range: [0, 4096], title:'X coord'},
-	yaxis: {autorange: 'reversed',range: [0, 4096], title:'Z coord', },
+	yaxis: {range: [0, 4096], title:'Z coord', },
 	hovermode : 'closest'
 };
 

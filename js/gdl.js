@@ -1,6 +1,6 @@
 
 var center = {
-  coords: [2048,128,2048],
+  coords: [2047,127,2047],
   name: 'Galaxy Center'
 };
 

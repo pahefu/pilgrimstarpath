@@ -33,25 +33,26 @@ var legendPercent = undefined;
 
 var svgHelper = {
 	
-	svg : undefined,	
+	svg : undefined,
+	parent: undefined,
 	
 	init: function(domId, a, b){
-		this.svg = document.getElementById(domId);
-		
-		if(a == undefined){			
+		this.parent = document.getElementById("svgp");
+		this.svg = document.getElementById("svgc");
+						
+		if(a == undefined){				
 			var parent = document.getElementById("plotparent");
 			wp = parent.getBoundingClientRect().width * 0.9;
 			hp = wp * (document.documentElement.clientHeight*1.0/document.documentElement.clientWidth); 
-			
 		}else{
 			wp = a;
 			hp = b;
 		}
-		
+	
 		this.svg.setAttribute("width",wp);
 		this.svg.setAttribute("height",hp);
-		this.svg.setAttribute("css","{width:'"+wp+"p‌​x',height:'"+hp+"px';}");
-		this.svg.innerHTML = "";
+		this.clearContent(this.svg);
+
 	},
 	
 	transformCoords : function (obj){
@@ -62,10 +63,27 @@ var svgHelper = {
 		obj.mapCoords[1] = obj.coords[1];
 		obj.mapCoords[2] = obj.coords[2] * hp / mZ;
 	},
+
+	clearContent : function(node){
+		while (node.firstChild) {
+			node.removeChild(node.firstChild);
+		}
+	},
+	
+	addNode : function(type, attributes, content){
+		var domObj = document.createElementNS("http://www.w3.org/2000/svg",type);
+		for(i = 0;i<attributes.length;i+=2){
+			domObj.setAttribute(attributes[i],""+attributes[i+1]);
+		}
+		if(content!=undefined && content!=null){
+			domObj.innerHTML+=""+content;
+		}
+		this.svg.appendChild(domObj);
+	},
 	
 	drawSvg : function(){
 		
-		this.svg.innerHTML = "";
+		this.clearContent(this.svg);
 		
 		this.drawGrid();
 		this.drawAxis();
@@ -81,75 +99,57 @@ var svgHelper = {
 			this.drawStar(userLocation,4,'#36AC3A');
 			this.drawTravel(userLocation.mapCoords[0],userLocation.mapCoords[2],pilgrim.mapCoords[0],pilgrim.mapCoords[2]);
 		}
+
 	},
 	
-	drawTravel : function(x1,y1,x2,y2){
-		//this.drawArrow(x1,y1,x2,y2, '5,5');		
-	},
-	
+
 	drawGrid : function(){
 		var step = 30;
 		var localHtml = "";
 		
 		var color = 153; // 0x99
-		
-		var template = '<line x1="{{x1}}" y1="{{y1}}" x2="{{x2}}" y2="{{y2}}" style="stroke:rgb({{color}},{{color}},{{color}});stroke-width:{{width}}" />';
-		
-		for(var i = step;i<wp;i+=step){
-			localHtml+=Mustache.render(template, {x1: i, y1: 0, x2 : i, y2: hp, color: color, width: 1});
+
+		for(var i = step;i<wp;i+=step){		
+			this.addNode("line", ["x1",i,"y1",0,"x2",i,"y2",hp, "style","stroke:rgb(153,153,153); stroke-width:1;"]);
+			
 		}
 		for(var i = step;i<hp;i+=step){
-			localHtml+=Mustache.render(template, {x1: 0, y1: i, x2 : wp, y2: i, color: color, width: 1});
+			this.addNode("line", ["x1",0,"y1",i,"x2",wp,"y2",i, "style","stroke:rgb(153,153,153); stroke-width:1;"]);
 		}
 		
-		this.svg.innerHTML+=localHtml;
 	},
 	
 	drawStar : function(obj,size, fillStyle){
 		var centerX = obj.mapCoords[0];
 		var centerZ = obj.mapCoords[2];
 		
-		var template = '<circle cx="{{centerX}}" cy="{{centerZ}}" r="{{size}}" stroke="{{fillStyle}}" stroke-width="1" fill="{{fillStyle}}" />';
-		this.svg.innerHTML+=Mustache.render(template, {centerX: centerX, centerZ: centerZ, size:size, fillStyle: fillStyle});
+		var template = '<circle cx="{{centerX}}" cy="{{centerZ}}" r="{{size}}" stroke="{{fillStyle}}" stroke-width="1" fill="{{fillStyle}}"></circle>';
+		this.addNode("circle",["cx",centerX,"cy",centerZ,"r",size,"stroke",fillStyle,"stroke-width","1","fill",fillStyle]);
 	},
-	drawText : function(text, x,y) {
+	drawText : function(textStr, x,y) {
 		var color = "white";
-		var template = '<text x="{{x}}" y="{{y}}" fill="{{color}}">{{text}}</text>';
-		this.svg.innerHTML+=Mustache.render(template, {x: x, y: y, color: color, text : text});
+		this.addNode("text", ["dy",".75em","x",x,"y",y,"fill",color],textStr);
 	},
 	
-	drawArrow : function(x1,y1,x2,y2, stroke){
+	drawArrow : function(x1,y1,x2,y2){
 		var color = 255;
-		var templateLine = '<line x1="{{x1}}" y1="{{y1}}" x2="{{x2}}" y2="{{y2}}" style="stroke:rgb({{color}},{{color}},{{color}}); stroke-width:{{width}};" {{{strokedash}}} />';
-		var templatePath = '<path d="{{text}}" fill="white" />';
-		
-		var localHtml = "";
-		
-		if (stroke!=undefined && stroke!=null){
-			stroke = 'stroke-dasharray="'+stroke+'"';
-		}else{
-			stroke="";
-		}
-		
-		localHtml+=Mustache.render(templateLine, {x1: x1, y1: y1, x2 : x2, y2: y2, color: color, width: 1, strokedash:stroke });
+
+		var document = 
+		this.addNode("line", ["x1",x1,"y1",y1,"x2",x2,"y2",y2, "style","stroke:rgb(255,255,255); stroke-width:1;"]);
 		
 		var headlen = 10;   
-		var angle = Math.atan2(y2-y1,x2-x1);
-		
+		var angle = Math.atan2(y2-y1,x2-x1);	
 		var pathText ="";
 		pathText += Mustache.render("M{{a}} {{b}} ", {a: x2,b:y2});
 		pathText += Mustache.render("L{{a}} {{b}} ", {a: x2-headlen*Math.cos(angle-Math.PI/6),b: y2-headlen*Math.sin(angle-Math.PI/6) });
 		pathText += Mustache.render("L{{a}} {{b}} ", {a: x2-headlen*Math.cos(angle+Math.PI/6),b: y2-headlen*Math.sin(angle+Math.PI/6) });
 		pathText+= " Z";
-    
-		localHtml+=Mustache.render(templatePath, {text: pathText});
-
-		this.svg.innerHTML+=localHtml;
+		this.addNode("path", ["d",pathText,"fill","white"]);
 
 	},
 	
 	drawAxis : function (){
-		this.drawText("X",140,35);
+		this.drawText("X",140,25);
 		this.drawArrow(10,10,150,10);
 		this.drawText("Z",18,150);
 		this.drawArrow(10,10,10,150);

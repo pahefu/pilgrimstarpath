@@ -26,7 +26,7 @@
 							<div class="card-content white-text">
 								<p class="white-text">Remember that this Star is in <span class="new">Euclid Galaxy</span>.</p>
 								<p class="white-text">Enter your location here in <strong>ABCD:1234:5678:1234:5678</strong> format</p>
-								<input id="userlocation" class="white-text" type="text" placeholder="ABCD:1234:5678:1234:5678"></input>
+								<input id="userlocation" class="white-text" type="text" placeholder="ABCD:1234:5678:1234:5678">
 
 								<!--<p id="destinationcheck">
 									<input type="checkbox" class="filled-in" id="usepilgrimswitch" checked="checked"></input>
@@ -34,7 +34,7 @@
 								</p> -->
 								
 								<p>
-									<input type="button" class="btn" value="Set Location" onclick="calculateLocation()"></input>
+									<input type="button" class="btn" value="Set Location" onclick="calculateLocation()">
 								</p>
 							</div>
 						</div>
@@ -52,12 +52,12 @@
 						<div id="locationcard" class="card card-panel blue-grey darken-1">
 							<p>Remember that this is <strong>approximate</strong> information. </p>
 							<table class="flow-text">
-								<tr><td><div> X Coord</td><td><span id="xcoord"></span></div></td></tr>
-								<tr><td><div> Y Coord</td><td><span id="ycoord"></span></div></td></tr>
-								<tr><td><div> Z Coord</td><td><span id="zcoord"></span></div></td></tr>
-								<tr><td><div> Linear distance to the center</td><td><span id="cdistance"></span></div></td></tr>
-								<tr><td><div> Linear distance to Pilgrim Star Region</td><td><span id="pdistance"></span></div></td></tr>
-								<tr><td><div> Estimated jumps to Pilgrim Star Region</td><td><span id="pjumps"></span></div></td></tr>
+								<tr><td><div> X Coord</div></td><td><span id="xcoord"></span></td></tr>
+								<tr><td><div> Y Coord</div></td><td><span id="ycoord"></span></td></tr>
+								<tr><td><div> Z Coord</div></td><td><span id="zcoord"></span></td></tr>
+								<tr><td><div> Linear distance to the center</div></td><td><span id="cdistance"></span></td></tr>
+								<tr><td><div> Linear distance to Pilgrim Star Region</div></td><td><span id="pdistance"></span></td></tr>
+								<tr><td><div> Estimated jumps to Pilgrim Star Region</div></td><td><span id="pjumps"></span></td></tr>
 							</table>
 						</div>
 					</div>
@@ -71,14 +71,13 @@
 				</div>
 				
 				<div id="svgp">
-					<svg id="galsvg">
-					</svg>
+					 <svg id="svgc" xmlns="http://www.w3.org/2000/svg"></svg>
 				</div>
 				
 				<div class="chip chipcenter">Galaxy center</div>
 				<div class="chip chipdestination">Destination</div>
 				<div class="chip chipuser">User Location</div>
 			</div>
-		</div>
+		</div>	
     </body>
 </html>

@@ -1,60 +1,83 @@
 <!doctype html>
 <html>
 	<head>
-		<script src="./js/gdl.js"></script>
-        <link href="./css/style.css" rel="stylesheet">
-		<link rel="stylesheet" href="./css/pure-min.css">
-		<link rel="stylesheet" href="./css/grids-responsive-min.css">
-		<title>PILGRIM STAR PATH</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="./js/mustache.min.js"></script>
+		<script src="./js/gdl.js"></script>
+		
+        <link href="./css/style.css" rel="stylesheet">
+		<link rel="stylesheet" href="./css/materialize.min.css">
+		<title>PILGRIM STAR PATH</title>
 	</head>
     
 	<body onload="generateMap()">
 		<div id="atlascontainer">
-			<img id="atlaslogo" src="./img/atlas.gif"/>
+			<img id="atlaslogo" src="./img/atlas_logo.png"/>
 			<h1 id="brand">PILGRIM STAR PATH</h1>
 		</div>
-	  	   
-		<div class="pure-g">
-			<div id="infoparent" class="pure-u-1-1 pure-u-md-2-5">
+
+		<div class="row">
+			<div id="infoparent" class="col s12 m6">
 				<div id="info">
-					<form class="pure-form pure-form-stacked">
-						<fieldset>
-							<legend>Check Your Location</legend>
+					<form class="">
+						<blockquote>Check your location</blockquote>
+						
+						<div id="inputcard" class="card card-panel blue-grey darken-1">
+							<div class="card-content white-text">
+								<p class="white-text">Remember that this Star is in <span class="new">Euclid Galaxy</span>.</p>
+								<p class="white-text">Enter your location here in <strong>ABCD:1234:5678:1234:5678</strong> format</p>
+								<input id="userlocation" class="white-text" type="text" placeholder="ABCD:1234:5678:1234:5678"></input>
 
-							<p>
-								<label>Remember that this Star is in <strong>Euclid Galaxy</strong></label>
-							</p>
-							
-							<label for="userlocation">Enter your location here in <strong>ABCD:1234:5678:1234:5678</strong> format</label>
-							<input id="userlocation" type="text" placeholder="ABCD:1234:5678:1234:5678">
-							
-							<p>
-								<input type="button" class="pure-button pure-button-primary" value="Set Location" onclick="calculateLocation()"></button>
-							</p>
-						</fieldset>
+								<!--<p id="destinationcheck">
+									<input type="checkbox" class="filled-in" id="usepilgrimswitch" checked="checked"></input>
+									<label for="usepilgrimswitch">Use Pilgrim Star as destination</label>
+								</p> -->
+								
+								<p>
+									<input type="button" class="btn" value="Set Location" onclick="calculateLocation()"></input>
+								</p>
+							</div>
+						</div>
 					</form>
-					
-					<div id="errorMessage" class="hidden"></div>
-					<div id="locationInfo" class="hidden">
-						<p>Remember that this is <strong>approximate</strong> information.</p>
-						<table class="pure-table">
-						<tr><td><div> X Coord</td><td><span id="xcoord"></span></div></td></tr>
-						<tr><td><div> Y Coord</td><td><span id="ycoord"></span></div></td></tr>
-						<tr><td><div> Z Coord</td><td><span id="zcoord"></span></div></td></tr>
-						<tr><td><div> Linear distance to center</td><td><span id="cdistance"></span></div></td></tr>
-						<tr><td><div> Linear distance to Pilgrim Star</td><td><span id="pdistance"></span></div></td></tr>
-						<tr><td><div> Estimated jumps to Pilgrim Star</td><td><span id="pjumps"></span></div></td></tr>
-						</table>
-					</div>
-					
-				</div>
 
-			</div>
-			<div id="plotparent" class="pure-u-1-1 pure-u-md-3-5">
-				<div id="canvasp">
-					<canvas id="plotc"></canvas>
+					<div id="errorMessage" class="card blue-grey indigo hidden">
+						<div class="card-content white-text">
+							<span class="card-title">Ooops</span>
+							<p id="errorMessageText"></p>
+						</div>
+					</div>
+
+					<div id="locationInfo" class="hidden">
+						<blockquote>Location information</blockquote>
+						<div id="locationcard" class="card card-panel blue-grey darken-1">
+							<p>Remember that this is <strong>approximate</strong> information. </p>
+							<table class="flow-text">
+								<tr><td><div> X Coord</td><td><span id="xcoord"></span></div></td></tr>
+								<tr><td><div> Y Coord</td><td><span id="ycoord"></span></div></td></tr>
+								<tr><td><div> Z Coord</td><td><span id="zcoord"></span></div></td></tr>
+								<tr><td><div> Linear distance to the center</td><td><span id="cdistance"></span></div></td></tr>
+								<tr><td><div> Linear distance to Pilgrim Star Region</td><td><span id="pdistance"></span></div></td></tr>
+								<tr><td><div> Estimated jumps to Pilgrim Star Region</td><td><span id="pjumps"></span></div></td></tr>
+							</table>
+						</div>
+					</div>
 				</div>
+			</div>
+			
+			<div id="plotparent" class="col s12 m6">
+				<blockquote>Galaxy map</blockquote>
+				<div id="canvasp">
+					<!--<canvas id="plotc"></canvas>-->
+				</div>
+				
+				<div id="svgp">
+					<svg id="galsvg">
+					</svg>
+				</div>
+				
+				<div class="chip chipcenter">Galaxy center</div>
+				<div class="chip chipdestination">Destination</div>
+				<div class="chip chipuser">User Location</div>
 			</div>
 		</div>
     </body>

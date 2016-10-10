@@ -8,7 +8,7 @@ body{
 	
 	background-color: #000000;
 	color:#ffffff;
-	
+	font-family: GillSans, Calibri, Trebuchet, sans-serif;
 	/*
 	background-color: #ffffff;
 	color:#000000;
@@ -16,11 +16,21 @@ body{
 	
 }
 
+#inputcard input{
+	color:#ffffff!important;
+	font-size:16pt;
+}
+
+#destinationcheck label{
+	color:#ffffff!important;
+	font-size:16pt!important;
+}
+
 #atlaslogo{
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
-	width:175px;
+	height:75px;
 }
 
 #brand{
@@ -37,7 +47,6 @@ legend{
 
 #userlocation{
 	min-width:350px !important;
-	color: #000000 !important;
 }
 
 #plotdiv{
@@ -51,8 +60,6 @@ legend{
 
 #canvasp{
 	text-align:center;
-	padding-top:20px;
-	
 }
 
 #plotc{
@@ -65,9 +72,40 @@ legend{
 	padding:10px;
 }
 
-#errorMessage{
-	
+#plotparent{
+	font-family: 'NmsFont';
+	font-size:17pt;
+	padding:10px;
 }
+
+#galsvg{
+	border:1px solid white;
+}
+
+.chip{
+	color:#ffffff!important;
+	font-size:16pt!important;
+}
+
+.chip{
+	color:#ffffff!important;
+	font-size:16pt!important;
+}
+
+.chipcenter{
+	background-color: #7672E8 !important;
+}
+
+.chipdestination{
+	background-color: #FFA500 !important;
+}
+
+.chipuser{
+	background-color: #36AC3A !important;
+}
+
+
+#errorMessage{}
 
 .visible{}
 

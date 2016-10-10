@@ -1,19 +1,12 @@
 @font-face {
   font-family: 'NmsFont';
   src:url('../fonts/geonms-webfont.ttf')  format('truetype') /* Safari, Android, iOS */
-
 }
 
 body{
-	
 	background-color: #000000;
 	color:#ffffff;
 	font-family: GillSans, Calibri, Trebuchet, sans-serif;
-	/*
-	background-color: #ffffff;
-	color:#000000;
-	*/
-	
 }
 
 #inputcard input{
@@ -46,7 +39,7 @@ legend{
 }
 
 #userlocation{
-	/*min-width:350px !important;*/
+
 }
 
 #plotdiv{
@@ -103,7 +96,6 @@ legend{
 .chipuser{
 	background-color: #36AC3A !important;
 }
-
 
 #errorMessage{}
 

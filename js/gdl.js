@@ -42,8 +42,15 @@ var svgHelper = {
 						
 		if(a == undefined){				
 			var parent = document.getElementById("plotparent");
+			
+			var pwith = parent.getBoundingClientRect().width*0.9;
+			var aspect = (document.documentElement.clientHeight*1.0/document.documentElement.clientWidth);
+			if(document.documentElement.clientHeight > document.documentElement.clientWidth){
+				aspect = (document.documentElement.clientWidth*1.0/document.documentElement.clientHeight);
+			}
+			
 			wp = parent.getBoundingClientRect().width * 0.9;
-			hp = wp * (document.documentElement.clientHeight*1.0/document.documentElement.clientWidth); 
+			hp = wp * aspect; 
 		}else{
 			wp = a;
 			hp = b;

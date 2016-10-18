@@ -14,7 +14,7 @@
 
 		<div id="atlascontainer">
 			<img id="atlaslogo" src="./img/atlas_logo.png"/>
-			<h3 id="brand">PILGRIM STAR PATH</h3>
+			<h3 id="brand">PILGRIM STAR PATH <span class="chip indigo">v0.3</span></h3>
 		</div>
 
 		<div class="row">
@@ -32,14 +32,14 @@
 								
 								<div class="row">
 									<div class="input-field col s12">
-										<input id="userlocation" class="white-text" type="text" placeholder="ABCD:1234:5678:1234:5678" value="ABCD:990:095:134:5678">
+										<input id="userlocation" class="white-text" type="text" placeholder="ABCD:1234:5678:1234:5678">
 										<label for="destinationlocation" class="white-text active" style="font-size:13pt">Current location</label>
 									</div>
 								</div>
 								
 								<div class="row">									
 									<div class="input-field col s12">
-										<textarea id="destinationlocation" class="white-text validate" disabled placeholder="Place destinations here">ABCD:064A:0082:01B9:0001</textarea>
+										<textarea id="destinationlocation" class="white-text validate materialize-textarea" disabled placeholder="Place destinations here">ABCD:064A:0082:01B9:0001</textarea>
 										<label for="destinationlocation" class="white-text active" style="font-size:13pt">Destinations</label>
 									</div>
 									<div id="destinationcheck" class="col s12">
@@ -76,13 +76,13 @@
 									<svg id="coordsvg" xmlns="http://www.w3.org/2000/svg"></svg>
 								</div>
 								
-								<div id="tableinfo" clasS="col s12 m6">
-									<table class="flow-text">
-										<tr><td><div> Linear distance to the center</div></td><td><span id="cdistance"></span></td></tr>
-										<tr><td><div> Linear distance to Destination Region</div></td><td><span id="pdistance"></span></td></tr>
-										<tr><td><div> Estimated jumps to Destination Region</div></td><td><span id="pjumps"></span></td></tr>
-									</table>
-								</div>								
+								<div id="centerdistsvgp" class="col s12 m6">
+									<svg id="centerdistsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+								</div>
+
+								<div id="relationinfo" class="col s12">
+									<table class="flow-text" id="relationinfotable"></table>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -111,7 +111,7 @@
 							</div>
 						</div>
 						<div class="col s12 m6">
-							<blockquote>Compass  <span class="chip teal">ALPHA</span></blockquote>
+							<blockquote>Compass <span class="chip teal">ALPHA</span></blockquote>
 							<div id="compassp">
 								<div>Looking at the center, you have to travel, <span id="degreestxt"></span> degrees to your <span id="degreesdirtxt"></span></div>
 								<svg id="compasssvg" xmlns="http://www.w3.org/2000/svg"></svg>

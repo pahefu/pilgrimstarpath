@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="./js/mustache.min.js"></script>
+		
+		
+        <link href="./css/style.css" rel="stylesheet">
+		<link rel="stylesheet" href="./css/materialize.min.css">
+		<title>PILGRIM STAR PATH</title>
+	</head>
+    
+	<body onload="generateMap();">
+
+		<div id="atlascontainer">
+			<img id="atlaslogo" src="./img/atlas_logo.png"/>
+			<h3 id="brand">PILGRIM STAR PATH</h3>
+		</div>
+
+		<div class="row">
+			<div id="infoparent" class="col s12 m5">
+				<div id="info">
+					<form class="">
+						<blockquote>Check your location</blockquote>
+						
+						<div id="inputcard" class="card card-panel blue-grey darken-1">
+							<div class="card-content white-text">
+								
+								<div class="row">
+									<div class="col s12 white-text">Enter your coordinates in <strong>ABCD:1234:5678:1234:5678</strong> format</div>
+								</div>
+								
+								<div class="row">
+									<div class="input-field col s12">
+										<input id="userlocation" class="white-text" type="text" placeholder="ABCD:1234:5678:1234:5678" value="ABCD:990:095:134:5678">
+										<label for="destinationlocation" class="white-text active" style="font-size:13pt">Current location</label>
+									</div>
+								</div>
+								
+								<div class="row">									
+									<div class="input-field col s12">
+										<textarea id="destinationlocation" class="white-text validate" disabled placeholder="Place destinations here">ABCD:064A:0082:01B9:0001</textarea>
+										<label for="destinationlocation" class="white-text active" style="font-size:13pt">Destinations</label>
+									</div>
+									<div id="destinationcheck" class="col s12">
+										<input type="checkbox" class="filled-in" id="usepilgrimswitch" checked onclick='handlecustomlocation(this);'>
+										<label for="usepilgrimswitch">Use Pilgrim Star as destination</label>
+									</div> 
+								</div>
+								
+								<hr/>
+								
+								<div class="row">
+									<div class="col s12">
+										<input type="button" class="btn" value="Set Location" onclick="calculateLocation()">
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+
+					<div id="errorMessage" class="card blue-grey indigo hidden">
+						<div class="card-content white-text">
+							<span class="card-title">Ooops</span>
+							<p id="errorMessageText"></p>
+						</div>
+					</div>
+
+					<div id="locationInfo" class="hidden">
+						<blockquote>Location information</blockquote>
+						<div id="locationcard" class="card card-panel blue-grey darken-1">
+							<p>Remember that this is <strong>approximate</strong> information. </p>
+							
+							<div class="row">
+								<div id="coordsvgp" class="col s12 m6">
+									<svg id="coordsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+								</div>
+								
+								<div id="tableinfo" clasS="col s12 m6">
+									<table class="flow-text">
+										<tr><td><div> Linear distance to the center</div></td><td><span id="cdistance"></span></td></tr>
+										<tr><td><div> Linear distance to Destination Region</div></td><td><span id="pdistance"></span></td></tr>
+										<tr><td><div> Estimated jumps to Destination Region</div></td><td><span id="pjumps"></span></td></tr>
+									</table>
+								</div>								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div id="plotparent" class="col s12 m7">
+				
+				<div id="galmapp">
+					<blockquote>Galaxy map</blockquote>					
+					<div id="svgp">
+						 <svg id="svgc" xmlns="http://www.w3.org/2000/svg"></svg>
+					</div>
+					
+					<div class="chip chipcenter">Galaxy center</div>
+					<div class="chip chipdestination">Destination</div>
+					<div class="chip chipuser">User Location</div>
+				</div>
+				
+				<div id="directionsmap" class="hidden">
+					<div class="row">
+						<div class="col s12 m6">
+							<blockquote>Height map</blockquote>
+							<div id="heightsvgp">
+								<svg id="heightsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+							</div>
+						</div>
+						<div class="col s12 m6">
+							<blockquote>Compass  <span class="chip teal">ALPHA</span></blockquote>
+							<div id="compassp">
+								<div>Looking at the center, you have to travel, <span id="degreestxt"></span> degrees to your <span id="degreesdirtxt"></span></div>
+								<svg id="compasssvg" xmlns="http://www.w3.org/2000/svg"></svg>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>	
+
+		<script src="./js/gdl.js"></script>
+	
+    </body>
+</html>

@@ -28,7 +28,6 @@ body{
 
 #brand{
 	text-align:center;
-	
 	font-family: 'NmsFont';
 	margin-top:0px;
 	margin-bottom:5px;	
@@ -62,7 +61,6 @@ legend{
 #info{
 	font-family: 'NmsFont';
 	font-size:17pt;
-	padding:10px;
 }
 
 #plotparent{

@@ -327,6 +327,7 @@ function generateMap(){
 		var centerZ = obj.getMapZ();
 		var fillStyle = obj.color;
 		this.addNode("circle",["cx",centerX,"cy",centerZ,"r",size,"stroke",fillStyle,"stroke-width","1","fill",fillStyle]);
+		this.drawText(obj.name,centerX+10, centerZ-10, "white");
 	};
 			
 	galSvg.drawAxis = function (){

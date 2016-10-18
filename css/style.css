@@ -46,8 +46,7 @@ legend{
 	margin-left: auto;
 	margin-right: auto;
 	width:500px;
-	height:500px;
-	
+	height:500px;	
 }
 
 #canvasp{
@@ -101,5 +100,10 @@ legend{
 
 .hidden{
 	display:none;
+}
+
+#heightsvg,#svgc{
+	border:1px solid #777777;
+	
 }
 

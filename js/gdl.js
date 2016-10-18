@@ -61,7 +61,8 @@ var destinations = [new Region(0x64a,0x082,0x1b9,'Pilgrim Star','orange')]; // S
 var galSvg = undefined; // Main SVG
 var compSvg = undefined; // Compass SVG
 var coordSvg = undefined; // Coordinates SVG
-var heightSvg = undefined // HeightMap SVG
+var centerDistSvg = undefined; // Distance to center SVG
+var heightSvg = undefined; // HeightMap SVG
 var customDestination = false;
 
 
@@ -112,6 +113,7 @@ var svgImage = Class({
 		if(content!=undefined && content!=null){
 			domObj.innerHTML+=""+content;
 		}
+
 		this.svg.appendChild(domObj);
 	},
 	
@@ -157,10 +159,16 @@ var svgImage = Class({
 function handlecustomlocation(){
 	var checkObj = document.getElementById("usepilgrimswitch");
 	var destTxt = document.getElementById("destinationlocation");
+	if(destinations.length==0){
+		destinations.push(new Region(0x64a,0x082,0x1b9,'Pilgrim Star','orange'));
+	}
+	
 	if(checkObj.checked){
 		customDestination = false;
+	
 		destinations[0].name = pilgrim.name;
 		destinations[0].updateCoords(pilgrim.getX(),pilgrim.getY(), pilgrim.getZ());
+		
 		destTxt.value = "DOIT:064A:0082:01B9:0001";
 		destTxt.disabled = true;
 	}else{
@@ -172,8 +180,6 @@ function handlecustomlocation(){
 }
 
 function generateMap(){
-
-	
 
 	var re = new RegExp("to=[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
 	var res = re.exec(window.location.search);
@@ -211,13 +217,24 @@ function generateMap(){
 		
 	}
 	
+	// Distance to center definition
+	
+	centerDistSvg = new svgImage("centerdistsvg","centerdistsvgp",null,100);
+	centerDistSvg.drawDistance = function(distance){
+		this.clearContent();
+		var distanceTxt = distance.toFixed(3) +" ly";
+		this.drawText(distanceTxt + " to the center" ,0,(this.hp/2)-20);
+		this.drawArrow(2,this.hp/2, this.wp-2, this.hp/2);
+	}
+	
 	// Compass definition
 	
 	compSvg = new svgImage("compasssvg","compassp",null,200);
 	compSvg.drawCompass = function(radius,radians){		
 		this.clearContent();
 		var pos = [80,80];
-		var degrees = (-1)*(radians*180/Math.PI);
+		
+		var degrees = (radians*180/Math.PI);
 		
 		var x = pos[0];
 		var y = pos[1]-radius;
@@ -241,14 +258,15 @@ function generateMap(){
 	
 	heightSvg = new svgImage("heightsvg","heightsvgp",null,150);
 	
-	heightSvg.drawStar = function(obj, x, size){
+	heightSvg.drawStar = function(obj, x, size, index){
 		var centerX = x;
 		var centerY = this.hp- (obj.mapCoords[1]* this.hp / 256);
 		var fillStyle = obj.color;
 
 		this.addNode("circle",["cx",centerX,"cy",centerY,"r",size,"stroke",fillStyle,"stroke-width","1","fill",fillStyle]);
 		
-		this.drawText(obj.name[0],centerX+10,centerY-10,obj.color);
+		var name = (index == undefined || index == null) ? (obj.name[0]) : (obj.name[0] + (index+1));
+		this.drawText(name,centerX+10,centerY-10,obj.color);
 		
 	}
 	
@@ -274,7 +292,7 @@ function generateMap(){
 			this.drawStar(userLocation,50,4);
 			
 			for(var i = 0;i<destinations.length;i++){
-				this.drawStar(destinations[i],(i*30)+100,4);	
+				this.drawStar(destinations[i],(i*30)+100,4,i);	
 			}
 	}
 	
@@ -340,8 +358,8 @@ function generateMap(){
 					this.drawStar(destinations[i],4);
 				}
 				
-				var v1 = center.getVector(userLocation); 
-				var v2 = center.getVector(destinations[0]);
+				var v1 = userLocation.getVector(center); 
+				var v2 = userLocation.getVector(destinations[0]);
 
 				var angle = v1.getDegreesVector(v2);		
 				
@@ -387,11 +405,25 @@ function showLocationInfo(x,y,z){
 	var elementB = document.getElementById("directionsmap");
 	elementB.className = "visible";
 	
-	userLocation.updateCoords(x,y,z);
+	var elementC = document.getElementById("relationinfotable");
 
-	setValue("cdistance", userLocation.calculateDistance(center).toFixed(3) +" ly");
-	setValue("pdistance",userLocation.calculateDistance(destinations[0]).toFixed(3) +" ly");
-	setValue("pjumps",Math.ceil(userLocation.calculateDistance(destinations[0])/400.0));
+	userLocation.updateCoords(x,y,z);
+	
+	relationinfotable.innerHTML = ""; // Clear the table
+	
+	var localHtml = "<tr><th>Destination Name</th><th>Distance (Ly)</th><th>Estimated jumps</th></tr>";
+
+	for(var i = 0;i<destinations.length;i++){
+		var rowTemplate = "<tr><td>{{destname}}</td> <td>{{distance}}</td><td>{{jumps}}</td></tr>";	
+		var distance = userLocation.calculateDistance(destinations[i]).toFixed(3);
+		var jumps = Math.ceil(userLocation.calculateDistance(destinations[i]) / 400.0);
+		localHtml+= Mustache.render(rowTemplate, { destname: destinations[i].name, distance: distance, jumps:jumps });
+	}
+	
+	relationinfotable.innerHTML = localHtml;
+		
+	centerDistSvg.initialize("centerdistsvg","centerdistsvgp",null,100);
+	centerDistSvg.drawDistance(userLocation.calculateDistance(center));
 	
 	coordSvg.initialize("coordsvg","coordsvgp",null,100);
 	coordSvg.drawCoords(x,y,z);

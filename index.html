@@ -2,11 +2,9 @@
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script src="./js/mustache.min.js"></script>
-		
-		
         <link href="./css/style.css" rel="stylesheet">
 		<link rel="stylesheet" href="./css/materialize.min.css">
+		<script src="./js/mustache.min.js"></script>	
 		<title>PILGRIM STAR PATH</title>
 	</head>
     
@@ -14,7 +12,7 @@
 
 		<div id="atlascontainer">
 			<img id="atlaslogo" src="./img/atlas_logo.png"/>
-			<h3 id="brand">PILGRIM STAR PATH <span class="chip indigo">v0.3</span></h3>
+			<h3 id="brand">PILGRIM STAR PATH <span class="chip indigo">v0.4</span></h3>
 		</div>
 
 		<div class="row">
@@ -26,39 +24,66 @@
 						<div id="inputcard" class="card card-panel blue-grey darken-1">
 							<div class="card-content white-text">
 								
-								<div class="row">
+								<div class="row nomarginrow">
 									<div class="col s12 white-text">Enter your coordinates in <strong>ABCD:1234:5678:1234:5678</strong> format</div>
 								</div>
 								
 								<div class="row">
 									<div class="input-field col s12">
-										<input id="userlocation" class="white-text" type="text" placeholder="ABCD:1234:5678:1234:5678">
-										<label for="destinationlocation" class="white-text active" style="font-size:13pt">Current location</label>
+										<input id="userlocation" class="white-text" type="text" placeholder="Place your location here">
 									</div>
 								</div>
 								
-								<div class="row">									
-									<div class="input-field col s12">
-										<textarea id="destinationlocation" class="white-text validate materialize-textarea" disabled placeholder="Place destinations here">ABCD:064A:0082:01B9:0001</textarea>
-										<label for="destinationlocation" class="white-text active" style="font-size:13pt">Destinations</label>
-									</div>
-									<div id="destinationcheck" class="col s12">
-										<input type="checkbox" class="filled-in" id="usepilgrimswitch" checked onclick='handlecustomlocation(this);'>
-										<label for="usepilgrimswitch">Use Pilgrim Star as destination</label>
-									</div> 
-								</div>
-								
-								<hr/>
-								
-								<div class="row">
+								<div class="row ">
 									<div class="col s12">
-										<input type="button" class="btn" value="Set Location" onclick="calculateLocation()">
+										<input type="button" class="btn" value="Draw Location" onclick="calculateLocation()">
+									</div>
+								</div>		
+
+								<div class="row nomarginrow">
+									<div id="locationInfo" class="hidden">
+										<div id="coordsvgp" class="col s12 m6">
+											<svg id="coordsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+										</div>
+										
+										<div id="centerdistsvgp" class="col s12 m6">
+											<svg id="centerdistsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</form>
 
+						<div id="destinationtable" class="card card-panel blue-grey darken-1" >
+							<div class="card-content white-text">
+								
+								<div class="row nomarginrow">									
+									<div class="col s12">
+										<div class="secondary-content">
+											<span class="btn teal" style="height:25px; line-height:25px;" onclick="destinationDataState.toggle();"><i id="showhidelabel">HIDE LIST</i></span>
+										</div>
+										<div class="white-text">Enter destinations in coordinate format:</div>
+										<textarea id="destinationlocation" class="white-text validate materialize-textarea" placeholder="Place destinations here"></textarea>
+									</div>
+								</div>
+								<div class="row nomarginrow">
+										<div class="col s12">
+											<input type="button" class="btn" value="Add them" onclick="destinationHandler.addBatch();"> 
+											<input type="button" class="btn" value="Add Pilgrim" onclick="destinationHandler.addPilgrim();">
+											<span class="btn" onclick="destinationHandler.grabRed();"> Grab from <img src="./img/rd.svg" style="height:20px"/></span>
+										</div>
+								</div>
+								
+								<div id="destinationdata">
+									<div class="row nomarginrow">
+										<ul class="collection black-text" id="destinationlist"></ul>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+					</form>
+					
 					<div id="errorMessage" class="card blue-grey indigo hidden">
 						<div class="card-content white-text">
 							<span class="card-title">Ooops</span>
@@ -66,26 +91,6 @@
 						</div>
 					</div>
 
-					<div id="locationInfo" class="hidden">
-						<blockquote>Location information</blockquote>
-						<div id="locationcard" class="card card-panel blue-grey darken-1">
-							<p>Remember that this is <strong>approximate</strong> information. </p>
-							
-							<div class="row">
-								<div id="coordsvgp" class="col s12 m6">
-									<svg id="coordsvg" xmlns="http://www.w3.org/2000/svg"></svg>
-								</div>
-								
-								<div id="centerdistsvgp" class="col s12 m6">
-									<svg id="centerdistsvg" xmlns="http://www.w3.org/2000/svg"></svg>
-								</div>
-
-								<div id="relationinfo" class="col s12">
-									<table class="flow-text" id="relationinfotable"></table>
-								</div>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 			
@@ -122,7 +127,29 @@
 			</div>
 		</div>	
 
-		<script src="./js/gdl.js"></script>
+		<script type="text/template" id="destinationtemplate">
+			<li class="collection-item" rel="{{id}}">
+				<div class="row nomarginrow" style="line-height:42px">
+					<div class="col s12 m4">
+						<input class="destinationName" type="text" onchange="destinationHandler.updateDestName({{id}},this);" id="desttb{{id}}" value="{{name}}">
+					</div>
+					<div class="col s6 m3 ">
+						{{distance}} ly
+					</div>
+					<div class="col s4 m3">
+						{{jumps}} jumps
+					</div>
+					<div class="col s2 m2">
+						<div class="secondary-content">
+							<input class="btn" onclick="destinationHandler.deleteDest({{id}});" type="button" value="X">
+						</div>
+					</div>
+				</div>
+			</li>
+		</script>
+		
+		<!-- <script type="text/javascript" id="redplaceholder"></script> -->
+		<script type="text/javascript" src="./js/gdl.js"></script>
 	
     </body>
 </html>

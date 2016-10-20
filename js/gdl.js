@@ -1,5 +1,14 @@
 // Class prototype
 
+function isValueNull(variable){
+	return (variable == undefined || variable == null);
+}
+
+function setDefaultValueIfNull(variable, defaultVal){
+	if(isValueNull(variable)) { variable = defaultVal; }
+	return variable;
+}
+
 var Class = function(methods) {   
     var klass = function() {    
         this.initialize.apply(this, arguments);          
@@ -58,6 +67,10 @@ var pilgrim = new Region(0x64a,0x082,0x1b9,'Pilgrim Star','orange');
 var userLocation = new Region(0x0,0x0,0x0,'User Location','#36AC3A');
 var destinations = [new Region(0x64a,0x082,0x1b9,'Pilgrim Star','orange')]; // Store for destinations (include one)
 
+var re = new RegExp("[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
+var lazyRe = new RegExp("[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
+var uberLazyRe = new RegExp("[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
+
 var galSvg = undefined; // Main SVG
 var compSvg = undefined; // Compass SVG
 var coordSvg = undefined; // Coordinates SVG
@@ -65,6 +78,29 @@ var centerDistSvg = undefined; // Distance to center SVG
 var heightSvg = undefined; // HeightMap SVG
 var customDestination = false;
 
+var destinationDataState = {
+	shown : true,
+	height : 0,
+	obj : undefined,
+	txtObj : undefined,
+	toggle : function(){
+		if (this.obj==undefined){
+			this.obj = document.getElementById("destinationdata");
+			this.txtObj = document.getElementById("showhidelabel");
+			this.height = this.obj.offsetHeight;
+		}
+		if(this.shown){
+			this.obj.setAttribute("class","slideup");
+			this.txtObj.innerHTML = "SHOW LIST";
+		}else{
+			this.obj.setAttribute("class","slidedown");
+			this.obj.setAttribute("style","min-height:"+this.height);
+			this.txtObj.innerHTML = "HIDE LIST";
+		}
+		this.shown = !this.shown;
+	}
+	
+};
 
 var svgImage = Class({
 	
@@ -78,7 +114,7 @@ var svgImage = Class({
 		
 		var aspect;
 		
-		if(width == undefined || width == null){		
+		if(isValueNull(width)){		
 
 			var parent = this.parent;
 			
@@ -89,7 +125,7 @@ var svgImage = Class({
 			this.wp = parent.getBoundingClientRect().width * 0.9;
 		}
 		
-		if(height == undefined || height == null){
+		if(isValueNull(height)){
 			//this.hp = this.wp;
 			this.hp = this.wp * aspect; 
 		}
@@ -110,7 +146,8 @@ var svgImage = Class({
 		for(i = 0;i<attributes.length;i+=2){
 			domObj.setAttribute(attributes[i],""+attributes[i+1]);
 		}
-		if(content!=undefined && content!=null){
+		
+		if(!isValueNull(content)){
 			domObj.innerHTML+=""+content;
 		}
 
@@ -118,27 +155,15 @@ var svgImage = Class({
 	},
 	
 	drawText : function(textStr, x,y, color, fontsize) {
-		if(color == undefined || color == null){
-			color = "white";
-		}
-		
-		if(fontsize == undefined || fontsize == null){
-			fontsize = "0.75em";
-		}
-		
+		color = setDefaultValueIfNull(color,"white");
+		fontsize = setDefaultValueIfNull(fontsize,"0.75em");
 		this.addNode("text", ["dy",fontsize,"x",x,"y",y,"fill",color],textStr);
 	},
 	
 	drawArrow : function(x1,y1,x2,y2, stroke, fill){
 		var color = 255;
-
-		if(stroke == undefined || stroke == null){
-			stroke = "stroke:rgb(255,255,255); stroke-width:1;";
-		}
-		
-		if(fill == undefined || fill == null){
-			fill = "white";
-		}
+		stroke = setDefaultValueIfNull(stroke,"stroke:rgb(255,255,255); stroke-width:1;");
+		fill = setDefaultValueIfNull(fill,"white");
 		
 		var document = 
 		this.addNode("line", ["x1",x1,"y1",y1,"x2",x2,"y2",y2, "style",stroke]);
@@ -156,42 +181,136 @@ var svgImage = Class({
 
 });
 
-function handlecustomlocation(){
-	var checkObj = document.getElementById("usepilgrimswitch");
-	var destTxt = document.getElementById("destinationlocation");
-	if(destinations.length==0){
-		destinations.push(new Region(0x64a,0x082,0x1b9,'Pilgrim Star','orange'));
-	}
+var destinationHandler = {
+	syncDestinationList : function (){
+		var destinationObj = document.getElementById("destinationlist");
+		var localHtml = "";
+		var template = document.getElementById("destinationtemplate").innerHTML;
+		for(var i = 0;i<destinations.length;i++){
+			var distance = (userLocation.enabled) ? ""+userLocation.calculateDistance(destinations[i]).toFixed(3) : "--";
+			var jumps = (userLocation.enabled) ? ""+ Math.ceil(userLocation.calculateDistance(destinations[i])/400.0) : "--";
+			localHtml+=Mustache.render(template,{id:i, name: destinations[i].name , distance:distance, jumps:jumps});
+		}
+		destinationObj.innerHTML = localHtml;
 	
-	if(checkObj.checked){
-		customDestination = false;
+		galSvg.drawSvg(); // Draw general map
+	},
 	
-		destinations[0].name = pilgrim.name;
-		destinations[0].updateCoords(pilgrim.getX(),pilgrim.getY(), pilgrim.getZ());
+	parseLine : function (line, name,color){
+		var data = undefined;
+		var reResult = re.exec(line);
+		if(reResult!=null){
+			
+			data = reResult[0].split(":");
+			data.shift();
+		}else{
+			reResult = lazyRe.exec(line);
+			if(reResult!=null){
+				data = reResult[0].split(":");
+			}
+		}
 		
-		destTxt.value = "DOIT:064A:0082:01B9:0001";
-		destTxt.disabled = true;
-	}else{
-		destTxt.value = "";
-		destinations[0].name = "Destination";
-		customDestination = true;
-		destTxt.disabled = false;
-	}	
+		if(data != undefined){
+			var x = Number("0x"+data[0]);
+			var y = Number("0x"+data[1]);
+			var z = Number("0x"+data[2]);
+
+			if(isNaN(x) || isNaN(y) || isNaN(z)){
+				data = undefined;
+			}else{
+				this.addDest(x,y,z,name,color);
+				data = true;
+			}
+		}
+		return data;
+	},
+	
+	addDest : function(x,y,z, name, color){	
+		if(!destinationDataState.shown){
+			destinationDataState.toggle();
+		}
+		name = setDefaultValueIfNull(name,"Destination " + destinations.length);
+		color = setDefaultValueIfNull(color,"orange");
+		
+		var found = false;
+		for(var i = 0;i<destinations.length;i++){
+			if(destinations[i].name == name || (destinations[i].getX()==x && destinations[i].getY()==y && destinations[i].getZ()==z)){
+				found = true;
+				break;
+			}
+		}
+		
+		if(!found){
+			destinations.push(new Region(x,y,z,name,color));
+		}
+	},
+	deleteDest : function(index){
+		if(destinations.length<2){
+			return;
+		}	
+		destinations.splice(index, 1);
+		
+		this.syncDestinationList();
+	},
+	updateDestName : function (index,obj){
+		destinations[index].name = obj.value;
+		galSvg.drawSvg();
+	},
+	addPilgrim : function(){
+		this.addDest(0x64a,0x082,0x1b9,'Pilgrim Star','orange');
+		this.syncDestinationList();
+	},
+	addBatch : function(){
+		var remainingText = "";
+		var destination = document.getElementById("destinationlocation");
+		var lines = destination.value.split("\n");		
+		for(var i = 0;i<lines.length;i++){
+			var data = this.parseLine(lines[i]);
+			if(data==undefined){
+				remainingText+=lines[i]+"\n";
+			}			
+		}
+		destination.value = remainingText;
+		this.syncDestinationList();
+	},
+	addRed: function(data){
+		var fullText = (data[0]['data']['children'][0]['data']['selftext']);
+		var lines = fullText.split("\n");
+		var localRe = new RegExp("[A-Z]*[:]*[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
+		for(var i = 0;i<lines.length;i++){		
+			var search = localRe.exec(lines[i]);
+			if (search!=null && search.input.indexOf("**[*")==0){
+				if(search[0] == "0000:1111:2222:3333"){
+					continue;
+				}
+				var name = lines[i].substring(0,lines[i].indexOf(" ")).replace(/[\*\[\]]/gi, '');
+				this.parseLine(lines[i],name);
+			}
+		}
+		this.syncDestinationList();
+	},
+	grabRed : function(){
+		jsonp("https://www.reddit.com/r/NoMansSkyTheGame/comments/5884yf/share_your_coordinates_recommend_planets_log_and/.json?limit=1&amp;jsonp=destinationHandler.addRed", this.addRed);
+	}
+};
+
+function jsonp(url, callback) {
+    var callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+    window[callbackName] = function(data) {
+        delete window[callbackName];
+        document.body.removeChild(script);
+        callback(data);
+    };
+
+    var script = document.createElement('script');
+    script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+    document.body.appendChild(script);
 }
 
 function generateMap(){
 
-	var re = new RegExp("to=[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
-	var res = re.exec(window.location.search);
 	
-	if(res!=null){
-		var destTxt = document.getElementById("destinationlocation");
-		var checkObj = document.getElementById("usepilgrimswitch");
-		checkObj.checked = false;
-		handlecustomlocation();
-		destTxt.value = res[0].substr(3);
-	}
-	
+
 	// Coordinates definition
 	
 	coordSvg = new svgImage("coordsvg","coordsvgp",null,100);
@@ -291,8 +410,10 @@ function generateMap(){
 			this.drawText("Y",15,20)
 			this.drawStar(userLocation,50,4);
 			
-			for(var i = 0;i<destinations.length;i++){
-				this.drawStar(destinations[i],(i*30)+100,4,i);	
+			var maxDestinations = Math.min(destinations.length,7);
+			
+			for(var i = 0;i<maxDestinations;i++){
+				this.drawStar(destinations[i],(i*40)+100,4,i);	
 			}
 	}
 	
@@ -338,6 +459,7 @@ function generateMap(){
 	}
 	
 	galSvg.drawSvg = function(){
+
 			this.clearContent();	
 			this.drawGrid();
 			this.drawAxis();
@@ -346,19 +468,17 @@ function generateMap(){
 			
 			this.transformCoords(userLocation);
 			
+			// Draw all locations even if there is no user
 			for(var i = 0;i<destinations.length;i++){
 				this.transformCoords(destinations[i]);	
+				this.drawStar(destinations[i],4);
 			}
 			
 			this.drawStar(center,6);
-
+		
 			if(userLocation.enabled){
 				this.drawStar(userLocation,4);
-				
-				for(var i = 0;i<destinations.length;i++){ // Draw all locations from user
-					this.drawStar(destinations[i],4);
-				}
-				
+
 				var v1 = userLocation.getVector(center); 
 				var v2 = userLocation.getVector(destinations[0]);
 
@@ -373,8 +493,15 @@ function generateMap(){
 			}
 	};
 	
-	galSvg.drawSvg(); // Draw it
+	var re = new RegExp("to=[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
+	var res = re.exec(window.location.search);
 	
+	if(res!=null){
+		destinationHandler.parseLine(res[0].replace("to=",""),"Shared location",null);
+		destinationHandler.deleteDest(0);
+	}
+	destinationHandler.syncDestinationList(); // So draws it too inside
+
 }
 
 function hideMessages(){
@@ -405,31 +532,17 @@ function showLocationInfo(x,y,z){
 	
 	var elementB = document.getElementById("directionsmap");
 	elementB.className = "visible";
-	
-	var elementC = document.getElementById("relationinfotable");
 
 	userLocation.updateCoords(x,y,z);
-	
-	relationinfotable.innerHTML = ""; // Clear the table
-	
-	var localHtml = "<tr><th>Destination Name</th><th>Distance (Ly)</th><th>Estimated jumps</th></tr>";
-
-	for(var i = 0;i<destinations.length;i++){
-		var rowTemplate = "<tr><td>{{destname}}</td> <td>{{distance}}</td><td>{{jumps}}</td></tr>";	
-		var distance = userLocation.calculateDistance(destinations[i]).toFixed(3);
-		var jumps = Math.ceil(userLocation.calculateDistance(destinations[i]) / 400.0);
-		localHtml+= Mustache.render(rowTemplate, { destname: destinations[i].name, distance: distance, jumps:jumps });
-	}
-	
-	relationinfotable.innerHTML = localHtml;
-		
+			
 	centerDistSvg.initialize("centerdistsvg","centerdistsvgp",null,100);
 	centerDistSvg.drawDistance(userLocation.calculateDistance(center));
 	
 	coordSvg.initialize("coordsvg","coordsvgp",null,100);
 	coordSvg.drawCoords(x,y,z);
 	
-	galSvg.drawSvg();
+	destinationHandler.syncDestinationList();
+	//galSvg.drawSvg();
 	
 }
 
@@ -452,36 +565,6 @@ function calculateLocation(){
 	if(isNaN(x) || isNaN(y) || isNaN(z)){
 		showErrorMessage("Invalid format for location");
 		return;
-	}
-	
-	// Check destination (if any)
-	
-	if(customDestination){
-		elementValue = document.getElementById("destinationlocation").value;
-		var lines = elementValue.split('\n')
-
-		destinations.splice(0,destinations.length);
-		
-		for(var i = 0;i<lines.length;i++){
-		
-			var data = lines[i].split(':');
-		
-			if(data.length!=5){
-				showErrorMessage("Invalid format for destination");
-				return;
-			}
-			
-			var dx = Number("0x"+data[1]);
-			var dy = Number("0x"+data[2]);
-			var dz = Number("0x"+data[3]);
-			
-			if(isNaN(dx) || isNaN(dy) || isNaN(dz)){
-				showErrorMessage("Invalid format for destination");
-				return;
-			}
-			
-			destinations.push(new Region(dx,dy,dz,'Destination '+(i+1),'orange'));
-		}
 	}
 
 	userLocation.enabled = true;

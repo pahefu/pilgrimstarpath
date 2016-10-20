@@ -90,10 +90,10 @@ var destinationDataState = {
 			this.height = this.obj.offsetHeight;
 		}
 		if(this.shown){
-			this.obj.setAttribute("class","slideup");
+			this.obj.setAttribute("class","hidden");
 			this.txtObj.innerHTML = "SHOW LIST";
 		}else{
-			this.obj.setAttribute("class","slidedown");
+			this.obj.setAttribute("class","visible");
 			this.obj.setAttribute("style","min-height:"+this.height);
 			this.txtObj.innerHTML = "HIDE LIST";
 		}
@@ -308,8 +308,6 @@ function jsonp(url, callback) {
 }
 
 function generateMap(){
-
-	
 
 	// Coordinates definition
 	

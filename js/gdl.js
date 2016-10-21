@@ -46,6 +46,10 @@ var Region = Class({
 		v.m = Math.sqrt((v.a*v.a) + (v.b*v.b));
 
 		v.getDegreesVector = function(otherV) {
+			if(otherV.m == 0 || this.m == 0){
+				return 0;
+			}
+			
 			var radians =  Math.atan2(otherV.b,otherV.a) - Math.atan2(this.b,this.a);
 			return radians;
 		}
@@ -196,18 +200,29 @@ var destinationHandler = {
 		galSvg.drawSvg(); // Draw general map
 	},
 	
-	parseLine : function (line, name,color){
+	parseLine : function (line, okCb, errorCb, name,color){
 		var data = undefined;
+		line = line.toUpperCase();
 		var reResult = re.exec(line);
 		if(reResult!=null){
-			
 			data = reResult[0].split(":");
 			data.shift();
 		}else{
+			
 			reResult = lazyRe.exec(line);
 			if(reResult!=null){
 				data = reResult[0].split(":");
+			}else{
+				
+				reResult = uberLazyRe.exec(line);
+				if(reResult!=null){
+					data = reResult[0].split(":");
+				}
+				else{
+					
+				}
 			}
+			
 		}
 		
 		if(data != undefined){
@@ -216,13 +231,14 @@ var destinationHandler = {
 			var z = Number("0x"+data[2]);
 
 			if(isNaN(x) || isNaN(y) || isNaN(z)){
-				data = undefined;
+				errorCb();
 			}else{
-				this.addDest(x,y,z,name,color);
-				data = true;
+				okCb(x,y,z,name,color);
 			}
+		}else{
+			errorCb();
 		}
-		return data;
+		
 	},
 	
 	addDest : function(x,y,z, name, color){	
@@ -260,15 +276,20 @@ var destinationHandler = {
 		this.addDest(0x64a,0x082,0x1b9,'Pilgrim Star','orange');
 		this.syncDestinationList();
 	},
+	
 	addBatch : function(){
 		var remainingText = "";
 		var destination = document.getElementById("destinationlocation");
 		var lines = destination.value.split("\n");		
 		for(var i = 0;i<lines.length;i++){
-			var data = this.parseLine(lines[i]);
-			if(data==undefined){
-				remainingText+=lines[i]+"\n";
-			}			
+			var data = this.parseLine(lines[i], 
+				function(x,y,z,name,color){
+					destinationHandler.addDest(x,y,z,name,color);
+				},
+				function(){
+					remainingText+=lines[i]+"\n";	
+				},
+				null,null);
 		}
 		destination.value = remainingText;
 		this.syncDestinationList();
@@ -276,7 +297,7 @@ var destinationHandler = {
 	addRed: function(data){
 		var fullText = (data[0]['data']['children'][0]['data']['selftext']);
 		var lines = fullText.split("\n");
-		var localRe = new RegExp("[A-Z]*[:]*[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
+		var localRe = new RegExp("[A-Z]*[:]*[0-9A-F]+:[0-9A-F]+:[0-9A-F]+[:]*[0-9A-F]*");
 		for(var i = 0;i<lines.length;i++){		
 			var search = localRe.exec(lines[i]);
 			if (search!=null && search.input.indexOf("**[*")==0){
@@ -284,7 +305,13 @@ var destinationHandler = {
 					continue;
 				}
 				var name = lines[i].substring(0,lines[i].indexOf(" ")).replace(/[\*\[\]]/gi, '');
-				this.parseLine(lines[i],name);
+								
+				this.parseLine(lines[i],
+					function(x,y,z,name,color){
+						destinationHandler.addDest(x,y,z,name,color);
+					},
+					function(){},
+				name,null);
 			}
 		}
 		this.syncDestinationList();
@@ -495,7 +522,13 @@ function generateMap(){
 	var res = re.exec(window.location.search);
 	
 	if(res!=null){
-		destinationHandler.parseLine(res[0].replace("to=",""),"Shared location",null);
+		destinationHandler.parseLine(res[0].replace("to=",""),
+			function(x,y,z,name,color){
+				destinationHandler.addDest(x,y,z,name,color);
+			},
+			function(){}
+			,"Shared location",null
+		);
 		destinationHandler.deleteDest(0);
 	}
 	destinationHandler.syncDestinationList(); // So draws it too inside
@@ -514,7 +547,7 @@ function hideMessages(){
 
 function showErrorMessage(text){
 	var element = document.getElementById("errorMessage");
-	element.className = "card indigo";
+	element.className = "card blue-grey indigo";
 	var elementText = document.getElementById("errorMessageText");
 	elementText.innerHTML = text;
 }
@@ -546,27 +579,23 @@ function showLocationInfo(x,y,z){
 
 function calculateLocation(){
 	var elementValue = document.getElementById("userlocation").value;
-	var data = elementValue.split(':');
 	
 	hideMessages();
 	userLocation.enabled = false;
 	
-	if(data.length!=5){
-		showErrorMessage("Invalid format for location");
-		return;
-	}
+	destinationHandler.parseLine(elementValue, 
+		function(x,y,z,name,color){
+			userLocation.enabled = true;
+			showLocationInfo(x,y,z);	
+		}, 
+		function(){
+			showErrorMessage("Invalid format for location");
+		}, 
+	null, null);
 	
-	var x = Number("0x"+data[1]);
-	var y = Number("0x"+data[2]);
-	var z = Number("0x"+data[3]);
 	
-	if(isNaN(x) || isNaN(y) || isNaN(z)){
-		showErrorMessage("Invalid format for location");
-		return;
-	}
 
-	userLocation.enabled = true;
-	showLocationInfo(x,y,z);	
+	
 }
 
 

@@ -95,11 +95,14 @@ var destinationDataState = {
 		}
 		if(this.shown){
 			this.obj.setAttribute("class","hidden");
-			this.txtObj.innerHTML = "SHOW LIST";
+			this.txtObj.setAttribute("class","icon-plus-circled");
+			this.txtObj.setAttribute("title","Show list");
 		}else{
 			this.obj.setAttribute("class","visible");
 			this.obj.setAttribute("style","min-height:"+this.height);
-			this.txtObj.innerHTML = "HIDE LIST";
+			this.txtObj.setAttribute("class","icon-minus-circled");
+			this.txtObj.setAttribute("title","Hide list");
+			
 		}
 		this.shown = !this.shown;
 	}
@@ -298,13 +301,17 @@ var destinationHandler = {
 		var fullText = (data[0]['data']['children'][0]['data']['selftext']);
 		var lines = fullText.split("\n");
 		var localRe = new RegExp("[A-Z]*[:]*[0-9A-F]+:[0-9A-F]+:[0-9A-F]+[:]*[0-9A-F]*");
+		
+		fullText = fullText.substring(fullText.indexOf("List"), fullText.indexOf("###RESOURCES AND HELP"));
+		
 		for(var i = 0;i<lines.length;i++){		
 			var search = localRe.exec(lines[i]);
-			if (search!=null && search.input.indexOf("**[*")==0){
+			if (search!=null && search.input.indexOf("|")>0){
+				
 				if(search[0] == "0000:1111:2222:3333"){
 					continue;
 				}
-				var name = lines[i].substring(0,lines[i].indexOf(" ")).replace(/[\*\[\]]/gi, '');
+				var name = lines[i].substring(0,lines[i].indexOf("|")).replace(/[\*\[\]]/gi, '');
 								
 				this.parseLine(lines[i],
 					function(x,y,z,name,color){
@@ -316,23 +323,13 @@ var destinationHandler = {
 		}
 		this.syncDestinationList();
 	},
-	grabRed : function(){
-		jsonp("https://www.reddit.com/r/NoMansSkyTheGame/comments/5884yf/share_your_coordinates_recommend_planets_log_and/.json?limit=1&amp;jsonp=destinationHandler.addRed", this.addRed);
+	grabRed : function(){		
+		$.ajax({ 
+			url: 'https://www.reddit.com/r/NoMansSkyTheGame/comments/5884yf/share_your_coordinates_recommend_planets_log_and/.json?limit=1&amp;jsonp=destinationHandler.addRed'
+		});
 	}
 };
 
-function jsonp(url, callback) {
-    var callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-    window[callbackName] = function(data) {
-        delete window[callbackName];
-        document.body.removeChild(script);
-        callback(data);
-    };
-
-    var script = document.createElement('script');
-    script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
-    document.body.appendChild(script);
-}
 
 function generateMap(){
 

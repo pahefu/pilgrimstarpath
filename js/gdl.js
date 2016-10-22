@@ -298,6 +298,7 @@ var destinationHandler = {
 		this.syncDestinationList();
 	},
 	addRed: function(data){
+		console.log("Callback from reddit");
 		var fullText = (data[0]['data']['children'][0]['data']['selftext']);
 		var lines = fullText.split("\n");
 		var localRe = new RegExp("[A-Z]*[:]*[0-9A-F]+:[0-9A-F]+:[0-9A-F]+[:]*[0-9A-F]*");
@@ -324,6 +325,7 @@ var destinationHandler = {
 		this.syncDestinationList();
 	},
 	grabRed : function(){		
+		console.log("Grabbing from reddit!");
 		$.ajax({ 
 			url: 'https://www.reddit.com/r/NoMansSkyTheGame/comments/5884yf/share_your_coordinates_recommend_planets_log_and/.json?limit=1&amp;jsonp=destinationHandler.addRed'
 		});

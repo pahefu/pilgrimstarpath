@@ -2,9 +2,13 @@
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="./css/style.css" rel="stylesheet">
+		<link href="./css/style.css" rel="stylesheet">
 		<link rel="stylesheet" href="./css/materialize.min.css">
-		<script src="./js/mustache.min.js"></script>	
+		<link rel="stylesheet" href="./css/nmsicons.css">
+		
+		<script src="./js/mustache.min.js"></script>
+		<script src="./js/zepto.min.js"></script>	
+		
 		<title>PILGRIM STAR PATH</title>
 	</head>
     
@@ -62,23 +66,39 @@
 						</div>
 
 						<div id="destinationtable" class="card card-panel blue-grey darken-1" >
-							<div class="card-content white-text">
-								
+							<div class="card-content white-text">								
 								<div class="row nomarginrow">									
+									<div class="col s10">
+										<div class="white-text">Enter destinations in coordinate format</div>
+									</div>
+									<div class="col s2">
+											<span class="btn-floating" onclick="destinationDataState.toggle();">
+												<i id="showhidelabel" title="Hide list" class="icon-minus-circled"></i>
+											</span>
+									</div>
+								</div>
+								
+								<div class="row nomarginrow">
 									<div class="col s12">
-										<div class="secondary-content">
-											<span class="btn teal" style="height:25px; line-height:25px;" onclick="destinationDataState.toggle();"><i id="showhidelabel">HIDE LIST</i></span>
-										</div>
-										<div class="white-text">Enter destinations in coordinate format:</div>
 										<textarea id="destinationlocation" class="white-text validate materialize-textarea" placeholder="Place destinations here"></textarea>
 									</div>
 								</div>
-								<div class="row nomarginrow">
-										<div class="col s12">
-											<input type="button" class="btn" value="Add them" onclick="destinationHandler.addBatch();"> 
-											<input type="button" class="btn" value="Add Pilgrim" onclick="destinationHandler.addPilgrim();">
-											<span class="btn" onclick="destinationHandler.grabRed();"> Grab from <img src="./img/rd.svg" style="height:20px"/></span>
-										</div>
+								
+								<div class="row">
+									<div class="col s12 m6 btn" onclick="destinationHandler.addBatch();">
+										Add them
+									</div>
+							
+									<div class="col s12 m6 btn"  onclick="destinationHandler.addPilgrim();">
+										Add Pilgrim
+									</div>
+								</div>
+								
+								<div class="row nomargin">								
+									<div class="col s12 btn" onclick="destinationHandler.grabRed();" title="Grab from Reddit">
+										<i class="hide-on-small-only" class="valign">Grab from</i>
+										<img src="./img/rd.svg" class="responsive-img" style="height:100%; max-height:25px;"/>
+									</div>
 								</div>
 								
 								<div id="destinationdata">
@@ -150,7 +170,6 @@
 			</li>
 		</script>
 		
-		<!-- <script type="text/javascript" id="redplaceholder"></script> -->
 		<script type="text/javascript" src="./js/gdl.js"></script>
 	
     </body>

@@ -17,7 +17,7 @@ body{
 }
 
 .hidden{
-	display:none;
+	display:none !important;
 }
 
 blockquote{
@@ -46,6 +46,16 @@ textarea{
 	font-family : NmsFont;
 }
 
+div .btn{
+	margin:5px !important;
+	width: 100%;
+	
+}
+
+.deletebtn{
+	text-align:center;
+}
+
 #atlaslogo{
 	max-height:60px;
 }
@@ -54,17 +64,9 @@ textarea{
 
 }
 
-#canvasp{
-	text-align:center;
-}
-
-#plotc{
-	border:1px solid #000000;
-}
 
 #info{
 }
-
 
 #plotparent{
 	font-size:17pt;
@@ -99,8 +101,6 @@ textarea{
 
 #errorMessage{}
 
-
-
 #heightsvg,#svgc{
 	border:1px solid #777777;
 	
@@ -120,6 +120,10 @@ textarea{
 #redditbtnlistcontent li{
 	width:90%;
 	margin:5px!important;
+}
+
+#destinationlist{
+	text-align:center;
 }
 
 .hide {

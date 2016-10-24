@@ -519,11 +519,16 @@ function generateMap(){
 	};
 	
 	galSvg.drawBHArea = function(){
+		
+		if(!userLocation.enabled){
+			showErrorMessage("Calculate your location first!");
+			return;
+		}
+		
+		$("#bhloadingprogress").toggleClass("hidden");
+		
 		/* BH jumping */
 
-		var backgroundBh = this.fastAdd("rect","id|bhMap|x|0|y|0|width|30|height|30|style|fill: rgb(250,215,212); fill-opacity:0.1");
-		document.getElementById(this.domIdName).appendChild(backgroundBh);			
-		
 		var centerDist = userLocation.calculateDistance(center);
 
 		var minD = Math.pow((centerDist-1000)/100.0 ,2) // 
@@ -553,6 +558,9 @@ function generateMap(){
 			}				
 		}
 		
+		$("#bhloadingprogress").toggleClass("hidden");
+		$("#blackholeinfo").toggleClass("hidden");
+		$("#blackholecount").html(""+count);
 		$("#bhMap").attr("x",minX * this.wp/4096);
 		$("#bhMap").attr("width", (maxX-minX) * this.wp/4096);
 		$("#bhMap").attr("y",minY * this.hp/4096);
@@ -570,7 +578,8 @@ function generateMap(){
 			this.transformCoords(userLocation);
 			
 			if(userLocation.enabled){
-				galSvg.drawBHArea();
+				var backgroundBh = this.fastAdd("rect","id|bhMap|x|0|y|0|width|0|height|0|style|fill: rgb(250,215,212); fill-opacity:0.2");
+				document.getElementById(this.domIdName).appendChild(backgroundBh);	
 			}
 
 			// Draw all locations even if there is no user

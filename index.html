@@ -15,9 +15,17 @@
 	<body onload="generateMap();">
 
 		<div id="atlascontainer">
-			<img id="atlaslogo" src="./img/atlas_logo.png"/>
-			<h3 id="brand">PILGRIM STAR PATH <span class="chip indigo">v0.4</span></h3>
+			
+			
 		</div>
+		
+		<nav>
+			<div class="nav-wrapper blue-grey darken-1">
+				<img id="atlaslogo" src="./img/atlas_logo.png" class="responsive-img"/>
+				<span id="brand" class="brand-logo ">PILGRIM STAR PATH <span class="chip indigo">v0.4.1</span></span>
+			</div>
+		</nav>
+		
 
 		<div class="row">
 			<div id="infoparent" class="col s12 m5">
@@ -29,7 +37,7 @@
 							<div class="card-content white-text">
 								
 								<div class="row nomarginrow">
-									<div class="col s12 white-text">Enter your coordinates in <strong>ABCD:1234:5678:1234:5678</strong> format</div>
+									<div class="col s12 white-text flow-text">Enter your coordinates in <strong>ABCD:1234:5678:1234:5678</strong> format</div>
 								</div>
 								
 								<div class="row">
@@ -69,7 +77,7 @@
 							<div class="card-content white-text">								
 								<div class="row nomarginrow">									
 									<div class="col s10">
-										<div class="white-text">Enter destinations in coordinate format</div>
+										<div class="white-text  flow-text">Enter destinations in coordinate format</div>
 									</div>
 									<div class="col s2">
 											<span class="btn-floating" onclick="destinationDataState.toggle();">
@@ -97,8 +105,18 @@
 								<div class="row nomargin">								
 									<div class="col s12 btn" onclick="destinationHandler.grabRed();" title="Grab from Reddit">
 										<i class="hide-on-small-only" class="valign">Grab from</i>
-										<img src="./img/rd.svg" class="responsive-img" style="height:100%; max-height:25px;"/>
+										<img src="./img/rd.svg" class="responsive-img" style="max-height:25px;"/>
 									</div>
+									
+									<div class="col s12 hide" id="redditbtnlist">
+										<div >
+											<ul class="collection" id="redditbtnlistcontent">
+												<li class="btn" onclick="destinationHandler.grabRed('Last');"><div>Last known locations</div></li>
+												<li class="btn" onclick="destinationHandler.grabRed('Rec');"><div>Recommended locations</div></li>
+											</ul>
+										</div>
+									</div>
+									
 								</div>
 								
 								<div id="destinationdata">
@@ -150,22 +168,25 @@
 		</div>	
 
 		<script type="text/template" id="destinationtemplate">
-			<li class="collection-item" rel="{{id}}">
-				<div class="row nomarginrow" style="line-height:42px">
-					<div class="col s12 m4">
-						<input class="destinationName" type="text" onchange="destinationHandler.updateDestName({{id}},this);" id="desttb{{id}}" value="{{name}}">
+			<li class="collection-item destinationtemplaterow" rel="{{id}}">
+				<div class="row nomarginrow">
+					<div class="col s11 m6 flow-text">
+						<input class="destinationname flow-text" type="text" onchange="destinationHandler.updateDestName({{id}},this);" id="desttb{{id}}" value="{{name}}">
 					</div>
-					<div class="col s12 m3 ">
+					<div class="col s1 btn hide-on-med-and-up" onclick="destinationHandler.deleteDest({{id}});" type="button">X</div>
+					<div class="col s12 m5">
+						{{x}}:{{y}}:{{z}}
+					</div>					
+				</div>
+				
+				<div class="row nomarginrow">
+					<div class="col s6 m5">
 						{{distance}} ly
 					</div>
-					<div class="col s6 m3">
+					<div class="col s6 m5">
 						{{jumps}} jumps
 					</div>
-					<div class="col s6 m2">
-						<div class="secondary-content">
-							<input class="btn" onclick="destinationHandler.deleteDest({{id}});" type="button" value="X">
-						</div>
-					</div>
+					<div class="col s6 m2 btn hide-on-small-only" onclick="destinationHandler.deleteDest({{id}});" type="button">X</div>
 				</div>
 			</li>
 		</script>

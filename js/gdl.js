@@ -129,7 +129,7 @@ var svgImage = Class({
 			if(document.documentElement.clientHeight > document.documentElement.clientWidth){
 				aspect = (document.documentElement.clientWidth*1.0/document.documentElement.clientHeight);
 			}
-			this.wp = parent.getBoundingClientRect().width * 0.9;
+			this.wp = parent.getBoundingClientRect().width * 0.99;
 		}
 		
 		if(isValueNull(height)){
@@ -196,7 +196,12 @@ var destinationHandler = {
 		for(var i = 0;i<destinations.length;i++){
 			var distance = (userLocation.enabled) ? ""+userLocation.calculateDistance(destinations[i]).toFixed(3) : "--";
 			var jumps = (userLocation.enabled) ? ""+ Math.ceil(userLocation.calculateDistance(destinations[i])/400.0) : "--";
-			localHtml+=Mustache.render(template,{id:i, name: destinations[i].name , distance:distance, jumps:jumps});
+			
+			var x = ('0000'+((destinations[i].getX()).toString(16))).slice(-4).toUpperCase();
+			var y = ('0000'+((destinations[i].getY()).toString(16))).slice(-4).toUpperCase();
+			var z = ('0000'+((destinations[i].getZ()).toString(16))).slice(-4).toUpperCase();
+			
+			localHtml+=Mustache.render(template,{id:i, name: destinations[i].name , distance:distance, jumps:jumps, x:x,y:y,z:z});
 		}
 		destinationObj.innerHTML = localHtml;
 	
@@ -252,11 +257,10 @@ var destinationHandler = {
 		color = setDefaultValueIfNull(color,"orange");
 		
 		var found = false;
-		for(var i = 0;i<destinations.length;i++){
-			if(destinations[i].name == name || (destinations[i].getX()==x && destinations[i].getY()==y && destinations[i].getZ()==z)){
-				found = true;
-				break;
-			}
+				
+		var totalSameCoords = destinations.filter(function(dest){ return (dest.getX()==x && dest.getY()==y && dest.getZ()==z)});
+		if(totalSameCoords.length!=0){
+			found = true;
 		}
 		
 		if(!found){
@@ -297,13 +301,33 @@ var destinationHandler = {
 		destination.value = remainingText;
 		this.syncDestinationList();
 	},
-	addRed: function(data){
-		console.log("Callback from reddit");
+	
+	addRedLast: function(data){
+		this.addRed(data, "Last");
+	},
+	addRedRec: function(data){
+		this.addRed(data, "Rec");
+	},
+	addRed: function(data, type){
+		
 		var fullText = (data[0]['data']['children'][0]['data']['selftext']);
-		var lines = fullText.split("\n");
+		
 		var localRe = new RegExp("[A-Z]*[:]*[0-9A-F]+:[0-9A-F]+:[0-9A-F]+[:]*[0-9A-F]*");
 		
-		fullText = fullText.substring(fullText.indexOf("List"), fullText.indexOf("###RESOURCES AND HELP"));
+		fullText = fullText.substring(fullText.indexOf("List"), fullText.indexOf("###RESOURCES AND HELP")).split("List: ");
+		
+		switch(type){
+			case "Last":
+				fullText = fullText.filter(function(x){ return (x.indexOf("Last")>=0 && x.indexOf("Last")<10);});
+			break;
+			
+			case "Rec":
+				fullText = fullText.filter(function(x){ return (x.indexOf("Rec")>=0 && x.indexOf("Rec")<10);});
+			break;		
+		}
+
+		fullText = fullText.join("\n");
+		var lines = fullText.split("\n");
 		
 		for(var i = 0;i<lines.length;i++){		
 			var search = localRe.exec(lines[i]);
@@ -323,12 +347,23 @@ var destinationHandler = {
 			}
 		}
 		this.syncDestinationList();
+		
+		$("#redditbtnlist").toggleClass("hide");
+		$("#redditbtnlist").toggleClass("show");
+		
 	},
-	grabRed : function(){		
-		console.log("Grabbing from reddit!");
-		$.ajax({ 
-			url: 'https://www.reddit.com/r/NoMansSkyTheGame/comments/5884yf/share_your_coordinates_recommend_planets_log_and/.json?limit=1&amp;jsonp=destinationHandler.addRed'
-		});
+	
+	grabRed : function(type){		
+
+		if(isValueNull(type)){
+			
+			$("#redditbtnlist").toggleClass("hide");
+			$("#redditbtnlist").toggleClass("show");
+		}else{
+			$.ajax({ 
+				url: 'https://www.reddit.com/r/NoMansSkyTheGame/comments/5884yf/share_your_coordinates_recommend_planets_log_and/.json?limit=1&amp;jsonp=destinationHandler.addRed'+type
+			});
+		}
 	}
 };
 
@@ -572,8 +607,7 @@ function showLocationInfo(x,y,z){
 	coordSvg.drawCoords(x,y,z);
 	
 	destinationHandler.syncDestinationList();
-	//galSvg.drawSvg();
-	
+
 }
 
 function calculateLocation(){
@@ -591,10 +625,6 @@ function calculateLocation(){
 			showErrorMessage("Invalid format for location");
 		}, 
 	null, null);
-	
-	
-
-	
 }
 
 

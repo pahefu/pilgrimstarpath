@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'NmsFont';
-  src:url('../fonts/geonms-webfont.ttf')  format('truetype') /* Safari, Android, iOS */
+  src:url('../fonts/geonms-webfont.woff') format('woff');
 }
 
 body{
@@ -9,44 +9,49 @@ body{
 	font-family: GillSans, Calibri, Trebuchet, sans-serif;
 }
 
+.nomarginrow{
+	margin-bottom:0px !important;
+}
+.visible{
+	
+}
+
+.hidden{
+	display:none;
+}
+
+blockquote{
+	font-size:17pt;
+	margin: 10px 0px !important;
+}
+
+.card-content{
+	padding: 0px !important;
+}
+
+.card-panel{
+	padding: 10px !important;
+}
+
 #inputcard input{
 	color:#ffffff!important;
 	font-size:16pt;
 }
 
-#destinationcheck label{
-	color:#ffffff!important;
-	font-size:16pt!important;
+textarea{
+	font-size:16pt !important;
+}
+
+#brand, .btn{
+	font-family : NmsFont;
 }
 
 #atlaslogo{
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	height:75px;
-}
-
-#brand{
-	text-align:center;
-	font-family: 'NmsFont';
-	margin-top:0px;
-	margin-bottom:5px;	
-}
-
-legend{
-	color: #ffffff !important;
+	max-height:60px;
 }
 
 #userlocation{
 
-}
-
-#plotdiv{
-	padding-top:10px;
-	margin-left: auto;
-	margin-right: auto;
-	width:500px;
-	height:500px;	
 }
 
 #canvasp{
@@ -58,12 +63,10 @@ legend{
 }
 
 #info{
-	font-family: 'NmsFont';
-	font-size:17pt;
 }
 
+
 #plotparent{
-	font-family: 'NmsFont';
 	font-size:17pt;
 	padding:10px;
 }
@@ -96,14 +99,54 @@ legend{
 
 #errorMessage{}
 
-.visible{}
 
-.hidden{
-	display:none;
-}
 
 #heightsvg,#svgc{
 	border:1px solid #777777;
 	
 }
 
+.destinationname{
+	margin-bottom:0px !important;
+	height:1.5em !important;
+	font-size:13pt !important;
+}
+
+#redditbtnlistcontent{
+	border:none;
+	text-align:center;
+}
+
+#redditbtnlistcontent li{
+	width:90%;
+	margin:5px!important;
+}
+
+.hide {
+    overflow: hidden;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    -moz-transition-duration: 0.3s;
+    -webkit-transition-duration: 0.3s;
+    -o-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -moz-transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+    -webkit-transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+    -o-transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+.show {
+    -moz-transition-duration: 0.3s;
+    -webkit-transition-duration: 0.3s;
+    -o-transition-duration: 0.3s;
+    transition-duration: 0.3s;
+    -moz-transition-timing-function: ease-in;
+    -webkit-transition-timing-function: ease-in;
+    -o-transition-timing-function: ease-in;
+    transition-timing-function: ease-in;
+    max-height: 1000px;
+    overflow: hidden;
+}

@@ -113,9 +113,9 @@ var svgImage = Class({
 	
 	initialize: function(domId, parentDomId, width, height) {
 
-		this.parent = document.getElementById(parentDomId);
-		
-		this.svg = document.getElementById(domId);
+		this.domIdName = domId;
+		this.parent = $("#"+parentDomId)[0];
+		this.svg = $("#" +domId)[0];
 		this.wp = width;
 		this.hp = height;
 		
@@ -159,6 +159,34 @@ var svgImage = Class({
 		}
 
 		this.svg.appendChild(domObj);
+	},
+	
+	fastAdd : function(type, attrs){
+		var node = document.createElementNS("http://www.w3.org/2000/svg",type);
+		attrs = attrs.split("|");
+		if(attrs!=null && attrs.length>1){
+			for(var i = 0;i<attrs.length;i+=2){
+				node.setAttribute(attrs[i],""+attrs[i+1]);
+			}
+		}
+		return node;
+	},
+	
+	drawGrid : function(){
+		var defsn = this.fastAdd("defs", "");
+		var patternN = this.fastAdd("pattern","id|gridPattern|x|0|y|0|width|30|height|30|patternUnits|userSpaceOnUse");
+		var rectN = this.fastAdd("rect","x|0|y|0|width|30|height|30|style|stroke: rgb(153,153,153);");
+		
+		var parentNode = document.getElementById(this.domIdName);
+		
+		patternN.appendChild(rectN);
+		defsn.appendChild(patternN);
+
+		var background = this.fastAdd("rect",Mustache.render('x|0|y|0|width|{{w}}|height|{{h}}|style|fill: url(#gridPattern);',{w :this.wp, h: this.hp} ));
+
+		parentNode.appendChild(defsn);	
+		parentNode.appendChild(background);	
+		
 	},
 	
 	drawText : function(textStr, x,y, color, fontsize) {
@@ -216,7 +244,6 @@ var destinationHandler = {
 			data = reResult[0].split(":");
 			data.shift();
 		}else{
-			
 			reResult = lazyRe.exec(line);
 			if(reResult!=null){
 				data = reResult[0].split(":");
@@ -230,7 +257,6 @@ var destinationHandler = {
 					
 				}
 			}
-			
 		}
 		
 		if(data != undefined){
@@ -448,20 +474,8 @@ function generateMap(){
 		
 	}
 	
-	heightSvg.drawGrid = function(){
-		var step = 30;
-		var localHtml = "";
-		
-		var color = 153; // 0x99
-
-		for(var i = step;i<this.wp;i+=step){		
-			this.addNode("line", ["x1",i,"y1",0,"x2",i,"y2",this.hp, "style","stroke:rgb(153,153,153); stroke-width:1;"]);		
-		}
-		for(var i = step;i<this.hp;i+=step){
-			this.addNode("line", ["x1",0,"y1",i,"x2",this.wp,"y2",i, "style","stroke:rgb(153,153,153); stroke-width:1;"]);
-		}
-
-	};
+	
+	
 	heightSvg.drawSvg = function(){
 			this.clearContent();	
 			this.drawGrid();
@@ -486,21 +500,8 @@ function generateMap(){
 			obj.mapCoords[1] = obj.coords[1];
 			obj.mapCoords[2] = obj.coords[2] * this.hp / mZ;
 	};
-				
-	galSvg.drawGrid = function(){
-		var step = 30;
-		var localHtml = "";
-		
-		var color = 153; // 0x99
-
-		for(var i = step;i<this.wp;i+=step){		
-			this.addNode("line", ["x1",i,"y1",0,"x2",i,"y2",this.hp, "style","stroke:rgb(153,153,153); stroke-width:1;"]);		
-		}
-		for(var i = step;i<this.hp;i+=step){
-			this.addNode("line", ["x1",0,"y1",i,"x2",this.wp,"y2",i, "style","stroke:rgb(153,153,153); stroke-width:1;"]);
-		}
-
-	};
+	
+	
 		
 	galSvg.drawStar = function(obj,size){
 		var centerX = obj.getMapX();
@@ -515,7 +516,49 @@ function generateMap(){
 		this.drawArrow(10,10,150,10);
 		this.drawText("Z",18,150);
 		this.drawArrow(10,10,10,150);
-	}
+	};
+	
+	galSvg.drawBHArea = function(){
+		/* BH jumping */
+
+		var backgroundBh = this.fastAdd("rect","id|bhMap|x|0|y|0|width|30|height|30|style|fill: rgb(250,215,212); fill-opacity:0.1");
+		document.getElementById(this.domIdName).appendChild(backgroundBh);			
+		
+		var centerDist = userLocation.calculateDistance(center);
+
+		var minD = Math.pow((centerDist-1000)/100.0 ,2) // 
+		var maxD = Math.pow((centerDist-2000)/100.0 ,2); // 
+		
+		var cenx = 2047;
+		var ceny = 2047;
+		
+		var minX = 9999; var maxX = 0;
+		var minY = 9999; var maxY = 0;
+
+		var localD = 0;
+		var count = 0;
+		for(var i = 0;i<4096;i++){
+			for(var j = 0;j<4096;j++){				
+				localD = (Math.pow(i-cenx,2) + Math.pow(j-ceny,2));
+				if(localD>=maxD && localD<=minD){
+					
+					if(i<minX) { minX = i;}
+					if(i>maxX) { maxX = i;}
+					if(j<minY) { minY = j;}
+					if(j>maxY) { maxY = j;}
+					
+					maxY = Math.max(maxY, j);
+					count++;
+				}
+			}				
+		}
+		
+		$("#bhMap").attr("x",minX * this.wp/4096);
+		$("#bhMap").attr("width", (maxX-minX) * this.wp/4096);
+		$("#bhMap").attr("y",minY * this.hp/4096);
+		$("#bhMap").attr("height", (maxY-minY) * this.hp/4096);
+		
+	},
 	
 	galSvg.drawSvg = function(){
 
@@ -523,10 +566,13 @@ function generateMap(){
 			this.drawGrid();
 			this.drawAxis();
 			
-			this.transformCoords(center);
-			
+			this.transformCoords(center);		
 			this.transformCoords(userLocation);
 			
+			if(userLocation.enabled){
+				galSvg.drawBHArea();
+			}
+
 			// Draw all locations even if there is no user
 			for(var i = 0;i<destinations.length;i++){
 				this.transformCoords(destinations[i]);	
@@ -548,6 +594,9 @@ function generateMap(){
 				
 				heightSvg.initialize("heightsvg","heightsvgp",null,150);
 				heightSvg.drawSvg();
+				
+				
+				
 				
 			}
 	};
@@ -597,7 +646,7 @@ function showLocationInfo(x,y,z){
 	
 	var elementB = document.getElementById("directionsmap");
 	elementB.className = "visible";
-
+	
 	userLocation.updateCoords(x,y,z);
 			
 	centerDistSvg.initialize("centerdistsvg","centerdistsvgp",null,100);
@@ -607,6 +656,7 @@ function showLocationInfo(x,y,z){
 	coordSvg.drawCoords(x,y,z);
 	
 	destinationHandler.syncDestinationList();
+
 
 }
 

@@ -42,7 +42,7 @@
 								
 								<div class="row">
 									<div class="input-field col s12">
-										<input id="userlocation" class="white-text" type="text" placeholder="Place your location here">
+										<input id="userlocation" class="white-text" type="text" placeholder="Place your location here" value="ABCD:064A:0082:01B9:0000">
 									</div>
 								</div>
 								
@@ -180,13 +180,13 @@
 				</div>
 				
 				<div class="row nomarginrow">
-					<div class="col s6 m5">
+					<div class="col s6 m6">
 						{{distance}} ly
 					</div>
 					<div class="col s6 m5">
 						{{jumps}} jumps
 					</div>
-					<div class="col s6 m2 btn hide-on-small-only" onclick="destinationHandler.deleteDest({{id}});" type="button">X</div>
+					<div class="col s6 m1 btn hide-on-small-only" onclick="destinationHandler.deleteDest({{id}});" type="button">X</div>
 				</div>
 			</li>
 		</script>

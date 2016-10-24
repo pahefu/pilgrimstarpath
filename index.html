@@ -13,19 +13,13 @@
 	</head>
     
 	<body onload="generateMap();">
-
-		<div id="atlascontainer">
-			
-			
-		</div>
 		
 		<nav>
 			<div class="nav-wrapper blue-grey darken-1">
 				<img id="atlaslogo" src="./img/atlas_logo.png" class="responsive-img"/>
-				<span id="brand" class="brand-logo ">PILGRIM STAR PATH <span class="chip indigo">v0.4.1</span></span>
+				<span id="brand" class="brand-logo">PILGRIM STAR PATH <span class="chip indigo">v0.5</span></span>
 			</div>
-		</nav>
-		
+		</nav>	
 
 		<div class="row">
 			<div id="infoparent" class="col s12 m5">
@@ -42,13 +36,19 @@
 								
 								<div class="row">
 									<div class="input-field col s12">
-										<input id="userlocation" class="white-text" type="text" placeholder="Place your location here" value="ABCD:064A:0082:01B9:0000">
+										<input id="userlocation" class="white-text" type="text" placeholder="Place your location here">
 									</div>
 								</div>
 								
 								<div class="row ">
-									<div class="col s12">
-										<input type="button" class="btn" value="Draw Location" onclick="calculateLocation()">
+									<div class="col s12 m6">
+										<div class="btn" onclick="calculateLocation()">Draw Location</div>
+									</div>
+									<div class="col s12 m6">
+										<div class="btn" onclick="galSvg.drawBHArea()">Draw B.Hole Area</div>
+										<div class="progress hidden" id="bhloadingprogress">
+											<div class="indeterminate"></div>
+										</div>
 									</div>
 								</div>
 
@@ -68,6 +68,11 @@
 										<div id="centerdistsvgp" class="col s12 m6">
 											<svg id="centerdistsvg" xmlns="http://www.w3.org/2000/svg"></svg>
 										</div>
+										
+										<div id="blackholeinfo" class="col s12 hidden">
+											From your current location, you may arrive to <strong id="blackholecount"></strong> destinations in the galaxy.
+										</div>
+										
 									</div>
 								</div>
 							</div>
@@ -93,19 +98,21 @@
 								</div>
 								
 								<div class="row">
-									<div class="col s12 m6 btn" onclick="destinationHandler.addBatch();">
-										Add them
+									<div class="col s12 m6">
+										<div class="btn" onclick="destinationHandler.addBatch();">Add them</div>
 									</div>
 							
-									<div class="col s12 m6 btn"  onclick="destinationHandler.addPilgrim();">
-										Add Pilgrim
+									<div class="col s12 m6">
+										<div class="btn" onclick="destinationHandler.addPilgrim();">Add Pilgrim</div>
 									</div>
 								</div>
 								
 								<div class="row nomargin">								
-									<div class="col s12 btn" onclick="destinationHandler.grabRed();" title="Grab from Reddit">
-										<i class="hide-on-small-only" class="valign">Grab from</i>
-										<img src="./img/rd.svg" class="responsive-img" style="max-height:25px;"/>
+									<div class="col s12" title="Grab from Reddit">
+										<div class="btn"  onclick="destinationHandler.grabRed();">
+											<i class="hide-on-small-only" class="valign">Grab from</i>
+											<img src="./img/rd.svg" class="responsive-img" style="max-height:25px;"/>
+										</div>
 									</div>
 									
 									<div class="col s12 hide" id="redditbtnlist">
@@ -170,23 +177,23 @@
 		<script type="text/template" id="destinationtemplate">
 			<li class="collection-item destinationtemplaterow" rel="{{id}}">
 				<div class="row nomarginrow">
-					<div class="col s11 m6 flow-text">
+					<div class="col s10 m6 flow-text">
 						<input class="destinationname flow-text" type="text" onchange="destinationHandler.updateDestName({{id}},this);" id="desttb{{id}}" value="{{name}}">
 					</div>
-					<div class="col s1 btn hide-on-med-and-up" onclick="destinationHandler.deleteDest({{id}});" type="button">X</div>
+					<div class="col s2 hide-on-med-and-up" onclick="destinationHandler.deleteDest({{id}});">
+						<div class="btn-floating deletebtn">X</div>
+					</div>
 					<div class="col s12 m5">
 						{{x}}:{{y}}:{{z}}
 					</div>					
 				</div>
 				
 				<div class="row nomarginrow">
-					<div class="col s6 m6">
-						{{distance}} ly
+					<div class="col s6 m6">{{distance}} ly</div>
+					<div class="col s6 m5">{{jumps}} jumps</div>
+					<div class="col s6 m1 hide-on-small-only">
+						<div class="btn-floating deletebtn" onclick="destinationHandler.deleteDest({{id}});">X</div>
 					</div>
-					<div class="col s6 m5">
-						{{jumps}} jumps
-					</div>
-					<div class="col s6 m1 btn hide-on-small-only" onclick="destinationHandler.deleteDest({{id}});" type="button">X</div>
 				</div>
 			</li>
 		</script>

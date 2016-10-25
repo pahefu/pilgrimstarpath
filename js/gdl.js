@@ -67,7 +67,6 @@ var Region = Class({
 });
 
 var center = new Region(2047,127,2047,'Galaxy Center','#7672E8' );
-var pilgrim = new Region(0x64a,0x082,0x1b9,'Pilgrim Star','orange');
 var userLocation = new Region(0x0,0x0,0x0,'User Location','#36AC3A');
 var destinations = [new Region(0x64a,0x082,0x1b9,'Pilgrim Star','orange')]; // Store for destinations (include one)
 
@@ -518,12 +517,58 @@ function generateMap(){
 		this.drawArrow(10,10,10,150);
 	};
 	
-	galSvg.drawBHArea = function(){
+	galSvg.drawBHZone = function(){
 		
 		if(!userLocation.enabled){
 			showErrorMessage("Calculate your location first!");
 			return;
 		}
+		
+		var minX = 9999; var maxX = 0;
+		var localD = 0;
+		var found = false;
+		
+		var centerDist = userLocation.calculateDistance(center);
+		
+		var minD = Math.pow((centerDist-1000)/100.0 ,2) // 
+		var maxD = Math.pow((centerDist-2000)/100.0 ,2); // 
+		var cenx = center.getX();
+		var ceny = center.getZ();
+		
+		var j = center.getZ();
+		for(var i = 0;i<cenx;i++){
+			localD = (Math.pow(i-cenx,2) + Math.pow(j-ceny,2));
+			if(localD>=maxD && localD<=minD){
+				
+				if(i<minX) { minX = i;}
+				if(i>maxX) { maxX = i;}
+				found = true;			
+			}
+		}
+		
+		if(found == true){
+			var aspectX = (this.wp/4096);
+			var aspectY = (this.hp/4096);
+
+			var rx = (center.getX()-minX) *(aspectX);
+			var ry = (center.getX()-minX) *(aspectY);
+			
+			var cx = center.getX()*aspectX;
+			var cy = center.getZ()*aspectY;
+			
+			var borderWidth = (maxX-minX)*(aspectX);
+			var borderHeight = (maxX-minX)*(aspectY);
+			var innerNode = this.fastAdd("ellipse",Mustache.render("cx|{{cx}}|cy|{{cy}}|rx|{{rx}}|ry|{{ry}}|style|stroke:rgb(255,0,0);stroke-width:5px;stroke-opacity:0.3;fill:none;",{ cx:cx, cy:cy, rx:rx-5,ry:ry-5 }));
+			this.svg.appendChild(innerNode);
+		}
+	}
+	
+	galSvg.drawBHArea = function(){
+		
+		
+		
+		this.drawBHCircle();
+		return;
 		
 		$("#bhloadingprogress").toggleClass("hidden");
 		

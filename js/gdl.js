@@ -530,89 +530,23 @@ function generateMap(){
 		
 		var centerDist = userLocation.calculateDistance(center);
 		
-		var minD = Math.pow((centerDist-1000)/100.0 ,2) // 
-		var maxD = Math.pow((centerDist-2000)/100.0 ,2); // 
-		var cenx = center.getX();
-		var ceny = center.getZ();
-		
-		var j = center.getZ();
-		for(var i = 0;i<cenx;i++){
-			localD = (Math.pow(i-cenx,2) + Math.pow(j-ceny,2));
-			if(localD>=maxD && localD<=minD){
-				
-				if(i<minX) { minX = i;}
-				if(i>maxX) { maxX = i;}
-				found = true;			
-			}
-		}
-		
-		if(found == true){
-			var aspectX = (this.wp/4096);
-			var aspectY = (this.hp/4096);
+		var outterDistance = (centerDist-1000)/100.0;
+		var innerDistance = (centerDist-2000)/100.0;
+			
+		var aspectX = (this.wp/4096);
+		var aspectY = (this.hp/4096);
 
-			var rx = (center.getX()-minX) *(aspectX);
-			var ry = (center.getX()-minX) *(aspectY);
-			
-			var cx = center.getX()*aspectX;
-			var cy = center.getZ()*aspectY;
-			
-			var borderWidth = (maxX-minX)*(aspectX);
-			var borderHeight = (maxX-minX)*(aspectY);
-			var innerNode = this.fastAdd("ellipse",Mustache.render("cx|{{cx}}|cy|{{cy}}|rx|{{rx}}|ry|{{ry}}|style|stroke:rgb(255,0,0);stroke-width:5px;stroke-opacity:0.3;fill:none;",{ cx:cx, cy:cy, rx:rx-5,ry:ry-5 }));
-			this.svg.appendChild(innerNode);
-		}
+		var rx = (outterDistance) *(aspectX);
+		var ry = (outterDistance) *(aspectY);
+		
+		var cx = center.getX()*aspectX;
+		var cy = center.getZ()*aspectY;
+
+		var innerNode = this.fastAdd("ellipse",Mustache.render("cx|{{cx}}|cy|{{cy}}|rx|{{rx}}|ry|{{ry}}|style|stroke:rgb(255,0,0);stroke-width:5px;stroke-opacity:0.3;fill:none;",{ cx:cx, cy:cy, rx:rx-5,ry:ry-5 }));
+		this.svg.appendChild(innerNode);
+		
 	}
-	
-	galSvg.drawBHArea = function(){
-		
-		
-		
-		this.drawBHCircle();
-		return;
-		
-		$("#bhloadingprogress").toggleClass("hidden");
-		
-		/* BH jumping */
 
-		var centerDist = userLocation.calculateDistance(center);
-
-		var minD = Math.pow((centerDist-1000)/100.0 ,2) // 
-		var maxD = Math.pow((centerDist-2000)/100.0 ,2); // 
-		
-		var cenx = 2047;
-		var ceny = 2047;
-		
-		var minX = 9999; var maxX = 0;
-		var minY = 9999; var maxY = 0;
-
-		var localD = 0;
-		var count = 0;
-		for(var i = 0;i<4096;i++){
-			for(var j = 0;j<4096;j++){				
-				localD = (Math.pow(i-cenx,2) + Math.pow(j-ceny,2));
-				if(localD>=maxD && localD<=minD){
-					
-					if(i<minX) { minX = i;}
-					if(i>maxX) { maxX = i;}
-					if(j<minY) { minY = j;}
-					if(j>maxY) { maxY = j;}
-					
-					maxY = Math.max(maxY, j);
-					count++;
-				}
-			}				
-		}
-		
-		$("#bhloadingprogress").toggleClass("hidden");
-		$("#blackholeinfo").toggleClass("hidden");
-		$("#blackholecount").html(""+count);
-		$("#bhMap").attr("x",minX * this.wp/4096);
-		$("#bhMap").attr("width", (maxX-minX) * this.wp/4096);
-		$("#bhMap").attr("y",minY * this.hp/4096);
-		$("#bhMap").attr("height", (maxY-minY) * this.hp/4096);
-		
-	},
-	
 	galSvg.drawSvg = function(){
 
 			this.clearContent();	

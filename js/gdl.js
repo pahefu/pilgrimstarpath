@@ -327,6 +327,13 @@ var destinationHandler = {
 		this.syncDestinationList();
 	},
 	
+	addRedHub: function(){
+		this.addDest(0x469,0x0081,0x0D6D,'Galactic Hub (R.e.)','#ccff33');
+		this.syncDestinationList();
+		$("#redditbtnlist").toggleClass("hide");
+		$("#redditbtnlist").toggleClass("show");
+	},
+	
 	addRedLast: function(data){
 		this.addRed(data, "Last");
 	},

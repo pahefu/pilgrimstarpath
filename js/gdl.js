@@ -403,7 +403,7 @@ var destinationHandler = {
 			$("#redditbtnlist").toggleClass("show");
 		}else{
 			$.ajax({ 
-				url: 'https://www.reddit.com/r/NoMansSkyTheGame/comments/5884yf/share_your_coordinates_recommend_planets_log_and/.json?limit=1&amp;jsonp=destinationHandler.addRed'+type
+				url: 'https://www.reddit.com/r/nomanshigh/comments/5a7ovn/share_your_coordinates_recommend_planets_log_and/.json?limit=1&amp;jsonp=destinationHandler.addRed'+type
 			});
 		}
 	}
@@ -481,11 +481,7 @@ function generateMap(){
 		var centerText = this.fastAdd("text", Mustache.render("style|font-family:'nmsicons'; font-size:15pt;|x|{{x}}|y|{{y}}|fill|{{color}}",
 			{x:75,y:15, color:center.color}
 		), 'Center');
-		
-		//this.addNode("text",["style","font-family:'nmsicons'; font-size:15pt;", "x",pos[0],"y",pos[1], "transform","rotate(-90 87 80)","stroke","#ffffff","stroke-width","1","fill","none"],'\uf197');
-		//this.drawText("Center",75,10, center.color);
-		//this.addNode("line", ["x1",pos[0],"y1",pos[1],"x2",x,"y2",y, "style","stroke:rgb(123,123,230); stroke-width:2;"]);	
-		
+
 		$("#"+this.domIdName).append(centerLine);
 		$("#"+this.domIdName).append(centerText);
 		

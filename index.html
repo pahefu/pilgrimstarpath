@@ -42,10 +42,10 @@
 								
 								<div class="row ">
 									<div class="col s12 m6">
-										<div class="btn" onclick="calculateLocation()">Draw Location</div>
+										<div class="btn" onclick="calculateLocation()"><i class="icon-street-view"></i> Draw Location</div>
 									</div>
 									<div class="col s12 m6">
-										<div class="btn" onclick="galSvg.drawBHZone()">Draw B.Hole Area</div>
+										<div class="btn" onclick="galSvg.drawBHZone()"><i class="icon-target-1"></i> Draw B.Hole Area</div>
 									</div>
 								</div>
 
@@ -77,9 +77,9 @@
 										<div class="white-text  flow-text">Enter destinations in coordinate format</div>
 									</div>
 									<div class="col s2">
-											<span class="btn-floating" onclick="destinationDataState.toggle();">
-												<i id="showhidelabel" title="Hide list" class="icon-minus-circled"></i>
-											</span>
+										<div onclick="destinationDataState.toggle();" style="text-align:right;font-size:23pt;cursor:pointer;">
+											<i id="showhidelabel" title="Hide list" class="icon-toggle-on"></i>
+										</div>
 									</div>
 								</div>
 								
@@ -102,8 +102,8 @@
 								<div class="row nomargin">								
 									<div class="col s12" title="Grab from Reddit">
 										<div class="btn"  onclick="destinationHandler.grabRed();">
-											<i class="hide-on-small-only" class="valign">Grab from</i>
-											<img src="./img/rd.svg" class="responsive-img" style="max-height:25px;"/>
+											<i class="hide-on-small-only" class="valign">Grab from</i> <i class="icon-reddit"></i> <strong>Reddit</strong>
+											
 										</div>
 									</div>
 									
@@ -145,6 +145,7 @@
 					<div class="chip chipcenter">Galaxy center</div>
 					<div class="chip chipdestination">Destination</div>
 					<div class="chip chipuser">User Location</div>
+					<div class="chip chiphub">Galactic Hub</div>
 				</div>
 				
 				<div id="directionsmap" class="hidden">
@@ -156,9 +157,10 @@
 							</div>
 						</div>
 						<div class="col s12 m6">
-							<blockquote>Compass <span class="chip teal">ALPHA</span></blockquote>
+							<blockquote>Compass <span class="chip teal">BETA</span></blockquote>
 							<div id="compassp">
-								<div>Looking at the center, you have to travel, <span id="degreestxt"></span> degrees to your <span id="degreesdirtxt"></span></div>
+								<div>To reach <strong><span id="destinationnamecompass"></span></strong> follow this direction:</div>
+								<div>Looking at the center, turn <span id="degreestxt"></span> degrees to your <span id="degreesdirtxt"></span></div>
 								<svg id="compasssvg" xmlns="http://www.w3.org/2000/svg"></svg>
 							</div>
 						</div>
@@ -170,7 +172,11 @@
 		<script type="text/template" id="destinationtemplate">
 			<li class="collection-item destinationtemplaterow" rel="{{id}}">
 				<div class="row nomarginrow">
-					<div class="col s10 m6 flow-text">
+					<div class="col s1 m1 targetSelect" title="Select as destination" onclick="destinationHandler.selectDest({{id}});">
+						<i class="icon-globe"></i>
+						<i class="icon-hand-pointer-o" style="position: absolute; margin-top:5px; margin-left:-8px;"></i>
+					</div>
+					<div class="col s9 m5 flow-text">
 						<input class="destinationname flow-text" type="text" onchange="destinationHandler.updateDestName({{id}},this);" id="desttb{{id}}" value="{{name}}">
 					</div>
 					<div class="col s2 hide-on-med-and-up" onclick="destinationHandler.deleteDest({{id}});">
@@ -185,7 +191,7 @@
 					<div class="col s6 m6">{{distance}} ly</div>
 					<div class="col s6 m5">{{jumps}} jumps</div>
 					<div class="col s6 m1 hide-on-small-only">
-						<div class="btn-floating deletebtn" onclick="destinationHandler.deleteDest({{id}});">X</div>
+						<div class="btn-floating deletebtn" title="Delete this destination" onclick="destinationHandler.deleteDest({{id}});"><i class="icon-trash"></i></div>
 					</div>
 				</div>
 			</li>

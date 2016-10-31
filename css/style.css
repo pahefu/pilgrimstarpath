@@ -73,9 +73,7 @@ div .btn{
 	padding:10px;
 }
 
-#galsvg{
-	border:1px solid white;
-}
+
 
 .chip{
 	color:#ffffff!important;
@@ -98,11 +96,14 @@ div .btn{
 .chipuser{
 	background-color: #36AC3A !important;
 }
+.chiphub{
+	background-color: #c0ca33 !important;
+}
 
 #errorMessage{}
 
 #heightsvg,#svgc{
-	border:1px solid #777777;
+	border:1px solid #00b8d4;
 	
 }
 
@@ -124,6 +125,10 @@ div .btn{
 
 #destinationlist{
 	text-align:center;
+}
+
+.targetSelect{
+	cursor:pointer;
 }
 
 .hide {

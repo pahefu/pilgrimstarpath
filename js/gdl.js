@@ -79,7 +79,7 @@ var compSvg = undefined; // Compass SVG
 var coordSvg = undefined; // Coordinates SVG
 var centerDistSvg = undefined; // Distance to center SVG
 var heightSvg = undefined; // HeightMap SVG
-var customDestination = false;
+var selectedDestination = 0;
 
 var destinationDataState = {
 	shown : true,
@@ -94,12 +94,12 @@ var destinationDataState = {
 		}
 		if(this.shown){
 			this.obj.setAttribute("class","hidden");
-			this.txtObj.setAttribute("class","icon-plus-circled");
+			this.txtObj.setAttribute("class","icon-toggle-off");
 			this.txtObj.setAttribute("title","Show list");
 		}else{
 			this.obj.setAttribute("class","visible");
 			this.obj.setAttribute("style","min-height:"+this.height);
-			this.txtObj.setAttribute("class","icon-minus-circled");
+			this.txtObj.setAttribute("class","icon-toggle-on");
 			this.txtObj.setAttribute("title","Hide list");
 			
 		}
@@ -160,7 +160,7 @@ var svgImage = Class({
 		this.svg.appendChild(domObj);
 	},
 	
-	fastAdd : function(type, attrs){
+	fastAdd : function(type, attrs, content){
 		var node = document.createElementNS("http://www.w3.org/2000/svg",type);
 		attrs = attrs.split("|");
 		if(attrs!=null && attrs.length>1){
@@ -168,13 +168,16 @@ var svgImage = Class({
 				node.setAttribute(attrs[i],""+attrs[i+1]);
 			}
 		}
+		if(!isValueNull(content)){
+			node.innerHTML = content;
+		}
 		return node;
 	},
 	
 	drawGrid : function(){
 		var defsn = this.fastAdd("defs", "");
 		var patternN = this.fastAdd("pattern","id|gridPattern|x|0|y|0|width|30|height|30|patternUnits|userSpaceOnUse");
-		var rectN = this.fastAdd("rect","x|0|y|0|width|30|height|30|style|stroke: rgb(153,153,153);");
+		var rectN = this.fastAdd("rect","x|0|y|0|width|30|height|30|style|stroke: rgb(0,184,212);stroke-opacity:0.7;");
 		
 		var parentNode = document.getElementById(this.domIdName);
 		
@@ -299,6 +302,13 @@ var destinationHandler = {
 		destinations.splice(index, 1);
 		
 		this.syncDestinationList();
+		
+	},
+	selectDest : function(index){	
+		selectedDestination = index;
+		if(userLocation.enabled){
+			galSvg.drawSvg();
+		}
 	},
 	updateDestName : function (index,obj){
 		destinations[index].name = obj.value;
@@ -328,7 +338,7 @@ var destinationHandler = {
 	},
 	
 	addRedHub: function(){
-		this.addDest(0x469,0x0081,0x0D6D,'Galactic Hub (R.e.)','#ccff33');
+		this.addDest(0x469,0x0081,0x0D6D,'Galactic Hub (R.E.)','#c0ca33');
 		this.syncDestinationList();
 		$("#redditbtnlist").toggleClass("hide");
 		$("#redditbtnlist").toggleClass("show");
@@ -450,24 +460,50 @@ function generateMap(){
 		var y = pos[1]-radius;
 		
 		var transform = "rotate("+degrees+" 80 80)";
+
+		var group = this.fastAdd("g","transform|"+transform);
 		
-		this.addNode("circle",["cx",pos[0],"cy",pos[1],"r",radius,"style","stroke:rgb(153,153,153); stroke-width:2;","transform",transform]);
-		this.addNode("line", ["x1",pos[0],"y1",pos[1],"x2",x,"y2",y, "style","stroke:rgb(123,123,230); stroke-width:2;"]);	
-		this.addNode("line", ["x1",pos[0],"y1",pos[1],"x2",x,"y2",y, "style","stroke:rgb(255,0,0); stroke-width:4;","transform",transform]);		
-		this.drawText("Center",75,10, center.color);
+		var circleNode = this.fastAdd("circle",Mustache.render("cx|{{cx}}|cy|{{cy}}|r|{{r}}|style|stroke:rgb(153,153,153); stroke-width:2; fill:none;",
+			{ cx:pos[0], cy:pos[1], r:radius}
+		));
+		var shipIcon = this.fastAdd("text", Mustache.render("style|font-family:'nmsicons'; font-size:15pt;|x|{{x}}|y|{{y}}|transform|rotate(-90 87 80)|stroke|#ffffff|stroke-width|1|fill|none",
+			{x:pos[0],y:pos[1]}
+		), '\uf197');
 		
-		var txt = document.getElementById("degreestxt");
-		var txtDir = document.getElementById("degreesdirtxt");
+		var shipLine = this.fastAdd("line", Mustache.render("x1|{{x1}}|y1|{{y1}}|x2|{{x2}}|y2|{{y2}}|style|stroke:rgb(255,0,0); stroke-width:1; stroke-opacity:0.5",
+			{x1:pos[0],y1:pos[1],x2:x,y2:y}
+		));
 		
-		txt.innerHTML = ""+Math.abs(degrees).toFixed(2);
-		txtDir.innerHTML = (degrees>0) ? "right" : "left";
+		var centerLine = this.fastAdd("line", Mustache.render("x1|{{x1}}|y1|{{y1}}|x2|{{x2}}|y2|{{y2}}|style|stroke:rgb(123,123,230); stroke-width:2;",
+			{x1:pos[0],y1:pos[1],x2:x,y2:y}
+		));
+	
+		var centerText = this.fastAdd("text", Mustache.render("style|font-family:'nmsicons'; font-size:15pt;|x|{{x}}|y|{{y}}|fill|{{color}}",
+			{x:75,y:15, color:center.color}
+		), 'Center');
 		
-	}
+		//this.addNode("text",["style","font-family:'nmsicons'; font-size:15pt;", "x",pos[0],"y",pos[1], "transform","rotate(-90 87 80)","stroke","#ffffff","stroke-width","1","fill","none"],'\uf197');
+		//this.drawText("Center",75,10, center.color);
+		//this.addNode("line", ["x1",pos[0],"y1",pos[1],"x2",x,"y2",y, "style","stroke:rgb(123,123,230); stroke-width:2;"]);	
+		
+		$("#"+this.domIdName).append(centerLine);
+		$("#"+this.domIdName).append(centerText);
+		
+		group.appendChild(circleNode);
+		group.appendChild(shipIcon);
+		group.appendChild(shipLine);
+		$("#"+this.domIdName).append(group);
+		
+		
+		var txt = $("#degreestxt").html(""+Math.abs(degrees).toFixed(2));
+		var txtDir = $("#degreesdirtxt").html((degrees>0) ? "right" : "left");
+		$("#destinationnamecompass").html(destinations[selectedDestination].name);
+
+	};
 
 	// HeightMap definition
 	
 	heightSvg = new svgImage("heightsvg","heightsvgp",null,150);
-	
 	heightSvg.drawStar = function(obj, x, size, index){
 		var centerX = x;
 		var centerY = this.hp- (obj.mapCoords[1]* this.hp / 256);
@@ -477,24 +513,21 @@ function generateMap(){
 		
 		var name = (index == undefined || index == null) ? (obj.name[0]) : (obj.name[0] + (index+1));
 		this.drawText(name,centerX+10,centerY-10,obj.color);
-		
-	}
-	
-	
-	
+	};
+
 	heightSvg.drawSvg = function(){
-			this.clearContent();	
-			this.drawGrid();
-			this.drawArrow(5,this.hp-2, 5,20);
-			this.drawText("Y",15,20)
-			this.drawStar(userLocation,50,4);
-			
-			var maxDestinations = Math.min(destinations.length,7);
-			
-			for(var i = 0;i<maxDestinations;i++){
-				this.drawStar(destinations[i],(i*40)+100,4,i);	
-			}
-	}
+		this.clearContent();	
+		this.drawGrid();
+		this.drawArrow(5,this.hp-2, 5,20,"stroke:#00b8d4 ; stroke-width:1;","#00b8d4");
+		this.drawText("Y",15,20,"#00b8d4")
+		this.drawStar(userLocation,50,4);
+		
+		var maxDestinations = Math.min(destinations.length,7);
+		
+		for(var i = 0;i<maxDestinations;i++){
+			this.drawStar(destinations[i],(i*40)+100,4,i);	
+		}
+	};
 	
 	// Gal Map definition
 	galSvg = new svgImage("svgc","svgp",undefined, undefined);
@@ -506,22 +539,26 @@ function generateMap(){
 			obj.mapCoords[1] = obj.coords[1];
 			obj.mapCoords[2] = obj.coords[2] * this.hp / mZ;
 	};
-	
-	
-		
-	galSvg.drawStar = function(obj,size){
+
+	galSvg.drawStar = function(obj,size, icon){
 		var centerX = obj.getMapX();
 		var centerZ = obj.getMapZ();
 		var fillStyle = obj.color;
-		this.addNode("circle",["cx",centerX,"cy",centerZ,"r",size,"stroke",fillStyle,"stroke-width","1","fill",fillStyle]);
+		var iconActive = !isValueNull(icon);
+		
+		if(!iconActive){
+			this.addNode("circle",["cx",centerX,"cy",centerZ,"r",size,"stroke",fillStyle,"stroke-width","1","fill",fillStyle]);
+		}else{
+			this.addNode("text",["style","font-family:'nmsicons'; font-size:15pt;", "x",centerX-15,"y",centerZ+8,"stroke",fillStyle,"stroke-width","1","fill","none"],icon);
+		}
 		this.drawText(obj.name,centerX+10, centerZ-10, "white");
 	};
 			
 	galSvg.drawAxis = function (){
-		this.drawText("X",140,25);
-		this.drawArrow(10,10,150,10);
-		this.drawText("Z",18,150);
-		this.drawArrow(10,10,10,150);
+		this.drawText("X",152,3,"#00b8d4");
+		this.drawArrow(10,10,150,10,"stroke:#00b8d4 ; stroke-width:1;","#00b8d4");
+		this.drawText("Z",4,152,"#00b8d4");
+		this.drawArrow(10,10,10,150,"stroke:#00b8d4 ; stroke-width:1;","#00b8d4");
 	};
 	
 	galSvg.drawBHZone = function(){
@@ -562,37 +599,33 @@ function generateMap(){
 			
 			this.transformCoords(center);		
 			this.transformCoords(userLocation);
-			
-			if(userLocation.enabled){
-				var backgroundBh = this.fastAdd("rect","id|bhMap|x|0|y|0|width|0|height|0|style|fill: rgb(250,215,212); fill-opacity:0.2");
-				document.getElementById(this.domIdName).appendChild(backgroundBh);	
-			}
 
 			// Draw all locations even if there is no user
 			for(var i = 0;i<destinations.length;i++){
 				this.transformCoords(destinations[i]);	
-				this.drawStar(destinations[i],4);
+				this.drawStar(destinations[i],4, (i!=selectedDestination) ? '\uf185' : '\ue807');
 			}
 			
-			this.drawStar(center,6);
+			if(userLocation.enabled){
+				var backgroundBh = this.fastAdd("rect","id|bhMap|x|0|y|0|width|0|height|0|style|fill: rgb(250,215,212); fill-opacity:0.2");
+				$("#"+this.domIdName)[0].appendChild(backgroundBh);
+			}
+			
+			this.drawStar(center,6,'\uf185');
 		
 			if(userLocation.enabled){
-				this.drawStar(userLocation,4);
+				this.drawStar(userLocation,4,'\uf21d');
 
 				var v1 = userLocation.getVector(center); 
-				var v2 = userLocation.getVector(destinations[0]);
+				var v2 = userLocation.getVector(destinations[selectedDestination]);
 
 				var angle = v1.getDegreesVector(v2);		
-				
+
 				compSvg.initialize("compasssvg","compassp",null,200);
 				compSvg.drawCompass(50,angle);
 				
 				heightSvg.initialize("heightsvg","heightsvgp",null,150);
 				heightSvg.drawSvg();
-				
-				
-				
-				
 			}
 	};
 	

@@ -9,9 +9,7 @@ body{
 	font-family: GillSans, Calibri, Trebuchet, sans-serif;
 }
 
-.nomarginrow{
-	margin-bottom:0px !important;
-}
+
 .visible{
 	
 }
@@ -20,69 +18,74 @@ body{
 	display:none !important;
 }
 
+.noinline{
+	display:block !important;
+}
+
+.nopadding{
+	padding:0px !important;
+}
+
 blockquote{
-	font-size:17pt;
 	margin: 10px 0px !important;
-}
-
-.card-content{
-	padding: 0px !important;
-}
-
-.card-panel{
-	padding: 10px !important;
-}
-
-#inputcard input{
-	color:#ffffff!important;
-	font-size:16pt;
+	border-bottom: 1px solid #bebebe;
 }
 
 textarea{
-	font-size:16pt !important;
+	
+	width:100%;
 }
 
-#brand, .btn{
-	font-family : NmsFont;
+
+#brand, .c-button{
+	font-family : NmsFont !important;
 }
 
-div .btn{
-	margin:5px !important;
-	width: 100%;
+
+div .panelbutton{
+	margin:5px !important;	
+	font-size:15pt;
 	
 }
 
-.deletebtn{
-	text-align:center;
+.tealbg{
+	background-color: #2bbbad !important;
 }
 
-#atlaslogo{
-	max-height:60px;
+.bluebg{
+	background-color: #546e7a;
 }
+
 
 #userlocation{
+	width:100%;
+}
 
+#destinationdata{
+	margin-top:8px;
+}
+
+#redditpanel{
+	margin-top:8px;
+	margin-bottom:8px;
+}
+
+#redditpanellabel{
+	background-color: #5f99cf;
+	font-family: NmsFont;
+}
+
+#redditpanelbg{
+	background-color: #cee3f8 !important;
+}
+
+.redditbtn{
+	background-color: #4980ae !important;
 }
 
 
-#info{
-}
-
-#plotparent{
-	font-size:17pt;
-	padding:10px;
-}
-
-
-
-.chip{
-	color:#ffffff!important;
-	font-size:16pt!important;
-}
-
-.chip{
-	color:#ffffff!important;
-	font-size:16pt!important;
+.destinationtemplaterow{
+	color: black;
 }
 
 .chipcenter{
@@ -100,31 +103,13 @@ div .btn{
 	background-color: #c0ca33 !important;
 }
 
-#errorMessage{}
-
 #heightsvg,#svgc{
-	border:1px solid #00b8d4;
-	
-}
-
-.destinationname{
-	margin-bottom:0px !important;
-	height:1.5em !important;
-	font-size:13pt !important;
-}
-
-#redditbtnlistcontent{
-	border:none;
-	text-align:center;
-}
-
-#redditbtnlistcontent li{
-	width:90%;
-	margin:5px!important;
+	border:1px solid #00b8d4;	
 }
 
 #destinationlist{
 	text-align:center;
+	color: black;
 }
 
 .targetSelect{

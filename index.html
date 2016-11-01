@@ -3,7 +3,7 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="./css/style.css" rel="stylesheet">
-		<link rel="stylesheet" href="./css/materialize.min.css">
+		<link rel="stylesheet" href="./css/blaze.min.css">
 		<link rel="stylesheet" href="./css/nmsicons.css">
 		
 		<script src="./js/mustache.min.js"></script>
@@ -14,127 +14,93 @@
     
 	<body onload="generateMap();">
 		
-		<nav>
-			<div class="nav-wrapper blue-grey darken-1">
-				<img id="atlaslogo" src="./img/atlas_logo.png" class="responsive-img"/>
-				<span id="brand" class="brand-logo">PILGRIM STAR PATH <span class="chip indigo">v0.5</span></span>
-			</div>
-		</nav>	
-
-		<div class="row">
-			<div id="infoparent" class="col s12 m5">
+		<ul class="c-nav c-nav--inline">
+			<li class="c-nav__content nopadding"><img id="atlaslogo" src="./img/atlas_logo.png" class="o-image"/></li>
+			<li class="c-nav__content nopadding" id="brand"><span style="font-size:19pt;">PIGRIM STAR PATH</span> <span class="c-badge c-badge--brand">v0.5.2</span></li>
+		</ul>
+		
+		<div class="o-grid o-grid--wrap">
+			<div id="infoparent" class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-40@small">
 				<div id="info">
-					<form class="">
-						<blockquote>Check your location</blockquote>
+					<blockquote>Coordinate information</blockquote>
+					
+					<div class="c-card c-card--accordion u-high">
+
+						<input type="checkbox" id="userlocationpanel" checked>
+						<label class="c-card__item c-card__item--brand" for="userlocationpanel">User Location</label>
+						<div class="c-card__item bluebg">
 						
-						<div id="inputcard" class="card card-panel blue-grey darken-1">
-							<div class="card-content white-text">
-								
-								<div class="row nomarginrow">
-									<div class="col s12 white-text flow-text">Enter your coordinates in <strong>ABCD:1234:5678:1234:5678</strong> format</div>
-								</div>
-								
-								<div class="row">
-									<div class="input-field col s12">
-										<input id="userlocation" class="white-text" type="text" placeholder="Place your location here">
-									</div>
-								</div>
-								
-								<div class="row ">
-									<div class="col s12 m6">
-										<div class="btn" onclick="calculateLocation()"><i class="icon-street-view"></i> Draw Location</div>
-									</div>
-									<div class="col s12 m6">
-										<div class="btn" onclick="galSvg.drawBHZone()"><i class="icon-target-1"></i> Draw B.Hole Area</div>
-									</div>
-								</div>
-
-								<div id="errorMessage" class="card blue-grey indigo hidden">
-									<div class="card-content white-text">
-										<span class="card-title">Ooops</span>
-										<p id="errorMessageText"></p>
-									</div>
-								</div>								
-
-								<div class="row nomarginrow">
-									<div id="locationInfo" class="hidden">
-										<div id="coordsvgp" class="col s12 m6">
-											<svg id="coordsvg" xmlns="http://www.w3.org/2000/svg"></svg>
-										</div>
-										
-										<div id="centerdistsvgp" class="col s12 m6">
-											<svg id="centerdistsvg" xmlns="http://www.w3.org/2000/svg"></svg>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div id="destinationtable" class="card card-panel blue-grey darken-1" >
-							<div class="card-content white-text">								
-								<div class="row nomarginrow">									
-									<div class="col s10">
-										<div class="white-text  flow-text">Enter destinations in coordinate format</div>
-									</div>
-									<div class="col s2">
-										<div onclick="destinationDataState.toggle();" style="text-align:right;font-size:23pt;cursor:pointer;">
-											<i id="showhidelabel" title="Hide list" class="icon-toggle-on"></i>
-										</div>
-									</div>
-								</div>
-								
-								<div class="row nomarginrow">
-									<div class="col s12">
-										<textarea id="destinationlocation" class="white-text validate materialize-textarea" placeholder="Place destinations here"></textarea>
-									</div>
-								</div>
-								
-								<div class="row">
-									<div class="col s12 m6">
-										<div class="btn" onclick="destinationHandler.addBatch();">Add them</div>
-									</div>
+							<p class="c-paragraph">
+								Enter your coordinates in <strong>ABCD:1234:5678:1234:5678</strong> format
+							</p>
 							
-									<div class="col s12 m6">
-										<div class="btn" onclick="destinationHandler.addPilgrim();">Add Pilgrim</div>
-									</div>
+							<p class="c-paragraph">
+								<input id="userlocation" class="c-field" type="text" placeholder="Place your location here">
+							</p>							
+							<div class="o-grid o-grid--wrap">
+								<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
+									<div class="c-button panelbutton tealbg noinline" onclick="calculateLocation()"><i class="icon-street-view"></i> Draw Location</div>
 								</div>
-								
-								<div class="row nomargin">								
-									<div class="col s12" title="Grab from Reddit">
-										<div class="btn"  onclick="destinationHandler.grabRed();">
-											<i class="hide-on-small-only" class="valign">Grab from</i> <i class="icon-reddit"></i> <strong>Reddit</strong>
-											
-										</div>
-									</div>
-									
-									<div class="col s12 hide" id="redditbtnlist">
-										<div >
-											<ul class="collection" id="redditbtnlistcontent">
-												<li class="btn" onclick="destinationHandler.grabRed('Last');"><div>Last known locations</div></li>
-												<li class="btn" onclick="destinationHandler.grabRed('Rec');"><div>Recommended locations</div></li>
-												<li class="btn" onclick="destinationHandler.addRedHub();"><div>Galactic Hub (R.E.)</div></li>
-											</ul>
-										</div>
-									</div>
-									
+								<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
+									<div class="c-button panelbutton tealbg noinline" onclick="galSvg.drawBHZone()"><i class="icon-target-1"></i> Draw B.Hole Area</div>
 								</div>
-								
-								<div id="destinationdata">
-									<div class="row nomarginrow">
-										<ul class="collection black-text" id="destinationlist"></ul>
-									</div>
-								</div>
-								
 							</div>
-						</div>
-					</form>
-					
-					
+							
+							<div id="errorMessage" class="c-alert c-alert--error hidden">
+								<span class="card-title">Ooops</span>
+								<p id="errorMessageText"></p>
+							</div>								
 
+							
+							<div id="locationInfo" class="o-grid o-grid--wrap hidden">
+								<div id="coordsvgp" class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
+									<svg id="coordsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+								</div>
+								
+								<div id="centerdistsvgp" class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
+									<svg id="centerdistsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+								</div>
+							</div>
+							
+						</div>
+
+						<input type="checkbox" id="destinationpanel" checked>
+						<label class="c-card__item c-card__item--brand" for="destinationpanel">Destinations</label>
+						<div class="c-card__item bluebg">
+
+							<div class="c-paragraph">Enter destinations in coordinate format</div>
+							<textarea id="destinationlocation" class="c-field" placeholder="Place destinations here"></textarea>
+							
+							<div class="o-grid o-grid--wrap">
+								<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
+									<div class="c-button tealbg panelbutton noinline" onclick="destinationHandler.addBatch();">Add them</div>
+								</div>
+								<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
+									<div class="c-button tealbg panelbutton noinline" onclick="destinationHandler.addPilgrim();">Add Pilgrim</div>
+								</div>
+							</div>
+							
+							<div class="c-card c-card--accordion u-high" id="redditpanel">
+								<input type="checkbox" id="reddittoggle">
+								<label class="c-card__item c-card__item--brand" id="redditpanellabel" for="reddittoggle">Grab from <i class="icon-reddit"></i> <strong>Reddit</strong></label>
+								<div class="c-card__item" id="redditpanelbg">
+									<div class="c-button c-button--brand panelbutton redditbtn noinline" onclick="destinationHandler.grabRed('Last');">Last known locations</div>
+									<div class="c-button c-button--brand panelbutton redditbtn noinline" onclick="destinationHandler.grabRed('Rec');">Recommended locations</div>
+									<div class="c-button c-button--brand panelbutton redditbtn noinline" onclick="destinationHandler.addRedHub();">Galactic Hub (R.E.)</div>
+								</div>
+							</div>
+							
+							<div id="destinationdata">
+								<div class="c-card u-high" id="destinationlist">
+								</div>
+							</div>
+							
+						</div>
+					</div>
 				</div>
 			</div>
 			
-			<div id="plotparent" class="col s12 m7">
+			<div id="plotparent" class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-60@small">
 				
 				<div id="galmapp">
 					<blockquote>Galaxy map</blockquote>					
@@ -142,22 +108,22 @@
 						 <svg id="svgc" xmlns="http://www.w3.org/2000/svg"></svg>
 					</div>
 					
-					<div class="chip chipcenter">Galaxy center</div>
-					<div class="chip chipdestination">Destination</div>
-					<div class="chip chipuser">User Location</div>
-					<div class="chip chiphub">Galactic Hub</div>
+					<div class="c-badge c-badge--brand chipcenter">Galaxy center</div>
+					<div class="c-badge c-badge--brand chipdestination">Destination</div>
+					<div class="c-badge c-badge--brand chipuser">User Location</div>
+					<div class="c-badge c-badge--brand chiphub">Galactic Hub</div>
 				</div>
 				
 				<div id="directionsmap" class="hidden">
-					<div class="row">
-						<div class="col s12 m6">
+					<div class="o-grid o-grid--wrap">
+						<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small">
 							<blockquote>Height map</blockquote>
 							<div id="heightsvgp">
 								<svg id="heightsvg" xmlns="http://www.w3.org/2000/svg"></svg>
 							</div>
 						</div>
-						<div class="col s12 m6">
-							<blockquote>Compass <span class="chip teal">BETA</span></blockquote>
+						<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small">
+							<blockquote>Compass <span class="c-badge c-badge--success">BETA</span></blockquote>
 							<div id="compassp">
 								<div>To reach <strong><span id="destinationnamecompass"></span></strong> follow this direction:</div>
 								<div>Looking at the center, turn <span id="degreestxt"></span> degrees to your <span id="degreesdirtxt"></span></div>
@@ -170,28 +136,27 @@
 		</div>	
 
 		<script type="text/template" id="destinationtemplate">
-			<li class="collection-item destinationtemplaterow" rel="{{id}}">
-				<div class="row nomarginrow">
-					<div class="col s1 m1 targetSelect" title="Select as destination" onclick="destinationHandler.selectDest({{id}});">
-						<i class="icon-globe"></i>
-						<i class="icon-hand-pointer-o" style="position: absolute; margin-top:5px; margin-left:-8px;"></i>
+				<div class="c-card__item destinationtemplaterow">
+					<div class="o-grid o-grid--wrap">
+						<div class="o-grid__cell o-grid__cell--width-10 nopadding targetSelect" title="Select as destination" onclick="destinationHandler.selectDest({{id}});">
+							<button class="c-button u-xsmall">
+								<i class="icon-target"></i>
+							</button>
+						</div>
+						<div class="o-grid__cell o-grid__cell--width-80">
+							<input class="destinationname c-field" type="text" onchange="destinationHandler.updateDestName({{id}},this);" id="desttb{{id}}" value="{{name}}">
+						</div>
+						<div class="o-grid__cell o-grid__cell--width-10 nopadding">
+							<button class="c-button  u-xsmall deletebtn" title="Delete this destination" onclick="destinationHandler.deleteDest({{id}});"><i class="icon-trash"></i></button>
+						</div>			
 					</div>
-					<div class="col s9 m5 flow-text">
-						<input class="destinationname flow-text" type="text" onchange="destinationHandler.updateDestName({{id}},this);" id="desttb{{id}}" value="{{name}}">
-					</div>
-					<div class="col s2 hide-on-med-and-up" onclick="destinationHandler.deleteDest({{id}});">
-						<div class="btn-floating deletebtn">X</div>
-					</div>
-					<div class="col s12 m5">
-						{{x}}:{{y}}:{{z}}
-					</div>					
-				</div>
-				
-				<div class="row nomarginrow">
-					<div class="col s6 m6">{{distance}} ly</div>
-					<div class="col s6 m5">{{jumps}} jumps</div>
-					<div class="col s6 m1 hide-on-small-only">
-						<div class="btn-floating deletebtn" title="Delete this destination" onclick="destinationHandler.deleteDest({{id}});"><i class="icon-trash"></i></div>
+					
+					<div class="o-grid o-grid--wrap">
+						<div class="o-grid__cell">
+							{{x}}:{{y}}:{{z}}
+						</div>	
+						<div class="o-grid__cell">{{distance}} ly</div>
+						<div class="o-grid__cell">{{jumps}} jumps</div>
 					</div>
 				</div>
 			</li>

@@ -547,7 +547,7 @@ function generateMap(){
 		}else{
 			this.addNode("text",["style","font-family:'nmsicons'; font-size:15pt;", "x",centerX-15,"y",centerZ+8,"stroke",fillStyle,"stroke-width","1","fill","none"],icon);
 		}
-		this.drawText(obj.name,centerX+10, centerZ-10, "white");
+		this.drawText(obj.name,centerX+10, centerZ-5, "white");
 	};
 			
 	galSvg.drawAxis = function (){
@@ -599,7 +599,7 @@ function generateMap(){
 			// Draw all locations even if there is no user
 			for(var i = 0;i<destinations.length;i++){
 				this.transformCoords(destinations[i]);	
-				this.drawStar(destinations[i],4, (i!=selectedDestination) ? '\uf185' : '\ue807');
+				this.drawStar(destinations[i],4);
 			}
 			
 			if(userLocation.enabled){
@@ -607,10 +607,10 @@ function generateMap(){
 				$("#"+this.domIdName)[0].appendChild(backgroundBh);
 			}
 			
-			this.drawStar(center,6,'\uf185');
+			this.drawStar(center,6);
 		
 			if(userLocation.enabled){
-				this.drawStar(userLocation,4,'\uf21d');
+				this.drawStar(userLocation,4);
 
 				var v1 = userLocation.getVector(center); 
 				var v2 = userLocation.getVector(destinations[selectedDestination]);
@@ -639,37 +639,24 @@ function generateMap(){
 		destinationHandler.deleteDest(0);
 	}
 	destinationHandler.syncDestinationList(); // So draws it too inside
-
 }
 
 function hideMessages(){
-	var elementA = document.getElementById("errorMessage");
-	var elementB = document.getElementById("locationInfo");
-	var elementC = document.getElementById("directionsmap");
-	
-	elementA.className = elementA.className + " hidden";
-	elementB.className = "hidden";
-	elementC.className = "hidden";
+	$("#locationInfo").addClass("hidden");
+	$("#directionsmap").addClass("hidden");
+	$("#errorMessage").addClass("hidden");
 }
 
 function showErrorMessage(text){
-	var element = document.getElementById("errorMessage");
-	element.className = "card blue-grey indigo";
-	var elementText = document.getElementById("errorMessageText");
-	elementText.innerHTML = text;
+	$("#errorMessage").removeClass().addClass("c-alert c-alert--error");
+	$("#errorMessageText").html(text);
 }
 
-function setValue(domId,value){
-	var element = document.getElementById(domId);
-	element.innerHTML = value;
-}
 
 function showLocationInfo(x,y,z){
-	var element = document.getElementById("locationInfo");
-	element.className = "visible";
 	
-	var elementB = document.getElementById("directionsmap");
-	elementB.className = "visible";
+	$("#locationInfo").removeClass("hidden");
+	$("#directionsmap").removeClass("hidden");
 	
 	userLocation.updateCoords(x,y,z);
 			
@@ -680,8 +667,6 @@ function showLocationInfo(x,y,z){
 	coordSvg.drawCoords(x,y,z);
 	
 	destinationHandler.syncDestinationList();
-
-
 }
 
 function calculateLocation(){

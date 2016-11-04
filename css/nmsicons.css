@@ -1,44 +1,77 @@
 @font-face {
   font-family: 'nmsicons';
-  src: url('../fonts/nmsicons.woff?72078688') format('woff'),
-       url('../fonts/nmsicons.ttf?72078688') format('truetype');
+
+  src: url('../fonts/nmsicons.woff?28770366') format('woff'),
+       url('../fonts/nmsicons.ttf?28770366') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
-[class^="icon-"]:before, [class*=" icon-"]:before {
+
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'nmsicons';
+    src: url('../font/nmsicons.svg?9312094#nmsicons') format('svg');
+  }
+}
+*/
+ 
+ [class^="icon-"]:before, [class*=" icon-"]:before {
   font-family: "nmsicons";
   font-style: normal;
   font-weight: normal;
   speak: none;
+ 
   display: inline-block;
   text-decoration: inherit;
   width: 1em;
   margin-right: .2em;
   text-align: center;
+  /* opacity: .8; */
+ 
+  /* For safety - reset parent styles, that can break glyph codes*/
   font-variant: normal;
   text-transform: none;
+ 
+  /* fix buttons height, for twitter bootstrap */
   line-height: 1em;
+ 
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
   margin-left: .2em;
+ 
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+ 
+  /* Font smoothing. That was taken from TWBS */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+ 
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
  
-.icon-megaphone:before { content: '\e800'; } /* '' */
-.icon-question:before { content: '\e801'; } /* '' */
-.icon-reddit:before { content: '\e802'; } /* '' */
-.icon-adult:before { content: '\e803'; } /* '' */
-.icon-target:before { content: '\e804'; } /* '' */
-.icon-light-up:before { content: '\e805'; } /* '' */
-.icon-cc-by:before { content: '\e806'; } /* '' */
+.icon-plus-circled:before { content: '\e800'; } /* '' */
+.icon-minus-circled:before { content: '\e801'; } /* '' */
+.icon-users:before { content: '\e802'; } /* '' */
+.icon-help-circled:before { content: '\e803'; } /* '' */
+.icon-megaphone:before { content: '\e804'; } /* '' */
+.icon-palette:before { content: '\e805'; } /* '' */
+.icon-target:before { content: '\e806'; } /* '' */
 .icon-globe:before { content: '\e807'; } /* '' */
-.icon-target-1:before { content: '\e808'; } /* '' */
-.icon-trash:before { content: '\e809'; } /* '' */
+.icon-reddit:before { content: '\e808'; } /* '' */
+.icon-target-1:before { content: '\e809'; } /* '' */
+.icon-trash:before { content: '\e80a'; } /* '' */
+.icon-coffee:before { content: '\f0f4'; } /* '' */
 .icon-plus-squared:before { content: '\f0fe'; } /* '' */
+.icon-rocket:before { content: '\f135'; } /* '' */
+.icon-bullseye:before { content: '\f140'; } /* '' */
 .icon-minus-squared:before { content: '\f146'; } /* '' */
-.icon-sun:before { content: '\f185'; } /* '' */
 .icon-space-shuttle:before { content: '\f197'; } /* '' */
-.icon-toggle-off:before { content: '\f204'; } /* '' */
-.icon-toggle-on:before { content: '\f205'; } /* '' */
+.icon-reddit-squared:before { content: '\f1a2'; } /* '' */
+.icon-brush:before { content: '\f1fc'; } /* '' */
 .icon-street-view:before { content: '\f21d'; } /* '' */
 .icon-hand-pointer-o:before { content: '\f25a'; } /* '' */
-.icon-map-pin:before { content: '\f276'; } /* '' */
+.icon-github:before { content: '\f300'; } /* '' */

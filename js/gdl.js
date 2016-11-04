@@ -1,14 +1,4 @@
 // Class prototype
-
-function isValueNull(variable){
-	return (variable == undefined || variable == null);
-}
-
-function setDefaultValueIfNull(variable, defaultVal){
-	if(isValueNull(variable)) { variable = defaultVal; }
-	return variable;
-}
-
 var Class = function(methods) {   
     var klass = function() {    
         this.initialize.apply(this, arguments);          
@@ -66,9 +56,10 @@ var Region = Class({
 	
 });
 
+var orangeColor = "#ffa500";
 var center = new Region(2047,127,2047,'Galaxy Center','#7672E8' );
 var userLocation = new Region(0x0,0x0,0x0,'User Location','#36AC3A');
-var destinations = [new Region(0x64a,0x082,0x1b9,'Pilgrim Star','orange')]; // Store for destinations (include one)
+var destinations = [new Region(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor)]; // Store for destinations (include one)
 
 var re = new RegExp("[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
 var lazyRe = new RegExp("[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
@@ -80,33 +71,6 @@ var coordSvg = undefined; // Coordinates SVG
 var centerDistSvg = undefined; // Distance to center SVG
 var heightSvg = undefined; // HeightMap SVG
 var selectedDestination = 0;
-
-var destinationDataState = {
-	shown : true,
-	height : 0,
-	obj : undefined,
-	txtObj : undefined,
-	toggle : function(){
-		if (this.obj==undefined){
-			this.obj = document.getElementById("destinationdata");
-			this.txtObj = document.getElementById("showhidelabel");
-			this.height = this.obj.offsetHeight;
-		}
-		if(this.shown){
-			this.obj.setAttribute("class","hidden");
-			this.txtObj.setAttribute("class","icon-toggle-off");
-			this.txtObj.setAttribute("title","Show list");
-		}else{
-			this.obj.setAttribute("class","visible");
-			this.obj.setAttribute("style","min-height:"+this.height);
-			this.txtObj.setAttribute("class","icon-toggle-on");
-			this.txtObj.setAttribute("title","Hide list");
-			
-		}
-		this.shown = !this.shown;
-	}
-	
-};
 
 var svgImage = Class({
 	
@@ -132,7 +96,6 @@ var svgImage = Class({
 		}
 		
 		if(isValueNull(height)){
-			//this.hp = this.wp;
 			this.hp = this.wp * aspect; 
 		}
 		
@@ -180,7 +143,6 @@ var svgImage = Class({
 		var rectN = this.fastAdd("rect","x|0|y|0|width|30|height|30|style|stroke: rgb(0,184,212);stroke-opacity:0.7;");
 		
 		var parentNode = document.getElementById(this.domIdName);
-		
 		patternN.appendChild(rectN);
 		defsn.appendChild(patternN);
 
@@ -213,10 +175,10 @@ var svgImage = Class({
 		pathText += Mustache.render("L{{a}} {{b}} ", {a: x2-headlen*Math.cos(angle+Math.PI/6),b: y2-headlen*Math.sin(angle+Math.PI/6) });
 		pathText+= " Z";
 		this.addNode("path", ["d",pathText,"fill",fill]);
-
 	}
-
 });
+
+
 
 var destinationHandler = {
 	syncDestinationList : function (){
@@ -227,9 +189,9 @@ var destinationHandler = {
 			var distance = (userLocation.enabled) ? ""+userLocation.calculateDistance(destinations[i]).toFixed(3) : "--";
 			var jumps = (userLocation.enabled) ? ""+ Math.ceil(userLocation.calculateDistance(destinations[i])/400.0) : "--";
 			
-			var x = ('0000'+((destinations[i].getX()).toString(16))).slice(-4).toUpperCase();
-			var y = ('0000'+((destinations[i].getY()).toString(16))).slice(-4).toUpperCase();
-			var z = ('0000'+((destinations[i].getZ()).toString(16))).slice(-4).toUpperCase();
+			var x = toHex(""+destinations[i].getX(),4);
+			var y = toHex(""+destinations[i].getY(),4);
+			var z = toHex(""+destinations[i].getZ(),4);
 			
 			localHtml+=Mustache.render(template,{id:i, name: destinations[i].name , distance:distance, jumps:jumps, x:x,y:y,z:z});
 		}
@@ -250,13 +212,9 @@ var destinationHandler = {
 			if(reResult!=null){
 				data = reResult[0].split(":");
 			}else{
-				
 				reResult = uberLazyRe.exec(line);
 				if(reResult!=null){
 					data = reResult[0].split(":");
-				}
-				else{
-					
 				}
 			}
 		}
@@ -278,11 +236,9 @@ var destinationHandler = {
 	},
 	
 	addDest : function(x,y,z, name, color){	
-		if(!destinationDataState.shown){
-			destinationDataState.toggle();
-		}
+		
 		name = setDefaultValueIfNull(name,"Destination " + destinations.length);
-		color = setDefaultValueIfNull(color,"orange");
+		color = setDefaultValueIfNull(color,orangeColor);
 		
 		var found = false;
 				
@@ -310,12 +266,15 @@ var destinationHandler = {
 			galSvg.drawSvg();
 		}
 	},
+	selectDestColor: function(index){
+		colorModalHandler.showModal(index);
+	},
 	updateDestName : function (index,obj){
 		destinations[index].name = obj.value;
 		galSvg.drawSvg();
 	},
 	addPilgrim : function(){
-		this.addDest(0x64a,0x082,0x1b9,'Pilgrim Star','orange');
+		this.addDest(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor);
 		this.syncDestinationList();
 	},
 	
@@ -409,6 +368,55 @@ var destinationHandler = {
 	}
 };
 
+var mathHandler = {
+	calculateLine : function(obj1, obj2){
+		var line = {
+			m : 0,
+			b : 0,
+			x1: 0,
+			x2: 0,
+			y1: 0,
+			y2: 0,
+			generate : function(obj1,obj2){
+				this.y1 = obj1.getZ();
+				this.y2 = obj2.getZ();
+				this.x1 = obj1.getX();
+				this.x2 = obj2.getX();
+				this.m = (this.y2 - this.y1) / (this.x2 - this.x1);
+				this.b = (this.y1 - (this.m*this.x1));
+			},
+			getY : function(xValue){
+				return Math.ceil(this.m*xValue + this.b);
+			},
+			getNextX : function(stepCount){
+				var dx = (this.x2 - this.x1);
+				var negative = (dx<0);
+				
+				var stepX = (!negative) ? Math.ceil(dx / 400.0) : (-1)*Math.ceil(-1*dx / 400.0) ;
+				var localX = Math.ceil(this.x1) + stepX*stepCount;
+				
+				if(this.x1 < this.x2){
+					return (localX<= this.x2) ? localX : undefined;
+				}else{
+					return (localX>= this.x2) ? localX : undefined;
+				}
+				
+			},
+			printSteps : function(stepCount){				
+				var localX = 0;			
+				for(var i = 0;i<stepCount;i++){
+					localX = this.getNextX(i);
+					if(localX>this.x2){
+						break;
+					}
+					//console.log("x",localX,"y",this.getY(localX));
+				}
+			}
+		};
+		line.generate(obj1,obj2);
+		return line;
+	}
+}
 
 function generateMap(){
 
@@ -529,11 +537,11 @@ function generateMap(){
 	galSvg = new svgImage("svgc","svgp",undefined, undefined);
 	
 	galSvg.transformCoords = function (obj){
-			var mX = 4096;
-			var mZ = 4096;
-			obj.mapCoords[0] = obj.coords[0] * this.wp / mX;
-			obj.mapCoords[1] = obj.coords[1];
-			obj.mapCoords[2] = obj.coords[2] * this.hp / mZ;
+		var mX = 4096;
+		var mZ = 4096;
+		obj.mapCoords[0] = obj.coords[0] * this.wp / mX;
+		obj.mapCoords[1] = obj.coords[1];
+		obj.mapCoords[2] = obj.coords[2] * this.hp / mZ;
 	};
 
 	galSvg.drawStar = function(obj,size, icon){
@@ -589,40 +597,62 @@ function generateMap(){
 
 	galSvg.drawSvg = function(){
 
-			this.clearContent();	
-			this.drawGrid();
-			this.drawAxis();
-			
-			this.transformCoords(center);		
-			this.transformCoords(userLocation);
-
-			// Draw all locations even if there is no user
-			for(var i = 0;i<destinations.length;i++){
-				this.transformCoords(destinations[i]);	
-				this.drawStar(destinations[i],4);
-			}
-			
-			if(userLocation.enabled){
-				var backgroundBh = this.fastAdd("rect","id|bhMap|x|0|y|0|width|0|height|0|style|fill: rgb(250,215,212); fill-opacity:0.2");
-				$("#"+this.domIdName)[0].appendChild(backgroundBh);
-			}
-			
-			this.drawStar(center,6);
+		var dest = destinations[selectedDestination];
 		
-			if(userLocation.enabled){
-				this.drawStar(userLocation,4);
+		this.clearContent();	
+		this.drawGrid();
+		this.drawAxis();
+		
+		this.transformCoords(center);		
+		this.transformCoords(userLocation);
 
-				var v1 = userLocation.getVector(center); 
-				var v2 = userLocation.getVector(destinations[selectedDestination]);
+		// Draw all locations even if there is no user
+		for(var i = 0;i<destinations.length;i++){
+			this.transformCoords(destinations[i]);	
+			this.drawStar(destinations[i],4);
+		}
+		
+		if(userLocation.enabled){
+			var backgroundBh = this.fastAdd("rect","id|bhMap|x|0|y|0|width|0|height|0|style|fill: rgb(250,215,212); fill-opacity:0.2");
+			$("#"+this.domIdName)[0].appendChild(backgroundBh);
+		}
+		
+		this.drawStar(center,6);
+	
+		if(userLocation.enabled){
+			this.drawStar(userLocation,4);
 
-				var angle = v1.getDegreesVector(v2);		
+			var v1 = userLocation.getVector(center); 
+			var v2 = userLocation.getVector(dest);
 
-				compSvg.initialize("compasssvg","compassp",null,200);
-				compSvg.drawCompass(50,angle);
-				
-				heightSvg.initialize("heightsvg","heightsvgp",null,150);
-				heightSvg.drawSvg();
+			var angle = v1.getDegreesVector(v2);		
+
+			compSvg.initialize("compasssvg","compassp",null,200);
+			compSvg.drawCompass(50,angle);
+
+			heightSvg.initialize("heightsvg","heightsvgp",null,150);
+			heightSvg.drawSvg();
+			
+			//this.drawArrow(userLocation.getMapX(), userLocation.getMapZ(),center.getMapX(), center.getMapZ());
+			//this.drawArrow(userLocation.getMapX(), userLocation.getMapZ(),dest.getMapX(), dest.getMapZ());
+			
+			var lineDest = mathHandler.calculateLine(userLocation,dest);
+			
+			$("#routedestinationtxt").html(dest.name);
+			$("#routelist").html("");
+			
+			for(var i = 1;i<11;i++){
+				var x = lineDest.getNextX(i);
+				if(x == undefined){
+					break;
+				}else{
+					var z = lineDest.getY(x);
+				}
+				$(Mustache.render($("#routetemplate").html(),{i:i,x:toHex(x,4), y:toHex(userLocation.getY(),4), z:toHex(z,4)})).appendTo("#routelist");
 			}
+			
+			
+		}
 	};
 	
 	var re = new RegExp("to=[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
@@ -651,7 +681,6 @@ function showErrorMessage(text){
 	$("#errorMessage").removeClass().addClass("c-alert c-alert--error");
 	$("#errorMessageText").html(text);
 }
-
 
 function showLocationInfo(x,y,z){
 	

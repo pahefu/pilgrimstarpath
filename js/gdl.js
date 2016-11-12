@@ -64,6 +64,7 @@ var destinations = [new Region(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor)]; /
 var re = new RegExp("[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
 var lazyRe = new RegExp("[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
 var uberLazyRe = new RegExp("[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
+var lolExtremeLazyRe = new RegExp("[0-9A-F]+ [0-9A-F]+ [0-9A-F]+");
 
 var galSvg = undefined; // Main SVG
 var compSvg = undefined; // Compass SVG
@@ -215,6 +216,11 @@ var destinationHandler = {
 				reResult = uberLazyRe.exec(line);
 				if(reResult!=null){
 					data = reResult[0].split(":");
+				}else{
+					reResult = lolExtremeLazyRe.exec(line);
+					if(reResult!=null){
+						data = reResult[0].split(" ");
+					}
 				}
 			}
 		}

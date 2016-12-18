@@ -59,7 +59,7 @@ var Region = Class({
 var orangeColor = "#ffa500";
 var center = new Region(2047,127,2047,'Galaxy Center','#7672E8' );
 var userLocation = new Region(0x0,0x0,0x0,'User Location','#36AC3A');
-var destinations = [new Region(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor)]; // Store for destinations (include one)
+var destinations = [new Region(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor), new Region(0x469,0x0081,0x0D6D,'Galactic Hub (R.E.)','#c0ca33')]; // Store for destinations (include one)
 
 var re = new RegExp("[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
 var lazyRe = new RegExp("[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
@@ -71,7 +71,7 @@ var compSvg = undefined; // Compass SVG
 var coordSvg = undefined; // Coordinates SVG
 var centerDistSvg = undefined; // Distance to center SVG
 var heightSvg = undefined; // HeightMap SVG
-var selectedDestination = 0;
+var selectedDestination = 1;
 
 var svgImage = Class({
 	

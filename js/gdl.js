@@ -1,4 +1,31 @@
 // Class prototype
+
+var orangeColor = "#ffa500";
+var re = new RegExp("[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
+var lazyRe = new RegExp("[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
+var uberLazyRe = new RegExp("[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
+var lolExtremeLazyRe = new RegExp("[0-9A-F]+ [0-9A-F]+ [0-9A-F]+");
+
+function generateMap(){
+	galaxyMapApp.initialize();
+	compassApp.initialize();
+	
+	var re = new RegExp("to=[0-9A-F]+:[0-9A-F]+:[0-9A-F]+[:]*[0-9A-F]*");
+	var res = re.exec(window.location.search);
+	
+	if(res!=null){
+		console.log("HI!");
+		textHandler.parseLine(res[0].replace("to=",""),
+			function(x,y,z,name,color){
+				destinationApp.addDest(x,y,z,name,color);
+				destinationApp.selectedDestination+=1;
+			},
+			function(){}
+			,"Shared location",null
+		);
+	}
+}
+
 var Class = function(methods) {   
     var klass = function() {    
         this.initialize.apply(this, arguments);          
@@ -14,20 +41,31 @@ var Class = function(methods) {
 };
 
 var Region = Class({ 
-    initialize: function(x,y,z, name, color) {
+    initialize: function(x,y,z, name, color, index) {
 		this.coords = [x,y,z];
 		this.mapCoords = [0,0,0];
 		this.name = name;	
 		this.enabled = false; // User Location Only
 		this.color = color;
+		this.index = index;
     },
 	updateCoords : function (x,y,z) { this.coords = [x,y,z];},
+	updateMapCoords : function(mapW, mapH){
+		var mX = 4096;
+		var mZ = 4096;
+		this.mapCoords[0] = this.coords[0] * mapW / mX;
+		this.mapCoords[1] = this.coords[1];
+		this.mapCoords[2] = this.coords[2] * mapH / mZ;
+	},
 	getX : function() { return this.coords[0];},
 	getY : function() { return this.coords[1];},
 	getZ : function() { return this.coords[2];},
 	getMapX : function() { return this.mapCoords[0];},
 	getMapY : function() { return this.mapCoords[1];},
 	getMapZ : function() { return this.mapCoords[2];},
+	getMapTextX : function () {return this.mapCoords[0] +10;},
+	getMapTextZ : function () {return this.mapCoords[2] -5;},
+	getHexStr : function() { return toHex(this.getX(),4)+":"+toHex(this.getY(),4)+":"+toHex(this.getZ(),4)},
 	getVector : function (otherR){
 
 		var v = { a: 0, b:0, m: 0};
@@ -56,151 +94,8 @@ var Region = Class({
 	
 });
 
-var orangeColor = "#ffa500";
-var center = new Region(2047,127,2047,'Galaxy Center','#7672E8' );
-var userLocation = new Region(0x0,0x0,0x0,'User Location','#36AC3A');
-var destinations = [new Region(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor), new Region(0x469,0x0081,0x0D6D,'Galactic Hub (R.E.)','#c0ca33')]; // Store for destinations (include one)
-
-var re = new RegExp("[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
-var lazyRe = new RegExp("[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
-var uberLazyRe = new RegExp("[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
-var lolExtremeLazyRe = new RegExp("[0-9A-F]+ [0-9A-F]+ [0-9A-F]+");
-
-var galSvg = undefined; // Main SVG
-var compSvg = undefined; // Compass SVG
-var coordSvg = undefined; // Coordinates SVG
-var centerDistSvg = undefined; // Distance to center SVG
-var heightSvg = undefined; // HeightMap SVG
-var selectedDestination = 1;
-
-var svgImage = Class({
-	
-	initialize: function(domId, parentDomId, width, height) {
-
-		this.domIdName = domId;
-		this.parent = $("#"+parentDomId)[0];
-		this.svg = $("#" +domId)[0];
-		this.wp = width;
-		this.hp = height;
-		
-		var aspect;
-		
-		if(isValueNull(width)){		
-
-			var parent = this.parent;
-			
-			aspect = (document.documentElement.clientHeight*1.0/document.documentElement.clientWidth);
-			if(document.documentElement.clientHeight > document.documentElement.clientWidth){
-				aspect = (document.documentElement.clientWidth*1.0/document.documentElement.clientHeight);
-			}
-			this.wp = parent.getBoundingClientRect().width * 0.99;
-		}
-		
-		if(isValueNull(height)){
-			this.hp = this.wp * aspect; 
-		}
-		
-		this.svg.setAttribute("width",this.wp);
-		this.svg.setAttribute("height",this.hp);
-		
-    },
-	
-	clearContent : function(){
-		while (this.svg.firstChild) {
-			this.svg.removeChild(this.svg.firstChild);
-		}
-	},
-	
-	addNode : function(type, attributes, content){
-		var domObj = document.createElementNS("http://www.w3.org/2000/svg",type);
-		for(i = 0;i<attributes.length;i+=2){
-			domObj.setAttribute(attributes[i],""+attributes[i+1]);
-		}
-		
-		if(!isValueNull(content)){
-			domObj.innerHTML+=""+content;
-		}
-
-		this.svg.appendChild(domObj);
-	},
-	
-	fastAdd : function(type, attrs, content){
-		var node = document.createElementNS("http://www.w3.org/2000/svg",type);
-		attrs = attrs.split("|");
-		if(attrs!=null && attrs.length>1){
-			for(var i = 0;i<attrs.length;i+=2){
-				node.setAttribute(attrs[i],""+attrs[i+1]);
-			}
-		}
-		if(!isValueNull(content)){
-			node.innerHTML = content;
-		}
-		return node;
-	},
-	
-	drawGrid : function(){
-		var defsn = this.fastAdd("defs", "");
-		var patternN = this.fastAdd("pattern","id|gridPattern|x|0|y|0|width|30|height|30|patternUnits|userSpaceOnUse");
-		var rectN = this.fastAdd("rect","x|0|y|0|width|30|height|30|style|stroke: rgb(0,184,212);stroke-opacity:0.7;");
-		
-		var parentNode = document.getElementById(this.domIdName);
-		patternN.appendChild(rectN);
-		defsn.appendChild(patternN);
-
-		var background = this.fastAdd("rect",Mustache.render('x|0|y|0|width|{{w}}|height|{{h}}|style|fill: url(#gridPattern);',{w :this.wp, h: this.hp} ));
-
-		parentNode.appendChild(defsn);	
-		parentNode.appendChild(background);	
-		
-	},
-	
-	drawText : function(textStr, x,y, color, fontsize) {
-		color = setDefaultValueIfNull(color,"white");
-		fontsize = setDefaultValueIfNull(fontsize,"0.75em");
-		this.addNode("text", ["dy",fontsize,"x",x,"y",y,"fill",color],textStr);
-	},
-	
-	drawArrow : function(x1,y1,x2,y2, stroke, fill){
-		var color = 255;
-		stroke = setDefaultValueIfNull(stroke,"stroke:rgb(255,255,255); stroke-width:1;");
-		fill = setDefaultValueIfNull(fill,"white");
-		
-		var document = 
-		this.addNode("line", ["x1",x1,"y1",y1,"x2",x2,"y2",y2, "style",stroke]);
-		
-		var headlen = 10;   
-		var angle = Math.atan2(y2-y1,x2-x1);	
-		var pathText ="";
-		pathText += Mustache.render("M{{a}} {{b}} ", {a: x2,b:y2});
-		pathText += Mustache.render("L{{a}} {{b}} ", {a: x2-headlen*Math.cos(angle-Math.PI/6),b: y2-headlen*Math.sin(angle-Math.PI/6) });
-		pathText += Mustache.render("L{{a}} {{b}} ", {a: x2-headlen*Math.cos(angle+Math.PI/6),b: y2-headlen*Math.sin(angle+Math.PI/6) });
-		pathText+= " Z";
-		this.addNode("path", ["d",pathText,"fill",fill]);
-	}
-});
-
-
-
-var destinationHandler = {
-	syncDestinationList : function (){
-		var destinationObj = document.getElementById("destinationlist");
-		var localHtml = "";
-		var template = document.getElementById("destinationtemplate").innerHTML;
-		for(var i = 0;i<destinations.length;i++){
-			var distance = (userLocation.enabled) ? ""+userLocation.calculateDistance(destinations[i]).toFixed(3) : "--";
-			var jumps = (userLocation.enabled) ? ""+ Math.ceil(userLocation.calculateDistance(destinations[i])/400.0) : "--";
-			
-			var x = toHex(""+destinations[i].getX(),4);
-			var y = toHex(""+destinations[i].getY(),4);
-			var z = toHex(""+destinations[i].getZ(),4);
-			
-			localHtml+=Mustache.render(template,{id:i, name: destinations[i].name , distance:distance, jumps:jumps, x:x,y:y,z:z});
-		}
-		destinationObj.innerHTML = localHtml;
-	
-		galSvg.drawSvg(); // Draw general map
-	},
-	
+var textHandler = {
+	okLines : "",
 	parseLine : function (line, okCb, errorCb, name,color){
 		var data = undefined;
 		line = line.toUpperCase();
@@ -240,81 +135,6 @@ var destinationHandler = {
 		}
 		
 	},
-	
-	addDest : function(x,y,z, name, color){	
-		
-		name = setDefaultValueIfNull(name,"Destination " + destinations.length);
-		color = setDefaultValueIfNull(color,orangeColor);
-		
-		var found = false;
-				
-		var totalSameCoords = destinations.filter(function(dest){ return (dest.getX()==x && dest.getY()==y && dest.getZ()==z)});
-		if(totalSameCoords.length!=0){
-			found = true;
-		}
-		
-		if(!found){
-			destinations.push(new Region(x,y,z,name,color));
-		}
-	},
-	deleteDest : function(index){
-		if(destinations.length<2){
-			return;
-		}	
-		destinations.splice(index, 1);
-		
-		this.syncDestinationList();
-		
-	},
-	selectDest : function(index){	
-		selectedDestination = index;
-		if(userLocation.enabled){
-			galSvg.drawSvg();
-		}
-	},
-	selectDestColor: function(index){
-		colorModalHandler.showModal(index);
-	},
-	updateDestName : function (index,obj){
-		destinations[index].name = obj.value;
-		galSvg.drawSvg();
-	},
-	addPilgrim : function(){
-		this.addDest(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor);
-		this.syncDestinationList();
-	},
-	
-	addBatch : function(){
-		var remainingText = "";
-		var destination = document.getElementById("destinationlocation");
-		var lines = destination.value.split("\n");		
-		for(var i = 0;i<lines.length;i++){
-			var data = this.parseLine(lines[i], 
-				function(x,y,z,name,color){
-					destinationHandler.addDest(x,y,z,name,color);
-				},
-				function(){
-					remainingText+=lines[i]+"\n";	
-				},
-				null,null);
-		}
-		destination.value = remainingText;
-		this.syncDestinationList();
-	},
-	
-	addRedHub: function(){
-		this.addDest(0x469,0x0081,0x0D6D,'Galactic Hub (R.E.)','#c0ca33');
-		this.syncDestinationList();
-		$("#redditbtnlist").toggleClass("hide");
-		$("#redditbtnlist").toggleClass("show");
-	},
-	
-	addRedLast: function(data){
-		this.addRed(data, "Last");
-	},
-	addRedRec: function(data){
-		this.addRed(data, "Rec");
-	},
 	addRed: function(data, type){
 		
 		var fullText = (data[0]['data']['children'][0]['data']['selftext']);
@@ -335,40 +155,37 @@ var destinationHandler = {
 
 		fullText = fullText.join("\n");
 		var lines = fullText.split("\n");
+		this.okLines = "";
 		
 		for(var i = 0;i<lines.length;i++){		
 			var search = localRe.exec(lines[i]);
 			if (search!=null && search.input.indexOf("|")>0){
-				
+
 				if(search[0] == "0000:1111:2222:3333"){
 					continue;
 				}
 				var name = lines[i].substring(0,lines[i].indexOf("|")).replace(/[\*\[\]]/gi, '');
-								
-				this.parseLine(lines[i],
-					function(x,y,z,name,color){
-						destinationHandler.addDest(x,y,z,name,color);
-					},
-					function(){},
-				name,null);
+		
+				this.okLines+=lines[i]+"\n";
 			}
 		}
-		this.syncDestinationList();
 		
+		destinationApp.addBatchText(this.okLines, true);
+
 		$("#redditbtnlist").toggleClass("hide");
 		$("#redditbtnlist").toggleClass("show");
 		
 	},
-	
-	grabRed : function(type){		
-
+	addRedRec : function(data){ this.addRed(data,"Rec") },
+	addRedLast : function(data){ this.addRed(data,"Last") },
+	grabRed : function(type){
 		if(isValueNull(type)){
 			
 			$("#redditbtnlist").toggleClass("hide");
 			$("#redditbtnlist").toggleClass("show");
 		}else{
 			$.ajax({ 
-				url: 'https://www.reddit.com/r/nomanshigh/comments/5a7ovn/share_your_coordinates_recommend_planets_log_and/.json?limit=1&amp;jsonp=destinationHandler.addRed'+type
+				url: 'https://www.reddit.com/r/nomanshigh/comments/5a7ovn/share_your_coordinates_recommend_planets_log_and/.json?limit=1&amp;jsonp=textHandler.addRed'+type
 			});
 		}
 	}
@@ -424,301 +241,332 @@ var mathHandler = {
 	}
 }
 
-function generateMap(){
-
-	// Coordinates definition
-	
-	coordSvg = new svgImage("coordsvg","coordsvgp",null,100);
-	coordSvg.drawCoords = function(x,y,z){
-		
-		var minx = 10;
-		var maxx = 70;
-		var miny = 70;
-		var maxy = 10;
-		
-		var midx = 45;
-		var midy = 35;
-
-		this.clearContent();
-		
-		this.drawArrow(minx,miny, maxx,miny); // X axis
-		this.drawArrow(minx,miny, minx,maxy); // Y axis
-		this.drawArrow(minx,miny, midx,midy); // Z axis
+var userLocationApp = new Vue({
+	el: '#userLocationApp',
+	data: {
+		userLocation : new Region(0x0,0x0,0x0,'User Location','#36AC3A'), // This is region APP
+		firstPush : false,
+		locationValid: false,
+		locationText : "",
+		errorMessage : "",
+		center : undefined
+	},
+	methods:{
+		calculateLocation : function(){
+			this.firstPush = true;
+			this.center = destinationApp.center;
+			var parentThis = this;
+			textHandler.parseLine(this.locationText, function(x,y,z,name,color){
+				parentThis.userLocation.updateCoords(x,y,z);
+				parentThis.userLocation.updateMapCoords(galaxyMapApp.width, galaxyMapApp.height);
+				parentThis.locationValid = true;
 				
-		this.drawText("X coord: " +x,maxx+5,miny-10);
-		this.drawText("Y coord: " +y,minx+5,maxy-10);
-		this.drawText("Z coord: " +z,midx+10,midy-5);
-		
+				destinationApp.reSyncFromUser(parentThis.userLocation); // Notify others, huh!
+				galaxyMapApp.syncUserLocation(parentThis.userLocation); // Resync data --> MAP
+				galaxyMapApp.showBlackHoleRing = false; // Not blackhole if you move
+				compassApp.syncCompass(); // Sync our current compass
+				heightMapApp.syncDiff();
+			}, 
+			function(){
+				parentThis.locationValid = false;
+				parentThis.errorMessage = "Invalid format for location";
+			}, 	
+			null, null);
+		},
+		drawBHZone : function (){ // Redirect
+			this.firstPush = true;
+			if(!this.locationValid){
+				this.errorMessage = "Calculate your location first!";
+				return;
+			}
+			galaxyMapApp.drawBHZone();
+		}
 	}
-	
-	// Distance to center definition
-	
-	centerDistSvg = new svgImage("centerdistsvg","centerdistsvgp",null,100);
-	centerDistSvg.drawDistance = function(distance){
-		this.clearContent();
-		var distanceTxt = distance.toFixed(3) +" ly";
-		this.drawText(distanceTxt + " to the center" ,0,(this.hp/2)-20);
-		this.drawArrow(2,this.hp/2, this.wp-2, this.hp/2);
-	}
-	
-	// Compass definition
-	
-	compSvg = new svgImage("compasssvg","compassp",null,200);
-	compSvg.drawCompass = function(radius,radians){		
-		this.clearContent();
-		var pos = [80,80];
-		
-		var degrees = (radians*180/Math.PI);
-		
-		var x = pos[0];
-		var y = pos[1]-radius;
-		
-		var transform = "rotate("+degrees+" 80 80)";
+});
 
-		var group = this.fastAdd("g","transform|"+transform);
+var destinationApp = new Vue({
+	el : '#destinationApp',
+	data : {
+		center: new Region(2047,127,2047,'Galaxy Center','#7672E8' ),
+		destinationsText : "",
+		destinations : [
+			new Region(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor,0), 
+			new Region(0x469,0x0081,0x0D6D,'Galactic Hub (R.E.)','#c0ca33',1)
+		],
+		selectedDestination : 1,
+	},
+	methods : {
+		destinationObj : function(){
+			return this.destinations[this.selectedDestination];
+		},
 		
-		var circleNode = this.fastAdd("circle",Mustache.render("cx|{{cx}}|cy|{{cy}}|r|{{r}}|style|stroke:rgb(153,153,153); stroke-width:2; fill:none;",
-			{ cx:pos[0], cy:pos[1], r:radius}
-		));
-		var shipIcon = this.fastAdd("text", Mustache.render("style|font-family:'nmsicons'; font-size:15pt;|x|{{x}}|y|{{y}}|transform|rotate(-90 87 80)|stroke|#ffffff|stroke-width|1|fill|none",
-			{x:pos[0],y:pos[1]}
-		), '\uf197');
-		
-		var shipLine = this.fastAdd("line", Mustache.render("x1|{{x1}}|y1|{{y1}}|x2|{{x2}}|y2|{{y2}}|style|stroke:rgb(255,0,0); stroke-width:1; stroke-opacity:0.5",
-			{x1:pos[0],y1:pos[1],x2:x,y2:y}
-		));
-		
-		var centerLine = this.fastAdd("line", Mustache.render("x1|{{x1}}|y1|{{y1}}|x2|{{x2}}|y2|{{y2}}|style|stroke:rgb(123,123,230); stroke-width:2;",
-			{x1:pos[0],y1:pos[1],x2:x,y2:y}
-		));
-	
-		var centerText = this.fastAdd("text", Mustache.render("style|font-family:'nmsicons'; font-size:15pt;|x|{{x}}|y|{{y}}|fill|{{color}}",
-			{x:75,y:15, color:center.color}
-		), 'Center');
-
-		$("#"+this.domIdName).append(centerLine);
-		$("#"+this.domIdName).append(centerText);
-		
-		group.appendChild(circleNode);
-		group.appendChild(shipIcon);
-		group.appendChild(shipLine);
-		$("#"+this.domIdName).append(group);
-		
-		
-		var txt = $("#degreestxt").html(""+Math.abs(degrees).toFixed(2));
-		var txtDir = $("#degreesdirtxt").html((degrees>0) ? "right" : "left");
-		$("#destinationnamecompass").html(destinations[selectedDestination].name);
-
-	};
-
-	// HeightMap definition
-	
-	heightSvg = new svgImage("heightsvg","heightsvgp",null,150);
-	heightSvg.drawStar = function(obj, x, size, index){
-		var centerX = x;
-		var centerY = this.hp- (obj.mapCoords[1]* this.hp / 256);
-		var fillStyle = obj.color;
-
-		this.addNode("circle",["cx",centerX,"cy",centerY,"r",size,"stroke",fillStyle,"stroke-width","1","fill",fillStyle]);
-		
-		var name = (index == undefined || index == null) ? (obj.name[0]) : (obj.name[0] + (index+1));
-		this.drawText(name,centerX+10,centerY-10,obj.color);
-	};
-
-	heightSvg.drawSvg = function(){
-		this.clearContent();	
-		this.drawGrid();
-		this.drawArrow(5,this.hp-2, 5,20,"stroke:#00b8d4 ; stroke-width:1;","#00b8d4");
-		this.drawText("Y",15,20,"#00b8d4")
-		this.drawStar(userLocation,50,4);
-		
-		var maxDestinations = Math.min(destinations.length,7);
-		
-		for(var i = 0;i<maxDestinations;i++){
-			this.drawStar(destinations[i],(i*40)+100,4,i);	
-		}
-	};
-	
-	// Gal Map definition
-	galSvg = new svgImage("svgc","svgp",undefined, undefined);
-	
-	galSvg.transformCoords = function (obj){
-		var mX = 4096;
-		var mZ = 4096;
-		obj.mapCoords[0] = obj.coords[0] * this.wp / mX;
-		obj.mapCoords[1] = obj.coords[1];
-		obj.mapCoords[2] = obj.coords[2] * this.hp / mZ;
-	};
-
-	galSvg.drawStar = function(obj,size, icon){
-		var centerX = obj.getMapX();
-		var centerZ = obj.getMapZ();
-		var fillStyle = obj.color;
-		var iconActive = !isValueNull(icon);
-		
-		if(!iconActive){
-			this.addNode("circle",["cx",centerX,"cy",centerZ,"r",size,"stroke",fillStyle,"stroke-width","1","fill",fillStyle]);
-		}else{
-			this.addNode("text",["style","font-family:'nmsicons'; font-size:15pt;", "x",centerX-15,"y",centerZ+8,"stroke",fillStyle,"stroke-width","1","fill","none"],icon);
-		}
-		this.drawText(obj.name,centerX+10, centerZ-5, "white");
-	};
-			
-	galSvg.drawAxis = function (){
-		this.drawText("X",152,3,"#00b8d4");
-		this.drawArrow(10,10,150,10,"stroke:#00b8d4 ; stroke-width:1;","#00b8d4");
-		this.drawText("Z",4,152,"#00b8d4");
-		this.drawArrow(10,10,10,150,"stroke:#00b8d4 ; stroke-width:1;","#00b8d4");
-	};
-	
-	galSvg.drawBHZone = function(){
-		
-		if(!userLocation.enabled){
-			showErrorMessage("Calculate your location first!");
-			return;
-		}
-		
-		var minX = 9999; var maxX = 0;
-		var localD = 0;
-		var found = false;
-		
-		var centerDist = userLocation.calculateDistance(center);
-		
-		var outterDistance = (centerDist-1000)/100.0;
-		var innerDistance = (centerDist-2000)/100.0;
-			
-		var aspectX = (this.wp/4096);
-		var aspectY = (this.hp/4096);
-
-		var rx = (outterDistance) *(aspectX);
-		var ry = (outterDistance) *(aspectY);
-		
-		var cx = center.getX()*aspectX;
-		var cy = center.getZ()*aspectY;
-
-		var innerNode = this.fastAdd("ellipse",Mustache.render("cx|{{cx}}|cy|{{cy}}|rx|{{rx}}|ry|{{ry}}|style|stroke:rgb(255,0,0);stroke-width:5px;stroke-opacity:0.3;fill:none;",{ cx:cx, cy:cy, rx:rx-5,ry:ry-5 }));
-		this.svg.appendChild(innerNode);
-		
-	}
-
-	galSvg.drawSvg = function(){
-
-		var dest = destinations[selectedDestination];
-		
-		this.clearContent();	
-		this.drawGrid();
-		this.drawAxis();
-		
-		this.transformCoords(center);		
-		this.transformCoords(userLocation);
-
-		// Draw all locations even if there is no user
-		for(var i = 0;i<destinations.length;i++){
-			this.transformCoords(destinations[i]);	
-			this.drawStar(destinations[i],4);
-		}
-		
-		if(userLocation.enabled){
-			var backgroundBh = this.fastAdd("rect","id|bhMap|x|0|y|0|width|0|height|0|style|fill: rgb(250,215,212); fill-opacity:0.2");
-			$("#"+this.domIdName)[0].appendChild(backgroundBh);
-		}
-		
-		this.drawStar(center,6);
-	
-		if(userLocation.enabled){
-			this.drawStar(userLocation,4);
-
-			var v1 = userLocation.getVector(center); 
-			var v2 = userLocation.getVector(dest);
-
-			var angle = v1.getDegreesVector(v2);		
-
-			compSvg.initialize("compasssvg","compassp",null,200);
-			compSvg.drawCompass(50,angle);
-
-			heightSvg.initialize("heightsvg","heightsvgp",null,150);
-			heightSvg.drawSvg();
-			
-			//this.drawArrow(userLocation.getMapX(), userLocation.getMapZ(),center.getMapX(), center.getMapZ());
-			//this.drawArrow(userLocation.getMapX(), userLocation.getMapZ(),dest.getMapX(), dest.getMapZ());
-			
-			var lineDest = mathHandler.calculateLine(userLocation,dest);
-			
-			$("#routedestinationtxt").html(dest.name);
-			$("#routelist").html("");
-			
-			for(var i = 1;i<11;i++){
-				var x = lineDest.getNextX(i);
-				if(x == undefined){
-					break;
-				}else{
-					var z = lineDest.getY(x);
-				}
-				$(Mustache.render($("#routetemplate").html(),{i:i,x:toHex(x,4), y:toHex(userLocation.getY(),4), z:toHex(z,4)})).appendTo("#routelist");
+		destinationName : function() {
+			return this.destinationObj().name;
+		},
+		addDest : function(x,y,z, name, color){
+			name = setDefaultValueIfNull(name,"Destination " + this.destinations.length);
+			color = setDefaultValueIfNull(color,orangeColor);
+			var found = false;
+					
+			var totalSameCoords = this.destinations.filter(function(dest){ return (dest.getX()==x && dest.getY()==y && dest.getZ()==z)});
+			if(totalSameCoords.length!=0){
+				found = true;
 			}
 			
+			if(!found){
+				this.destinations.push(new Region(x,y,z,name,color, this.destinations.length));
+			}
+		},	
+		addBatchText : function(textLines, fromReddit){
+			var lines = textLines.split("\n");		
+
+			for(var i = 0;i<lines.length;i++){
+				var name = null;
+				if(fromReddit){
+					name = lines[i].substring(0,lines[i].indexOf("|")).replace(/[\*\[\]]/gi, '');	
+				}
+				
+				var data = textHandler.parseLine(lines[i], 
+					function(x,y,z,name,color){
+						destinationApp.addDest(x,y,z,name,color);
+					},
+					function(){
+						
+					},
+					name,null);
+			}
+			galaxyMapApp.syncDestinations();
+			heightMapApp.syncDiff();
+		},
+		addBatch : function(){
+			this.addBatchText(this.destinationsText, false);		
+		},
+		deleteDest : function(index){
+			if(this.destinations.length<2){
+				return;
+			}	
+			var shadow = this.destinations.slice(0, index).concat(this.destinations.slice(index+1, this.destinations.length)); // shadowcopy
+			for(var i = 0;i<shadow.length;i++){
+				shadow[i].index = i;
+			}
+			this.destinations = shadow;
+			this.selectedDestination = 0;	
+			galaxyMapApp.syncDestinations();
+			heightMapApp.syncDiff();
+		},
+		selectDest : function(index){	
+			this.selectedDestination = index;
+			compassApp.syncCompass();
+			heightMapApp.syncDiff();
+		},
+		selectDestColor: function(index){
+			colorPickerApp.showWindow(index);
+		},
+		addPilgrim : function(){
+			this.addDest(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor);
+		},		
+		addRedHub: function(){
+			this.addDest(0x469,0x0081,0x0D6D,'Galactic Hub (R.E.)','#c0ca33');			
+		},
+		addRedLast: function(){
+			textHandler.grabRed("Last");
+		},
+		addRedRec: function(){
+			textHandler.grabRed("Rec");
+		},
+		updateMapCoords : function(mapW, mapH){
+			for(var i = 0;i<this.destinations.length; i++){				
+				this.destinations[i].updateMapCoords(mapW,mapH);
+			}			
+			this.center.updateMapCoords(mapW, mapH);
+		},
+		reSyncFromUser : function(usr){
 			
 		}
-	};
-	
-	var re = new RegExp("to=[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
-	var res = re.exec(window.location.search);
-	
-	if(res!=null){
-		destinationHandler.parseLine(res[0].replace("to=",""),
-			function(x,y,z,name,color){
-				destinationHandler.addDest(x,y,z,name,color);
-			},
-			function(){}
-			,"Shared location",null
-		);
-		destinationHandler.deleteDest(0);
 	}
-	destinationHandler.syncDestinationList(); // So draws it too inside
-}
+});
 
-function hideMessages(){
-	$("#locationInfo").addClass("hidden");
-	$("#directionsmap").addClass("hidden");
-	$("#errorMessage").addClass("hidden");
-}
+var galaxyMapApp = new Vue({
+	el : '#galaxyMapApp',
+	data: {
+		width: 0,
+		height: 0,
+		aspect : 0,
+		showBlackHoleRing: false,
+		blackHoleRadius : {rx : 0, ry: 0},
+		userApp : userLocationApp,
+		userPoint : { mx : 0, mz: 0, mxT : 0, mzT: 0,name:"", color:""},
+		center : destinationApp.center,
+		destinations : destinationApp.destinations
+	},
+	methods : {
+		initialize : function(){
+			this.width = (this.$el).getBoundingClientRect().width * 0.99;
+			this.aspect = (document.documentElement.clientWidth*1.0/document.documentElement.clientHeight);
+			this.height =  this.width / this.aspect; 
+			this.syncDestinations(); // Notify map info
+		},
+		
+		drawBHZone : function(){
+			var centerDist = this.userApp.userLocation.calculateDistance(this.center);
+			var outterDistance = (centerDist-1000)/100.0;
+			var innerDistance = (centerDist-2000)/100.0;
+				
+			var aspectX = (this.width/4096);
+			var aspectY = (this.height/4096);
 
-function showErrorMessage(text){
-	$("#errorMessage").removeClass().addClass("c-alert c-alert--error");
-	$("#errorMessageText").html(text);
-}
-
-function showLocationInfo(x,y,z){
-	
-	$("#locationInfo").removeClass("hidden");
-	$("#directionsmap").removeClass("hidden");
-	
-	userLocation.updateCoords(x,y,z);
+			var rx = (outterDistance) *(aspectX);
+			var ry = (outterDistance) *(aspectY);
 			
-	centerDistSvg.initialize("centerdistsvg","centerdistsvgp",null,100);
-	centerDistSvg.drawDistance(userLocation.calculateDistance(center));
+			//var cx = center.getX()*aspectX;
+			//var cy = center.getZ()*aspectY;
+			this.blackHoleRadius.rx = rx-5;
+			this.blackHoleRadius.ry = ry-5;
+			this.showBlackHoleRing = true;
+			
+		},
+		syncUserLocation : function(obj){
+			this.userPoint = { mx : obj.getMapX(), mz: obj.getMapZ(), mxT : obj.getMapTextX(), mzT: obj.getMapTextZ() ,name: obj.name, color:obj.color};
+		},
+		
+		syncDestinations : function(){
+			this.destinations = destinationApp.destinations;
+			destinationApp.updateMapCoords(this.width, this.height);
+			// send map
+		}
+	}
 	
-	coordSvg.initialize("coordsvg","coordsvgp",null,100);
-	coordSvg.drawCoords(x,y,z);
-	
-	destinationHandler.syncDestinationList();
-}
+});
 
-function calculateLocation(){
-	var elementValue = document.getElementById("userlocation").value;
-	
-	hideMessages();
-	userLocation.enabled = false;
-	
-	destinationHandler.parseLine(elementValue, 
-		function(x,y,z,name,color){
-			userLocation.enabled = true;
-			showLocationInfo(x,y,z);	
-		}, 
-		function(){
-			showErrorMessage("Invalid format for location");
-		}, 
-	null, null);
-}
+var heightMapApp = new Vue({
+	el: '#heightMapApp',
+	data: {
+		userApp : userLocationApp,
+		destApp : destinationApp,
+		destinations : []
+	},
+	methods:{
+		syncDiff : function(){
+			var u = this.userApp.userLocation;
+			var dd = this.destApp.destinations;
+			var si = this.destApp.selectedDestination;
+			var copy = dd.slice(0,dd.length);
+			var dest = copy[si];
+			
+			var destinations = []
+			var diff = function(a,b){
+				var r = b-a;
+				return (r > 0) ? ("-" +r) : ("+" +r*-1);
+			}
+			destinations.push( { name: dest.name, diffTxt : diff (u.getY(), dest.getY()) });
+			
+			for(var j = 0;j<copy.length ;j++){
+				if(destinations.length == 10) { break; }
+				if(j==si) { continue; }
+				destinations.push( { name: copy[j].name, diffTxt : diff (u.getY(), copy[j].getY()) });
+			}
+			
+			this.destinations = destinations;
+			console.log(this.destinations);
+			
+		}
+	}
+});
 
+var compassApp = new Vue({
+	el: '#compassApp',
+	data: {
+		width: 0,
+		height: 0,
+		aspect : 0,
+		userApp : userLocationApp,
+		userPoint : { mx : 0, mz: 0, mxT : 0, mzT: 0,name:"", color:""},
+		selectedDestinationName : destinationApp.destinationName(),
+		compassDegrees : 0,
+		compassDir : 'left',
+		compassRadius : 50,
+		rotateStr : ''
+	},
+	methods:{
+		initialize : function(){
+			this.width = (this.$el).getBoundingClientRect().width * 0.99;
+			this.aspect = (document.documentElement.clientWidth*1.0/document.documentElement.clientHeight);
+			this.height =  200; 
+		},
+		
+		syncCompass : function(){
+			this.selectedDestinationName = destinationApp.destinationName();
+	
+			var v1 = userLocationApp.userLocation.getVector(destinationApp.center); 
+			var v2 = userLocationApp.userLocation.getVector(destinationApp.destinationObj());
+			var radians = v1.getDegreesVector(v2);
+	
+			var degrees = (radians*180/Math.PI)
+			this.rotateStr = "rotate("+degrees+" 80 80)";
+			this.compassDegrees = Math.abs(degrees).toFixed(2);
+			this.compassDir = (degrees>0) ? "right" : "left";
+			
+			
+		}
+	}
+	
+});
 
+var colorPickerApp = new Vue({
+	el: '#colorPickerApp',
+	data: {
+		visible : false,
+		colors : ["663300", "990000","990033","990099","9900cc","6600cc","333399","003399","006666",
+			"339933","003300","333300","996633","ff9900","cc0066","ff9933","ffff00","99ff33","33cc33","00ff99"
+		],
+		destinationName : "",
+		previousColor : "",
+		newColor : {r:0,g:0,b:0},
+		index : 0
+	},
+	methods:{
+		
+		getColor : function(n){
+			return "#"+toHex(n.r,2)+toHex(n.g,2)+toHex(n.b,2);
+		},
+		
+		getBgColor(index){
+			return "background-color: #" + this.colors[index];
+		},
+		
+		getPrevBgStr : function(){
+			return "width:50px;height:50px;background-color : " + this.previousColor;
+		},
+		
+		getBgStr : function(){
+			return "width:50px;height:50px;background-color : " + this.getColor(this.newColor);
+		},
+		
+		setColor : function(element){
+			if(element.target.id.indexOf("pc"!=-1)){
+				var c = element.target.id.replace("pc","");
+				this.newColor.r = fromHex(c.substr(1,2));
+				this.newColor.g = fromHex(c.substr(3,2));
+				this.newColor.b = fromHex(c.substr(5,2));
+			}
+		},
+		
+		showWindow : function (index){
+			this.index = index;
+			this.newColor = {r:125,g:125,b:125};
+			this.previousColor = destinationApp.destinations[index].color;
+			this.destinationName = destinationApp.destinations[index].name;
+			this.visible = true;
+		},
+		apply : function(){
+			// Generate new color, apply to the system itself
+			destinationApp.destinations[this.index].color = this.getColor(this.newColor);
+			this.close();
+		},
+		close : function (){
+			this.visible = false;
+		}
+		
+	}
+	
+});

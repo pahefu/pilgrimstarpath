@@ -6,7 +6,7 @@
 		<link rel="stylesheet" href="./css/blaze.min.css">
 		<link rel="stylesheet" href="./css/nmsicons.css">
 		
-		<script src="./js/mustache.min.js"></script>
+		<script src="./js/vue.min.js"></script>
 		<script src="./js/zepto.min.js"></script>	
 		<script src="./js/utils.js"></script>
 		
@@ -17,7 +17,7 @@
 		
 		<ul class="c-nav c-nav--inline">
 			<li class="c-nav__content nopadding"><img id="atlaslogo" src="./img/atlas_logo.png" class="o-image"/></li>
-			<li class="c-nav__content nopadding" id="brand"><span style="font-size:19pt;">PILGRIM STAR PATH</span> <span class="c-badge c-badge--brand">v0.6.1</span></li>
+			<li class="c-nav__content nopadding" id="brand"><span style="font-size:19pt;">PILGRIM STAR PATH</span> <span class="c-badge c-badge--brand">v0.6.2</span></li>
 		</ul>
 		
 		<div class="o-grid o-grid--wrap">
@@ -25,99 +25,199 @@
 				<div id="info">
 					<blockquote>Coordinate information</blockquote>
 					
-					<div class="c-card c-card--accordion u-high">
-
-						<input type="checkbox" id="userlocationpanel" checked>
-						<label class="c-card__item c-card__item--brand" for="userlocationpanel">User Location</label>
-						<div class="c-card__item bluebg">
+					<!-- User Location APP -->
+					<div class="c-card">
+						<div id="userLocationApp" class="c-card--accordion u-high">
+							<input type="checkbox" id="userlocationpanel" checked>
+							<label class="c-card__item c-card__item--brand" for="userlocationpanel">User Location</label>
+							<div class="c-card__item bluebg">
 						
-							<p class="c-paragraph">
-								Enter your coordinates in <strong>ABCD:1234:5678:1234:5678</strong> format 
-								or <strong>1234:5678:1234:5678</strong> format
-							</p>
+								<p class="c-paragraph">
+									Enter your coordinates in <strong>ABCD:1234:5678:1234:5678</strong> format 
+									or <strong>1234:5678:1234:5678</strong> format
+								</p>
 							
-							<p class="c-paragraph">
-								<input id="userlocation" class="c-field" type="text" placeholder="Place your location here">
-							</p>							
-							<div class="o-grid o-grid--wrap">
-								<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
-									<div class="c-button panelbutton tealbg noinline" onclick="calculateLocation()"><i class="icon-street-view"></i> Draw Location</div>
+								<p class="c-paragraph">
+									<input id="userlocation" class="c-field" type="text" v-model="locationText" placeholder="Place your location here">
+								</p>							
+							
+								<div class="o-grid o-grid--wrap">
+									<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
+										<div class="c-button panelbutton tealbg noinline" v-on:click="calculateLocation"><i class="icon-street-view"></i> Draw Location</div>
+									</div>
+									<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
+										<div class="c-button panelbutton tealbg noinline" v-on:click="drawBHZone"><i class="icon-target-1"></i> Draw B.Hole Ring</div>
+									</div>
 								</div>
-								<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
-									<div class="c-button panelbutton tealbg noinline" onclick="galSvg.drawBHZone()"><i class="icon-target-1"></i> Draw B.Hole Ring</div>
+							
+								<div v-show="firstPush" style="display:none;">
+									<div id="locationInfo" class="o-grid o-grid--wrap" v-if="locationValid">
+									
+										<table id="locationInfoTable" class="c-table">
+											<thead class="c-table__head">
+												<tr class="c-table__row c-table__row--heading">
+													<th class="c-table__cell mwidth_20p">X</th>
+													<th class="c-table__cell mwidth_20p">Y</th>
+													<th class="c-table__cell mwidth_20p">Z</th>
+													<th class="c-table__cell">Distance to center</th>
+												</tr>
+											</thead>
+											<tbody class="c-table__body">
+												<tr class="c-table__row">
+													<td class="c-table__cell mwidth_20p">{{userLocation.getX()}}</td>
+													<td class="c-table__cell mwidth_20p">{{userLocation.getY()}}</td>
+													<td class="c-table__cell mwidth_20p">{{userLocation.getZ()}}</td>
+													<td class="c-table__cell">{{userLocation.calculateDistance(center)}}</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+									<div id="errorMessage" class="c-alert c-alert--error" v-show="locationValid == false">
+										<span class="card-title">Ooops</span>
+										<p id="errorMessageText">{{errorMessage}}</p>
+									</div>								
 								</div>
 							</div>
-							
-							<div id="errorMessage" class="c-alert c-alert--error hidden">
-								<span class="card-title">Ooops</span>
-								<p id="errorMessageText"></p>
-							</div>								
+						</div>
+						<!-- / UserLocation APP -->
 
-							
-							<div id="locationInfo" class="o-grid o-grid--wrap hidden">
-								<div id="coordsvgp" class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
-									<svg id="coordsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+						<!-- Destinations APP -->
+						<div id="destinationApp" class="c-card--accordion u-high">
+							<input type="checkbox" id="destinationpanel" checked>
+							<label class="c-card__item c-card__item--brand" for="destinationpanel">Destinations</label>
+							<div class="c-card__item bluebg">
+								<div class="c-paragraph">Enter destinations in coordinate format</div>
+								<textarea id="destinationlocation" class="c-field" placeholder="Place destinations here" v-model="destinationsText"></textarea>
+								
+								<div class="o-grid o-grid--wrap">
+									<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small">
+										<div class="c-button tealbg panelbutton noinline" v-on:click="addBatch">Add them</div>
+									</div>
+									<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small">
+										<div class="c-button tealbg panelbutton noinline" v-on:click="addPilgrim">Add Pilgrim</div>
+									</div>
 								</div>
 								
-								<div id="centerdistsvgp" class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
-									<svg id="centerdistsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+								<div class="c-card c-card--accordion u-high" id="redditpanel">
+									<input type="checkbox" id="reddittoggle">
+									<label class="c-card__item c-card__item--brand" id="redditpanellabel" for="reddittoggle">Grab from <i class="icon-reddit"></i> <strong>Reddit</strong></label>
+									<div class="c-card__item" id="redditpanelbg">
+										<div class="c-button c-button--brand panelbutton redditbtn noinline" v-on:click="addRedLast">Last known locations</div>
+										<div class="c-button c-button--brand panelbutton redditbtn noinline" v-on:click="addRedRec">Recommended locations</div>
+										<div class="c-button c-button--brand panelbutton redditbtn noinline" v-on:click="addRedHub">
+											<i class="icon-globe"></i> Galactic Hub (R.E.)
+										</div>
+									</div>
 								</div>
-							</div>
-							
-						</div>
-
-						<input type="checkbox" id="destinationpanel" checked>
-						<label class="c-card__item c-card__item--brand" for="destinationpanel">Destinations</label>
-						<div class="c-card__item bluebg">
-							<div class="c-paragraph">Enter destinations in coordinate format</div>
-							<textarea id="destinationlocation" class="c-field" placeholder="Place destinations here"></textarea>
-							
-							<div class="o-grid o-grid--wrap">
-								<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small">
-									<div class="c-button tealbg panelbutton noinline" onclick="destinationHandler.addBatch();">Add them</div>
-								</div>
-								<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small">
-									<div class="c-button tealbg panelbutton noinline" onclick="destinationHandler.addPilgrim();">Add Pilgrim</div>
-								</div>
-							</div>
-							
-							<div class="c-card c-card--accordion u-high" id="redditpanel">
-								<input type="checkbox" id="reddittoggle">
-								<label class="c-card__item c-card__item--brand" id="redditpanellabel" for="reddittoggle">Grab from <i class="icon-reddit"></i> <strong>Reddit</strong></label>
-								<div class="c-card__item" id="redditpanelbg">
-									<div class="c-button c-button--brand panelbutton redditbtn noinline" onclick="destinationHandler.grabRed('Last');">Last known locations</div>
-									<div class="c-button c-button--brand panelbutton redditbtn noinline" onclick="destinationHandler.grabRed('Rec');">Recommended locations</div>
-									<div class="c-button c-button--brand panelbutton redditbtn noinline" onclick="destinationHandler.addRedHub();">
-										<i class="icon-globe"></i> Galactic Hub (R.E.)
+															
+								<div id="destinationdata">
+									<div class="c-card u-high" id="">
+										<template v-for="destination of destinations">
+											<div class="c-card__item destinationtemplaterow" >
+												<div class="o-grid o-grid--wrap">
+													<div class="o-grid__cell o-grid__cell--width-10 nopadding targetSelect" title="Select as destination" v-on:click="selectDest(destination.index)">
+														<button class="c-button u-xsmall">
+															<i class="icon-target"></i>
+														</button>
+													</div>
+													<div class="o-grid__cell o-grid__cell--width-10 nopadding targetSelect" title="Change destination color"  v-on:click="selectDestColor(destination.index)">
+														<button class="c-button u-xsmall">
+															<i class="icon-brush"></i>
+														</button>
+													</div>
+													<div class="o-grid__cell o-grid__cell--width-70">
+														<input class="destinationname c-field" type="text" v-model="destination.name">
+													</div>
+													<div class="o-grid__cell o-grid__cell--width-10 nopadding">
+														<div class="c-button  u-xsmall deletebtn" title="Delete this destination" v-on:click="deleteDest(destination.index)">
+															<i class="icon-trash"></i>
+														</div>
+													</div>
+												</div>
+												<div class="o-grid o-grid--wrap">
+													<div class="o-grid__cell">
+														{{destination.getHexStr()}}
+													</div>	
+													<div class="o-grid__cell">{{destination.distance}} ly</div>
+													<div class="o-grid__cell">{{destination.jumps}} jumps</div>
+												</div>
+											</div>
+										</template>
 									</div>
 								</div>
 							</div>
-							
-							<div id="destinationdata">
-								<div class="c-card u-high" id="destinationlist"></div>
+						</div>
+						<!-- / Destinations APP -->
+						
+						<!-- Debug APP -->
+						<!-- / Debug APP -->
+
+						<!-- COFFEE APP -->
+						<div id="coffeeApp" class="c-card--accordion u-high">
+							<input type="checkbox" id="usergpspaneltoggle">
+							<label class="c-card__item c-card__item--brand" for="usergpspaneltoggle">
+								<span title="Computer Oriented Flight For Euclidean Explorers"><i class="icon-coffee"></i> C.O.F.F.E.E.</span><i class="icon-rocket"></i>
+								<span class="c-badge c-badge--warning">Alpha</span>
+							</label>
+							<div class="c-card__item bluebg">
+								<p>Welcome to the <strong>Computer Oriented Flight For Euclidean Explorers</strong></p>
+								<p>This is your estimated route to <strong id="routedestinationtxt"><small>... draw your location and select some destination first! beep</small></strong></p>
+								<div class="c-card u-high" id="routelist">
+									<!--  TEMPLATING -->
+									<div style="display:none;">
+										<div  class="c-card__item destinationtemplaterow">Step {{i}} {{x}}:{{y}}:{{z}}</div>
+									</div>
+									<!--  /TEMPLATING -->
+								</div>
 							</div>
 						</div>
-						
-						<input type="checkbox" id="usergpspaneltoggle">
-						<label class="c-card__item c-card__item--brand" for="usergpspaneltoggle">
-							<span title="Computer Oriented Flight For Euclidean Explorers"><i class="icon-coffee"></i> C.O.F.F.E.E.</span><i class="icon-rocket"></i>
-							<span class="c-badge c-badge--warning">Alpha</span>
-						</label>
-						<div class="c-card__item bluebg">
-							<p>Welcome to the <strong>Computer Oriented Flight For Euclidean Explorers</strong></p>
-							<p>This is your estimated route to <strong id="routedestinationtxt"><small>... draw your location and select some destination first! beep</small></strong></p>
-							<div class="c-card u-high" id="routelist"></div>
-						</div>
+						<!-- / COFFEE APP -->
 					</div>
 				</div>
 			</div>
-			
+
 			<div id="plotparent" class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-60@small">
 				
-				<div id="galmapp">
+				<!-- GalaxyMap APP -->
+				<div id="galaxyMapApp">
 					<blockquote>Galaxy map</blockquote>					
-					<div id="svgp">
-						 <svg id="svgc" xmlns="http://www.w3.org/2000/svg"></svg>
+					<div id="galmapsvgp">
+						 <svg id="galmapsvg" xmlns="http://www.w3.org/2000/svg" :width="width" :height="height">
+							<defs>
+								<pattern id="gridPattern" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+									<rect x="0" y="0" width="30" height="30" style="stroke: rgb(0,184,212);stroke-opacity:0.7;"></rect>
+								</pattern>
+							</defs>
+							<rect x="0" y="0" :width="width" :height="height" style="fill: url(#gridPattern);"></rect>
+							<g id="aX">
+								<text dy="0.75em" x="152" y="3" fill="#00b8d4">X</text>
+								<line x1="10" y1="10" x2="150" y2="10" style="stroke:#00b8d4 ; stroke-width:1;"></line>
+								<path d="M150 10 L141.3397459621556 15 L141.3397459621556 5.000000000000001  Z" fill="#00b8d4"></path>
+							</g>
+							<g id="aZ">
+								<text dy="0.75em" x="4" y="152" fill="#00b8d4">Z</text>
+								<line x1="10" y1="10" x2="10" y2="150" style="stroke:#00b8d4 ; stroke-width:1;"></line>
+								<path d="M10 150 L5.000000000000001 141.3397459621556 L14.999999999999998 141.3397459621556  Z" fill="#00b8d4"></path>
+							</g>
+							
+							<circle :cx="center.getMapX()" :cy="center.getMapZ()" r="6" :stroke="center.color" stroke-width="1" :fill="center.color"></circle>
+							<text dy="0.75em" :x="center.getMapTextX()" :y="center.getMapTextZ()" fill="white">{{center.name}}</text>
+							
+							<g v-show="userApp.locationValid">
+								<circle v-bind:cx="userPoint.mx" v-bind:cy="userPoint.mz" r="4" :stroke="userPoint.color" stroke-width="1" v-bind:fill="userPoint.color"></circle>
+								<text dy="0.75em" v-bind:x="userPoint.mxT" v-bind:y="userPoint.mzT" fill="white">{{userPoint.name}}</text>
+							</g>
+							
+							<template v-for="dest of destinations">
+								<circle :cx="dest.getMapX()" :cy="dest.getMapZ()" r="4" :stroke="dest.color" stroke-width="1" :fill="dest.color"></circle>
+								<text dy="0.75em" :x="dest.getMapTextX()" :y="dest.getMapTextZ()" fill="white">{{dest.name}}</text>
+							</template>
+							
+							<g v-show="showBlackHoleRing">
+								<ellipse :cx="center.getMapX()" :cy="center.getMapZ()" :rx="blackHoleRadius.rx" :ry="blackHoleRadius.ry" style="stroke:rgb(255,0,0);stroke-width:5px;stroke-opacity:0.3;fill:none;">
+							</g>
+							
+						 </svg>
 					</div>
 					
 					<div class="c-badge c-badge--brand chipcenter">Galaxy center</div>
@@ -125,21 +225,44 @@
 					<div class="c-badge c-badge--brand chipuser">User Location</div>
 					<div class="c-badge c-badge--brand chiphub">Galactic Hub</div>
 				</div>
+				<!-- / GalaxyMap APP -->
 				
-				<div id="directionsmap" class="hidden">
+				<div id="directionsmap">
 					<div class="o-grid o-grid--wrap">
+
 						<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small">
-							<blockquote>Height map</blockquote>
-							<div id="heightsvgp">
-								<svg id="heightsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+							<div id="heightMapApp">
+								<div v-show="userApp.locationValid"  style="display:none;">
+									<blockquote>Height map</blockquote>
+									<p>This is your height difference with the destinations<br/>
+									Selected destination is always the first</p>
+									
+									<div id="heightsvgp">
+										<span v-for="(dest, index) in destinations" class="c-badge c-badge--brand hmapbadge">{{dest.name}} : {{dest.diffTxt}}</span>										
+									</div>
+								</div>
 							</div>
 						</div>
+
 						<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small ">
-							<blockquote>Compass <span class="c-badge c-badge--success">BETA</span></blockquote>
-							<div id="compassp">
-								<div>To reach <strong><span id="destinationnamecompass"></span></strong> follow this direction:</div>
-								<div>Looking at the center, turn <span id="degreestxt"></span> degrees to your <span id="degreesdirtxt"></span></div>
-								<svg id="compasssvg" xmlns="http://www.w3.org/2000/svg"></svg>
+							<div id="compassApp">
+								<div v-show="userApp.locationValid"  style="display:none;">
+									<blockquote>Compass <span class="c-badge c-badge--success">BETA</span></blockquote>
+									<div id="compassp">
+										<div>To reach <strong>{{selectedDestinationName}}</strong> follow this direction:</div>
+										<div>Looking at the center, turn {{compassDegrees}} degrees to your {{compassDir}}</div>
+											<svg id="compasssvg" xmlns="http://www.w3.org/2000/svg" :width="width" :height="height">
+												<line x1="80" y1="80" x2="80" y2="30" style="stroke:rgb(123,123,230); stroke-width:2;"></line>
+												<text style="font-family:'nmsicons'; font-size:15pt;" x="75" y="15" fill="#7672E8">Center</text>
+												<g :transform="rotateStr">
+													<circle cx="80" cy="80" r="50" style="stroke:rgb(153,153,153); stroke-width:2; fill:none;"></circle>
+													<text style="font-family:'nmsicons'; font-size:15pt;" x="80" y="80" transform="rotate(-90 87 80)" stroke="#ffffff" stroke-width="1" fill="none"></text>
+													<line x1="80" y1="80" x2="80" y2="30" style="stroke:rgb(255,0,0); stroke-width:1; stroke-opacity:0.5"></line>
+												</g>
+											</svg>
+										</svg>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -147,88 +270,58 @@
 			</div>
 		</div>	
 
-		<div id="modalcolor" style="display:none;"></div>
-		
-		<script type="text/template" id="destinationtemplate">
-				<div class="c-card__item destinationtemplaterow">
-					<div class="o-grid o-grid--wrap">
-						<div class="o-grid__cell o-grid__cell--width-10 nopadding targetSelect" title="Select as destination" onclick="destinationHandler.selectDest({{id}});">
-							<button class="c-button u-xsmall">
-								<i class="icon-target"></i>
-							</button>
-						</div>
-						<div class="o-grid__cell o-grid__cell--width-10 nopadding targetSelect" title="Change destination color" onclick="destinationHandler.selectDestColor({{id}});">
-							<button class="c-button u-xsmall">
-								<i class="icon-brush"></i>
-							</button>
-						</div>
-						<div class="o-grid__cell o-grid__cell--width-70">
-							<input class="destinationname c-field" type="text" onchange="destinationHandler.updateDestName({{id}},this);" id="desttb{{id}}" value="{{name}}">
-						</div>
-						<div class="o-grid__cell o-grid__cell--width-10 nopadding">
-							<button class="c-button  u-xsmall deletebtn" title="Delete this destination" onclick="destinationHandler.deleteDest({{id}});"><i class="icon-trash"></i></button>
-						</div>			
-					</div>
-					
-					<div class="o-grid o-grid--wrap">
-						<div class="o-grid__cell">
-							{{x}}:{{y}}:{{z}}
-						</div>	
-						<div class="o-grid__cell">{{distance}} ly</div>
-						<div class="o-grid__cell">{{jumps}} jumps</div>
-					</div>
-				</div>
-			</li>
-		</script>
-		
-		<script type="text/template" id="routetemplate">
-			<div  class="c-card__item destinationtemplaterow">Step {{i}} {{x}}:{{y}}:{{z}}</div>
-		</script>
-		
-		<script type="text/template" id="modalcolortemplate">
-			<div class="c-overlay" style="position:fixed; width:100%;height:100%;"></div>
+		<!-- COLOR PICKER APP -->
+		<div id="colorPickerApp">
+			<div id="modalcolor" v-show="visible" style="display:none;">
+				<div class="c-overlay" style="position:fixed; width:100%;height:100%;"></div>
 			<div class="o-modal" style="color:black; position: fixed;">
 				<div class="c-card">
 					<header class="c-card__header">
 					<h2 class="c-heading">Pick a color</h2>
 					</header>
 					<div class="c-card__body">
-						<p>Changing <strong>{{name}} color</strong></p>
+						<p>Changing <strong>{{destinationName}} color</strong></p>
 
 						<div>Select a predefined color: </div>
-						<div id="predefinedcolors"></div>
+						<div id="predefinedcolors" v-on:click="setColor">
+							<template v-for="(color, index) of colors">
+								<div class='pickcolor' :id='"#pc"+color' :style='getBgColor(index)' ></div>
+							</template>
+						</div>
 						
 						<div>Select one color with the ranges: </div>
 						
 						<div id="rgbranges">
-							<input type="range" id="colorr" onchange="colorModalHandler.onChangeColor();" class="c-range c-range--error" min="0" max="255" step="1">
-							<input type="range" id="colorg" onchange="colorModalHandler.onChangeColor();" class="c-range c-range--success" min="0" max="255" step="1">
-							<input type="range" id="colorb" onchange="colorModalHandler.onChangeColor();" class="c-range c-range--info" min="0" max="255" step="1">
+							<input type="range" id="colorr" v-model="newColor.r" class="c-range c-range--error" min="0" max="255" step="1">
+							<input type="range" id="colorg" v-model="newColor.g" class="c-range c-range--success" min="0" max="255" step="1">
+							<input type="range" id="colorb" v-model="newColor.b" class="c-range c-range--info" min="0" max="255" step="1">
 						</div>
 
 						<div class="o-grid o-grid--wrap">
 							<div class="o-grid__cell o-grid__cell--width-50 nopadding">
 								Current color: 
-								<div style="width:50px; height:50px;background-color :{{color}}"></div>			
+								<div :style="getPrevBgStr()"></div>			
 							</div>
 							<div class="o-grid__cell o-grid__cell--width-50 nopadding">
 								New Color: 
-								<div id="colordemo" style="width:50px; height:50px;background-color :{{color}}"></div>			
+								<div id="colordemo" :style="getBgStr()"></div>			
 							</div>
 						</div>												
 					</div>
 
 					<footer class="c-card__footer">
 						<div class="c-input-group">
-							<button type="button" class="c-button c-button--block c-button--brand" onclick='colorModalHandler.onColorOk();'>Apply</button>
-							<button type="button" class="c-button c-button--block" onclick='colorModalHandler.closeColorModal();'>Cancel</button>
+							<button type="button" class="c-button c-button--block c-button--brand" v-on:click="apply">Apply</button>
+							<button type="button" class="c-button c-button--block" v-on:click="close">Cancel</button>
 						</div>
 					</footer>
 
 				</div>
 			</div>
-		</script>
-		
+			</div>
+		</div>
+		<!-- COLOR PICKER APP -->
+
 		<script type="text/javascript" src="./js/gdl.js"></script>
     </body>
 </html>

@@ -67,7 +67,7 @@
 													<td class="c-table__cell mwidth_20p">{{userLocation.getX()}}</td>
 													<td class="c-table__cell mwidth_20p">{{userLocation.getY()}}</td>
 													<td class="c-table__cell mwidth_20p">{{userLocation.getZ()}}</td>
-													<td class="c-table__cell">{{userLocation.calculateDistance(center)}}</td>
+													<td class="c-table__cell">{{userLocation.calculateDistance(center).toFixed(3)}}</td>
 												</tr>
 											</tbody>
 										</table>
@@ -109,7 +109,7 @@
 										</div>
 									</div>
 								</div>
-															
+
 								<div id="destinationdata">
 									<div class="c-card u-high" id="">
 										<template v-for="destination of destinations">

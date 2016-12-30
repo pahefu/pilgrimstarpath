@@ -14,7 +14,6 @@ function generateMap(){
 	var res = re.exec(window.location.search);
 	
 	if(res!=null){
-		console.log("HI!");
 		textHandler.parseLine(res[0].replace("to=",""),
 			function(x,y,z,name,color){
 				destinationApp.addDest(x,y,z,name,color);
@@ -48,6 +47,8 @@ var Region = Class({
 		this.enabled = false; // User Location Only
 		this.color = color;
 		this.index = index;
+		this.distance = "";
+		this.jumps = "";
     },
 	updateCoords : function (x,y,z) { this.coords = [x,y,z];},
 	updateMapCoords : function(mapW, mapH){
@@ -232,7 +233,6 @@ var mathHandler = {
 					if(localX>this.x2){
 						break;
 					}
-					//console.log("x",localX,"y",this.getY(localX));
 				}
 			}
 		};
@@ -380,7 +380,13 @@ var destinationApp = new Vue({
 			}			
 			this.center.updateMapCoords(mapW, mapH);
 		},
-		reSyncFromUser : function(usr){
+		reSyncFromUser : function(usrLoc){
+			
+			for(var i = 0;i < this.destinations.length;i++){
+				var distance = usrLoc.calculateDistance(this.destinations[i]);
+				this.destinations[i].distance = distance.toFixed(3);
+				this.destinations[i].jumps = Math.ceil(distance/400.0);
+			}
 			
 		}
 	}
@@ -467,7 +473,6 @@ var heightMapApp = new Vue({
 			}
 			
 			this.destinations = destinations;
-			console.log(this.destinations);
 			
 		}
 	}

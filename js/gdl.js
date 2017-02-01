@@ -467,7 +467,7 @@ var heightMapApp = new Vue({
 			
 			function getDiffTxt(u,dest){
 				var localDiff = diff (u.getY(), dest.getY());
-				var txt = "Go " + math.abs(localDiff) + " ";
+				var txt = "Go " + Math.abs(localDiff) + " ";
 				txt+=(localDiff>0) ? "Down" : "Up";
 			}
 			

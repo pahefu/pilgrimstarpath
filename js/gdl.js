@@ -455,9 +455,9 @@ var heightMapApp = new Vue({
 		syncDiff : function(){
 			var u = this.userApp.userLocation;
 			var dd = this.destApp.destinations;
-			var si = this.destApp.selectedDestination;
+			var sd = this.destApp.selectedDestination;
 			var copy = dd.slice(0,dd.length);
-			var dest = copy[si];
+			var dest = copy[sd];
 			
 			var destinations = []
 			var diff = function(a,b){
@@ -468,7 +468,11 @@ var heightMapApp = new Vue({
 			function getDiffTxt(u,dest){
 				var localDiff = diff (u.getY(), dest.getY());
 				var txt = "Go " + Math.abs(localDiff) + " ";
-				txt+=(localDiff>0) ? "Down" : "Up";
+				if(localDiff == 0){
+					txt="OK";
+				}else{
+					txt+=(localDiff>0) ? "Down" : "Up";
+				}
 				return txt;
 			}
 			
@@ -476,8 +480,8 @@ var heightMapApp = new Vue({
 			
 			for(var j = 0;j<copy.length ;j++){
 				if(destinations.length == 10) { break; }
-				if(j==si) { continue; }
-				destinations.push( { name: copy[j].name, diffTxt : getDiffTxt(u,dest) });
+				if(j==sd) { continue; }
+				destinations.push( { name: copy[j].name, diffTxt : getDiffTxt(u,copy[j]) });
 			}
 			
 			this.destinations = destinations;

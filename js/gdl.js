@@ -464,12 +464,19 @@ var heightMapApp = new Vue({
 				var r = b-a;
 				return (r > 0) ? ("-" +r) : ("+" +r*-1);
 			}
-			destinations.push( { name: dest.name, diffTxt : diff (u.getY(), dest.getY()) });
+			
+			function getDiffTxt(u,dest){
+				var localDiff = diff (u.getY(), dest.getY());
+				var txt = "Go " + math.abs(localDiff) + " ";
+				txt+=(localDiff>0) ? "Down" : "Up";
+			}
+			
+			destinations.push( { name: dest.name, diffTxt : getDiffTxt(u,dest) });
 			
 			for(var j = 0;j<copy.length ;j++){
 				if(destinations.length == 10) { break; }
 				if(j==si) { continue; }
-				destinations.push( { name: copy[j].name, diffTxt : diff (u.getY(), copy[j].getY()) });
+				destinations.push( { name: copy[j].name, diffTxt : getDiffTxt(u,dest) });
 			}
 			
 			this.destinations = destinations;

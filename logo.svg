@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 2017 - Logo calculated by Pahefu  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 300 500" xml:space="preserve">
+<g>
+<path d="M150 0 L300 200 L150 500 L0 200 z"/>
+<path d="M150 115 A 50 50 90 0 1 150 265 L150 265" fill="#ff0000" stroke="#ff0000"/>	
+<path d="M0 200 L150 150 Z M150 150 L150 0 L300 200 Z M300 200 L219 220 Z M150 0 V500 Z" stroke-width="1" stroke="#ffffff" fill="#ffffff"/>
+
+<path d="M150 0 L300 200Z" stroke="#000000"/>
+	
+	
+</g>
+</svg>

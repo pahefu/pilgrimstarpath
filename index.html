@@ -1,388 +1,499 @@
+
 <!doctype html>
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link href="./css/style.css" rel="stylesheet">
-		<link rel="stylesheet" href="./css/blaze.min.css">
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="./css/pmd.css">
 		<link rel="stylesheet" href="./css/nmsicons.css">
+		<link href="./css/style.css" rel="stylesheet">
 		
-		<script src="./js/vue.min.js"></script>
+		<script src="./js/rivets.bundled.min.js"></script>
 		<script src="./js/zepto.min.js"></script>	
-		<script src="./js/utils.js"></script>
 		
 		<title>PILGRIM STAR PATH</title>
-		
-		<script>
-		function today(td){
-			var d = new Date();
-			console.log(d);
-			console.log(d.getDate(), d.getMonth());
-			return d.getDate()==1 && d.getMonth() == 3;
-		}
-		
-		var apCheck = function(){
-			//if(today()){
-			//	$("#apfools").css("opacity","1");
-			//}else{
-				clearAF();
-			//}
-		}
-		</script>
-		
 	</head>
     
-	<body onload="apCheck();">
+	<body onload="generateMap();">		
 		
-		<div id="apfools" style="opacity:0;display:flex;background:#ffffff;position:absolute;z-index:1;justify-content: center; align-items:center;width: 100%;height: 100%; flex-direction: column;">
-			<div style="flex-grow:1;">
-				<img id="apalogo" style="max-height: 250px; margin-top: 25px;min-width: 250px;" src="./img/logo.svg"/>
-			</div>
-			<div style="flex-grow:2;color:black;text-align:center;font-size: 1.65rem;font-family : NmsFont;font-weight: bold;text-transform: uppercase;">
-				We are Atlas<br/>
-				Our Portals are now open<br/>
-				Come to us ...<br/>
-				Fulfill your destiny<br/>
-				<a id="cont" style="color:black;margin-top: 4px;display: block;" href="#" id="apcont" onclick="clearAF();">Continue</a>
-			</div>
-			<style>
-			@keyframes toColor {
-				from {filter: grayscale(75%);}
-				to {filter: grayscale(0%);}
-			}
-			@keyframes toShow {
-				from {opacity: 0;}
-				to {opacity:1;}
-			}
-			#cont{
-				animation: toShow 20s;
-			}
+		<div class="ph-navbar">			
+			<ul id="mainnav">
+				<li>
+					<div class="ph-inline">
+						<img class="ph-inline" id="atlasLogo" src="./img/logo.svg"/>
+						<div class="ph-inline" id="nameTag">PILGRIM STAR PATH</div>
+						<div class="ph-inline" id="version">v0.7</div>
+					</div>
+				</li>
 			
-			#apalogo { 
-			   animation: toColor 5s;
-			   
-			}
-			</style>
-		</div>
-		
-		<div id="content" style="display:none;">
-			<ul class="c-nav c-nav--inline">
-				<li class="c-nav__content nopadding"><img id="atlaslogo" src="./img/atlas_logo.png" class="o-image"/></li>
-				<li class="c-nav__content nopadding" id="brand">
-					<span style="font-size:19pt;">PILGRIM STAR PATH</span> 
-					<span class="c-badge c-badge--brand">v0.6.3</span>
+				<li>
+					<div id="author" class="ph-inline">by pahefu</div>
 				</li>
 			</ul>
+		</div>
 			
-			<div class="o-grid o-grid--wrap">
-				<div id="infoparent" class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-40@small">
-					<div id="info">
-						<blockquote>Coordinate information</blockquote>
+		<div id="layout" class="ph-flex ph-horz ph-vertmob">
+			
+			<div id="menu" class="ph-flex ph-vert ph-horzmob ph-mob100p">
+				<div class="menuitem active" rel="page1"><i class="icon-street-view"></i></div>
+				<div class="menuitem" rel="page2"><i class="icon-globe"></i></div>
+				<div class="menuitem" rel="page3"><i class="icon-sliders"></i></div>
+				<div class="menuitem" rel="page4"><i class="icon-help-circled"></i></div>
+			</div>
+			
+			<div id="content" class="ph-grow2">
+					
+				<div class="page active" id="page1">
+				
+					<div class="ph-sectheader"><span class="ph-secticon">&gt;</span> User location</div>
+				
+					<!-- User Location APP -->
+					<div id="userLocationApp" class="ph-row">
 						
-						<!-- User Location APP -->
-						<div class="c-card">
-							<div id="userLocationApp" class="c-card--accordion u-high">
-								<input type="checkbox" id="userlocationpanel" checked>
-								<label class="c-card__item c-card__item--brand" for="userlocationpanel">User Location</label>
-								<div class="c-card__item bluebg">
-							
-									<p class="c-paragraph">
-										Enter your coordinates in <strong>ABCD:1234:5678:1234:5678</strong> format 
-										or <strong>1234:5678:1234:5678</strong> format
-									</p>
-								
-									<p class="c-paragraph">
-										<input id="userlocation" class="c-field" type="text" v-model="locationText" placeholder="Place your location here">
-									</p>							
-								
-									<div class="o-grid o-grid--wrap">
-										<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
-											<div class="c-button panelbutton tealbg noinline" v-on:click="calculateLocation"><i class="icon-street-view"></i> Draw Location</div>
-										</div>
-										<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small nopadding">
-											<div class="c-button panelbutton tealbg noinline" v-on:click="drawBHZone"><i class="icon-target-1"></i> Draw B.Hole Ring</div>
-										</div>
+						<div class="ph-c-1-3 ph-c-tab-1-1 ph-c-m-1-1">
+							<div id="userInputPanel" class="ph-100p">		
+								<div id="userLocationP" class="ph-100p">
+									<input id="userLocation" type="text" class="ph-100p" rv-value="locationText" placeholder="Write your coords here">
+								</div>
+								<div class="ph-row">
+									<div class="ph-c-2-4">
+										<button class="ph-btn ripple ph-100p bigBtn" rv-on-click="calculateLocation"><i class="icon-street-view"></i> Update Location</button>
 									</div>
+									<div class="ph-c-2-4">
+										<button class="ph-btn ripple ph-100p bigBtn" rv-on-click="drawBHZone"><i class="icon-target-1"></i> Draw B.Hole Ring</button>
+									</div>
+								</div>
+								<div rv-show="firstPush" style="display:none;">
+									<div id="errorMessage" class="ph-info ph-danger" rv-hide="locationValid">
+										<div id="errorMessageText">{{errorMessage}}</div>
+									</div>	
+								</div>
+							</div>
+						</div>
+						
+						<!-- UserToDest Panel -->
+						<div class="ph-c-1-3 ph-c-tab-1-2 ph-c-m-1-1">
+							<div id="locationInfoTable" rv-if="locationValid">
 								
-									<div v-show="firstPush" style="display:none;">
-										<div id="locationInfo" class="o-grid o-grid--wrap" v-if="locationValid">
-										
-											<table id="locationInfoTable" class="c-table">
-												<thead class="c-table__head">
-													<tr class="c-table__row c-table__row--heading">
-														<th class="c-table__cell mwidth_20p">X</th>
-														<th class="c-table__cell mwidth_20p">Y</th>
-														<th class="c-table__cell mwidth_20p">Z</th>
-														<th class="c-table__cell">Distance to center</th>
-													</tr>
-												</thead>
-												<tbody class="c-table__body">
-													<tr class="c-table__row">
-														<td class="c-table__cell mwidth_20p">{{userLocation.getX()}}</td>
-														<td class="c-table__cell mwidth_20p">{{userLocation.getY()}}</td>
-														<td class="c-table__cell mwidth_20p">{{userLocation.getZ()}}</td>
-														<td class="c-table__cell">{{userLocation.calculateDistance(center).toFixed(3)}}</td>
-													</tr>
-												</tbody>
-											</table>
-										</div>
-										<div id="errorMessage" class="c-alert c-alert--error" v-show="locationValid == false">
-											<span class="card-title">Ooops</span>
-											<p id="errorMessageText">{{errorMessage}}</p>
-										</div>								
+								<div class="ph-trow">
+									<div class="ph-tc-40 roundLabel">
+										<div >Pos</div> 
+									</div>
+									<div class="ph-tc-100">
+										x:{{userLocation.coords.0}} y:{{userLocation.coords.1}} z:{{userLocation.coords.2}}
+									</div>
+								</div>
+								<div class="ph-trow">
+									<div class="ph-tc-40 roundLabel">
+										<div>Dest</div>
+									</div>
+									<div class="ph-tc-100">
+										<div>{{common.selectedDestinationName}}</div>
+									</div>
+								</div>
+
+								<div class="ph-trow">
+									<div class="ph-tc-40">
+										<div class="roundLabel">To center</div> 
+									</div>
+									<div class="ph-tc-100">
+										{{userLocation.distance}} ly
+									</div>
+								</div>	
+								<div class="ph-trow">
+									<div class="ph-tc-40 roundLabel">
+										<div>To dest</div> 
+									</div>
+									<div class="ph-tc-100">
+										{{common.selectedDestinationObj.distance}} ly
 									</div>
 								</div>
 							</div>
-							<!-- / UserLocation APP -->
-
-							<!-- Destinations APP -->
-							<div id="destinationApp" class="c-card--accordion u-high">
-								<input type="checkbox" id="destinationpanel" checked>
-								<label class="c-card__item c-card__item--brand" for="destinationpanel">Destinations</label>
-								<div class="c-card__item bluebg">
-									<div class="c-paragraph">Enter destinations in coordinate format</div>
-									<textarea id="destinationlocation" class="c-field" placeholder="Place destinations here" v-model="destinationsText"></textarea>
-									
-									<div class="o-grid o-grid--wrap">
-										<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small">
-											<div class="c-button tealbg panelbutton noinline" v-on:click="addBatch">Add them</div>
+						</div>
+						
+						<div class="ph-c-1-3 ph-c-tab-1-2 ph-c-m-1-1">
+							<div id="locationCalcTable" rv-show="locationValid">	
+							
+								<div class="ph-trow">
+									<div class="ph-tc-40 roundLabel">
+										<div>Estimated jumps</div> 
+									</div>
+									<div class="ph-tc-100">
+										{{common.selectedDestinationObj.jumps}} ({{common.jumpRange}}ly hyperdrive)
+									</div>
+								</div>
+								
+								<div>
+									<div class="ph-trow">
+										<div class="ph-tc-40 roundLabel">
+											<div>Degrees from center</div> 
 										</div>
-										<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small">
-											<div class="c-button tealbg panelbutton noinline" v-on:click="addPilgrim">Add Pilgrim</div>
+										<div class="ph-tc-90">
+											{{common.degrees}} {{common.degreesDir}} 
+										</div>
+										<div class="ph-tc-10">
+											<button rv-on-click="toggleCompass">
+												<i rv-hide="showCompass" class="icon-plus-circled"></i> 
+												<i rv-show="showCompass" class="icon-minus-circled"></i> 
+											</button>
+										</div>
+									</div>
+
+									<div rv-show="showCompass" class="ph-row">
+										<hr class="divider" />
+										<div class="ph-c-2-4">
+											<svg id="compasssvg" xmlns="http://www.w3.org/2000/svg" width="140" height="140">
+												<line x1="80" y1="80" x2="80" y2="30" style="stroke:rgb(123,123,230); stroke-width:2;"></line>
+												<text style="font-family:'nmsicons'; font-size:15pt;" x="50" y="20" fill="#7672E8">Center</text>
+												<g rv-transform="common.degreesTransf">
+													<circle cx="80" cy="80" r="50" style="stroke:#999999; stroke-width:2; fill:none;"></circle>
+													<text style="font-family:'nmsicons'; font-size:15pt;" x="80" y="80" transform="rotate(-90 87 80)" stroke="#ffffff" stroke-width="1" fill="none"></text>
+													<line x1="80" y1="80" x2="80" y2="30" style="stroke:rgb(255,0,0); stroke-width:1; stroke-opacity:0.5"></line>
+												</g>
+											</svg>
+										</div>
+										<div>
+											<div>To reach <strong>{{common.selectedDestinationName}}</strong> follow this direction:</div>
+											<div>Looking at the center, turn {{common.degrees}} degrees to your {{common.degreesDir}}</div>
 										</div>
 									</div>
 									
-									<div class="c-card c-card--accordion u-high" id="redditpanel">
-										<input type="checkbox" id="reddittoggle">
-										<label class="c-card__item c-card__item--brand" id="redditpanellabel" for="reddittoggle">Grab from <i class="icon-reddit"></i> <strong>Reddit</strong></label>
-										<div class="c-card__item" id="redditpanelbg">
-											<div class="c-button c-button--brand panelbutton redditbtn noinline" v-on:click="addRedLast">Last known locations</div>
-											<div class="c-button c-button--brand panelbutton redditbtn noinline" v-on:click="addRedRec">Recommended locations</div>
-											<div class="c-button c-button--brand panelbutton redditbtn noinline" v-on:click="addRedHub">
-												<i class="icon-globe"></i> Galactic Hub (R.E.)
+								</div>
+								
+								<div>
+								
+									<div class="ph-trow">
+										<div class="ph-tc-40 roundLabel">
+											<div><i class="icon-emo-coffee"></i> Hint</div> 
+										</div>
+										<div class="ph-tc-90">
+											{{common.coffeeHint}}
+										</div>
+										<div class="ph-tc-10">
+											<button rv-show="common.shouldUseBh" rv-on-click="toggleBhHelper">
+												<i rv-hide="showBhHelper" class="icon-plus-circled"></i> 
+												<i rv-show="showBhHelper" class="icon-minus-circled"></i> 
+											</button>
+										</div>
+									</div>
+								
+									<div rv-show="showBhHelper" class="ph-row">
+										<hr class="divider" />
+										<div class="ph-c-2-4">
+											<input type="text" class="ph-100p" placeholder="Write your BH distance here" rv-value="lastJumpDistanceText"><br/>
+											<div class="ph-btn" rv-on-click="drawAreaHint">Draw hint</div>
+										</div>
+										<div class="ph-c-2-4">
+											Write your last distance shown after going through Black Hole
+										</div>
+									</div>
+								
+									<div class="ph-trow" rv-show="common.heightNotOK">
+										<div class="ph-tc-40 roundLabel warning">
+											<div>*WARNING*</div> 
+										</div>
+										<div class="ph-tc-100">
+											you are {{common.heightDiff}} region(s) {{common.heightDir}} <strong>{{common.selectedDestinationName}}</strong>
+										</div>
+									</div>																
+								</div>
+							</div>
+						</div>
+						<!-- EO UserToDest Panel -->
+					</div>
+					<!-- / UserLocation APP -->
+					
+					
+					<!-- Map APPS -->
+					<div id="mapContainer">	
+					
+						<div id="mapOverlayApp">
+							<button class="ph-btn ripple" rv-on-click="toggleMode">
+								<span rv-hide="galaxyMode">Set Galaxy Mode</span>
+								<span rv-show="galaxyMode">Set Local Mode</span>
+							</button>
+						</div>
+					
+						<!-- GalaxyMap APP -->
+						<div id="galaxyMapApp">
+							<div id="galmapsvgp" rv-show="mapEnabled">
+								 <svg id="galmapsvg" xmlns="http://www.w3.org/2000/svg" rv-width="width" rv-height="height">
+									<defs>
+										<pattern id="gridPattern" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+											<rect x="0" y="0" width="30" height="30" style="stroke: rgb(0,184,212);stroke-opacity:0.7;"></rect>
+										</pattern>
+									</defs>
+									<rect x="0" y="0" rv-width="width" rv-height="height" style="fill: url(#gridPattern);"></rect>
+									<g id="aX">
+										<text dy="0.75em" x="152" y="3" fill="#00b8d4">X</text>
+										<line x1="10" y1="10" x2="150" y2="10" style="stroke:#00b8d4 ; stroke-width:1;"></line>
+										<path d="M150 10 L141.3397459621556 15 L141.3397459621556 5.000000000000001  Z" fill="#00b8d4"></path>
+									</g>
+									<g id="aZ">
+										<text dy="0.75em" x="4" y="152" fill="#00b8d4">Z</text>
+										<line x1="10" y1="10" x2="10" y2="150" style="stroke:#00b8d4 ; stroke-width:1;"></line>
+										<path d="M10 150 L5.000000000000001 141.3397459621556 L14.999999999999998 141.3397459621556  Z" fill="#00b8d4"></path>
+									</g>
+
+									<circle rv-cx="center.mapCoords.0" rv-cy="center.mapCoords.2" r="6" rv-stroke="center.color" stroke-width="1" rv-fill="center.color"></circle>
+									<text dy="0.75em" rv-x="center.mapCoords.0 | plus 10" rv-y="center.mapCoords.2 | plus -5" fill="white">{{center.name}}</text>
+
+									<g rv-show="userApp.locationValid">
+										<circle rv-cx="userLocation.mapCoords.0" rv-cy="userLocation.mapCoords.2" r="4" rv-stroke="userLocation.color" stroke-width="1" rv-fill="userLocation.color"></circle>
+										<text dy="0.75em" rv-x="userLocation.mapCoords.0 | plus 10" rv-y="userLocation.mapCoords.2 | plus -5" fill="white">{{userLocation.name}}</text>
+									</g>
+
+									<g rv-each-dest="destinations" rv-on-click="destApp.selectDest" rv-rel="index">
+										<circle rv-cx="dest.mapCoords.0" rv-cy="dest.mapCoords.2" r="4" rv-stroke="dest.color" stroke-width="1" rv-fill="dest.color"  ></circle>
+										<text dy="0.75em" rv-x="dest.mapCoords.0 | plus 10" rv-y="dest.mapCoords.2 | plus -5" fill="white">{{dest.name}}</text>
+									</g>
+
+									<g rv-show="showAreaHint">
+										<ellipse rv-cx="areaHint.cx" rv-cy="areaHint.cy" rv-rx="areaHint.rx" rv-ry="areaHint.ry"  style="stroke:#486f1b; stroke-width:2; fill:none;"></circle>
+									</g>
+									
+									<g rv-show="showBlackHoleRing">
+										<ellipse rv-cx="center.mapCoords.0" rv-cy="center.mapCoords.2" rv-rx="blackHoleRadius.rx" rv-ry="blackHoleRadius.ry" style="stroke:rgb(255,0,0);stroke-width:5px;stroke-opacity:0.3;fill:none;"/>
+									</g>
+								 </svg>
+							</div>
+						</div>
+						<!-- / GalaxyMap APP -->	
+						
+						<!-- LocalRadar APP -->
+						<div id="localRadarApp"  rv-show="mapEnabled" style="display:none;">
+							<svg id="localRadarSvg" xmlns="http://www.w3.org/2000/svg" rv-width="width" rv-height="height">
+								<defs>
+									<pattern id="localRadarPattern" x="0" y="0" rv-width="mapRelationW" rv-height="mapRelationH" patternUnits="userSpaceOnUse">
+										<rect x="0" y="0" rv-width="mapRelationW" rv-height="mapRelationH" style="stroke: rgb(0,184,212);stroke-opacity:0.7;"></rect>
+									</pattern>
+								</defs>
+
+								<rect x="0" y="0" rv-width="width" rv-height="height" style="fill: url(#localRadarPattern);"></rect>
+								
+								<g id="bigWarning"  rv-hide="radarValid">
+									<rect x="8" y="0.6em" width="200" height="25" fill="#00b8d4"></rect>
+									<text y="10" fill="#00b8d4">
+										<tspan x="10" dy="1.2em" fill="#ffffff">
+										  
+										  WARNING, INTERLOPER.
+										</tspan>
+										<tspan x="10" dy="1.6em">
+											YOU ARE TOO FAR AWAY!
+										</tspan>
+										<tspan x="10" dy="1.2em">
+											Settings distance to appear here is
+										</tspan>
+										<tspan x="10" dy="1.2em">
+											{{radarValidDist}} jumps from your dest
+										</tspan>
+									</text>
+									 
+								</g>
+								
+								<g id="arrows" rv-show="radarValid">
+								
+									<g id="aXR">
+										<text dy="0.75em" x="152" y="3" fill="#00b8d4">X</text>
+										<line x1="10" y1="10" x2="150" y2="10" style="stroke:#00b8d4 ; stroke-width:1;"></line>
+										<path d="M150 10 L141.3397459621556 15 L141.3397459621556 5.000000000000001  Z" fill="#00b8d4"></path>
+									</g>
+									<g id="aZR">
+										<text dy="0.75em" x="4" y="152" fill="#00b8d4">Z</text>
+										<line x1="10" y1="10" x2="10" y2="150" style="stroke:#00b8d4 ; stroke-width:1;"></line>
+										<path d="M10 150 L5.000000000000001 141.3397459621556 L14.999999999999998 141.3397459621556  Z" fill="#00b8d4"></path>
+									</g>
+								</g>
+								
+								
+								
+								<g id="destR">
+									<circle id="radarDest" rv-cx="dest.mx" rv-cy="dest.mz" r="6" rv-stroke="dest.color" stroke-width="1" rv-fill="dest.color"></circle>
+									<text dy="0.75em" rv-x="dest.mxT" rv-y="dest.mzT" fill="white">{{dest.name}}</text>
+								</g>
+								
+								<g rv-show="radarValid">
+									<circle id="radarUser" rv-cx="userPoint.mx" rv-cy="userPoint.mz" r="4" rv-stroke="userPoint.color" stroke-width="1" rv-fill="userPoint.color"></circle>
+									<text dy="0.75em" rv-x="userPoint.mxT" rv-y="userPoint.mzT" fill="white">{{userPoint.name}}</text>
+								</g>
+								<g rv-show="heightNotOK">
+									<rect id="radarHeightWarning" width="80" rv-x="20" rv-y="height | plus -22" height="18" stroke="#00b8d4" fill="#00b8d4"></rect>
+									<text dy="0.75em" rv-x="25" rv-y="height | plus -25" fill="#ffffff">WARNING</text>
+									<text dy="0.75em" rv-x="125" rv-y="height | plus -25" fill="#ffffff">You are {{heightDiff}} regions {{heightDir}} {{dest.name}} location</text>
+								</g>
+							 </svg>
+						</div>
+						<!-- / LocalRadar APP -->
+					</div>
+					<!-- / Map APPS -->
+				</div>
+					
+				<div class="page" id="page2">
+					<!-- Destinations APP -->
+					<div class="ph-sectheader"><span class="ph-secticon">&gt;</span> Destinations</div>
+					<div id="destinationApp">
+						
+						<div class="destinationSection">
+							<div class="title">Custom destinations</div>
+							
+							<p>Enter a list of custom coordinates here, one per line</p>
+							
+							<div class="">
+								<div class="ph-100p" id="destinationlocation">
+									<textarea  rows="4" class="ph-100p" placeholder="Place destinations here" rv-value="destinationsText"></textarea>
+								</div>
+								<button class="ph-btn ripple bigBtn" rv-on-click="addBatchText">Add custom destinations</button>
+							</div>
+						</div>
+						
+						<div class="destinationSection">
+							<div class="title">Reddit destinations</div>
+							
+							<p>Add destinations from common points from <i class="icon-reddit"></i> <strong>Reddit</strong></p>
+							
+							<div class="ph-inline">							
+								<div class="ph-btn ripple ph-inline" rv-on-click="addPilgrim">Add Pilgrim</div>
+								<div class="ph-btn ripple ph-inline" rv-on-click="addRedHub"><i class="icon-globe"></i> Add Galactic Hub</div>
+							</div>
+						</div>
+						
+						<div class="destinationSection">
+							<div class="title">Wiki destinations</div>
+
+							<div class="poweredBy" class="ph-inline">
+								<div class="ph-inline">	Powered by NMS Wiki at 
+									<a class="ph-inline" href="http://nomanssky.gamepedia.com">
+										<img src="http://nomanssky.gamepedia.com/skins/Hydra/images/netbar/logo-fallback.png" alt="Gamepedia wiki"/>
+									</a>
+								</div>
+							</div>
+							
+							<p>Add destinations provided by redditors and wiki users</p>						
+					
+							<div class="ph-info" rv-show="wikiLoading">
+								<div id="errorMessageText">Loading info from wiki</div>
+							</div>	
+							
+							<div class="ph-inline">		
+								<div class="ph-btn ripple ph-inline" rv-on-click="loadLast">Last known locations</div>
+								<div class="ph-btn ripple ph-inline" rv-on-click="loadRec">Recommended locations</div>
+							</div>
+						</div>
+						
+						<div class="destinationSection">		
+							<div class="title">Active destinations</div>						
+							<div id="destinationdata">
+								<div class="ph-row">
+									<div rv-each-destination="destinations" class="destination">
+										
+										<div class="ph-row">
+											<div class="ph-c-2-4 ph-c-auto">
+												<div class="ph-row">
+													<div class="ph-c-2-4">
+														<input class="destinationname ph-100p" type="text" rv-value="destination.name">
+													</div>
+													<div class="ph-c-auto" title="Select as destination" rv-on-click="selectDest" rv-rel="index">
+														<button class="ph-btn ripple"><i class="icon-target"></i></button>
+													</div>
+													<div class="ph-c-auto">
+														<button class="ph-btn ripple" title="Delete this destination" rv-on-click="deleteDest"  rv-rel="index">
+															<i class="icon-trash"></i>
+														</button>
+													</div>
+												</div>	
+											</div>
+										
+											<div class="ph-c-2-4  ph-c-m-1-2">
+												<span>{{destination.getHexStr |call}}</span> 	
+												<span><strong>{{destination.distance}}ly </strong></span>
+												<span>{{destination.jumps}} jumps</span>
 											</div>
 										</div>
 									</div>
-
-									<div id="destinationdata">
-										<div class="c-card u-high" id="">
-											<template v-for="destination of destinations">
-												<div class="c-card__item destinationtemplaterow" >
-													<div class="o-grid o-grid--wrap">
-														<div class="o-grid__cell o-grid__cell--width-10 nopadding targetSelect" title="Select as destination" v-on:click="selectDest(destination.index)">
-															<button class="c-button u-xsmall">
-																<i class="icon-target"></i>
-															</button>
-														</div>
-														<div class="o-grid__cell o-grid__cell--width-10 nopadding targetSelect" title="Change destination color"  v-on:click="selectDestColor(destination.index)">
-															<button class="c-button u-xsmall">
-																<i class="icon-brush"></i>
-															</button>
-														</div>
-														<div class="o-grid__cell o-grid__cell--width-70">
-															<input class="destinationname c-field" type="text" v-model="destination.name">
-														</div>
-														<div class="o-grid__cell o-grid__cell--width-10 nopadding">
-															<div class="c-button  u-xsmall deletebtn" title="Delete this destination" v-on:click="deleteDest(destination.index)">
-																<i class="icon-trash"></i>
-															</div>
-														</div>
-													</div>
-													<div class="o-grid o-grid--wrap">
-														<div class="o-grid__cell">
-															{{destination.getHexStr()}}
-														</div>	
-														<div class="o-grid__cell">{{destination.distance}} ly</div>
-														<div class="o-grid__cell">{{destination.jumps}} jumps</div>
-													</div>
-												</div>
-											</template>
-										</div>
-									</div>
 								</div>
 							</div>
-							<!-- / Destinations APP -->
-							
-							<!-- Debug APP -->
-							<!-- / Debug APP -->
-
-							<!-- COFFEE APP -->
-							<div id="coffeeApp" class="c-card--accordion u-high">
-								<input type="checkbox" id="usergpspaneltoggle">
-								<label class="c-card__item c-card__item--brand" for="usergpspaneltoggle">
-									<span title="Computer Oriented Flight For Euclidean Explorers"><i class="icon-coffee"></i> C.O.F.F.E.E.</span><i class="icon-rocket"></i>
-									<span class="c-badge c-badge--warning">Alpha</span>
-								</label>
-								<div class="c-card__item bluebg">
-									<p>Welcome to the <strong>Computer Oriented Flight For Euclidean Explorers</strong></p>
-									<p>This is your estimated route to <strong id="routedestinationtxt"><small>... draw your location and select some destination first! beep</small></strong></p>
-									<div class="c-card u-high" id="routelist">
-										<!--  TEMPLATING -->
-										<div style="display:none;">
-											<div  class="c-card__item destinationtemplaterow">Step {{i}} {{x}}:{{y}}:{{z}}</div>
-										</div>
-										<!--  /TEMPLATING -->
-									</div>
-								</div>
-							</div>
-							<!-- / COFFEE APP -->
 						</div>
 					</div>
-				</div>
+					<!-- / Destinations APP -->
+				</div>  
+						
+				<div class="page" id="page3">
+					<!-- page 3 -->
+					<div class="ph-sectheader"><span class="ph-secticon">&gt;</span> Settings</div>					
+					<!-- SettingsApp -->
+					<div id="settingsApp">
 
-				<div id="plotparent" class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-60@small">
-					
-					<!-- GalaxyMap APP -->
-					<div id="galaxyMapApp">
-						<blockquote>Galaxy map</blockquote>					
-						<div id="galmapsvgp">
-							 <svg id="galmapsvg" xmlns="http://www.w3.org/2000/svg" :width="width" :height="height">
-								<defs>
-									<pattern id="gridPattern" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-										<rect x="0" y="0" width="30" height="30" style="stroke: rgb(0,184,212);stroke-opacity:0.7;"></rect>
-									</pattern>
-								</defs>
-								<rect x="0" y="0" :width="width" :height="height" style="fill: url(#gridPattern);"></rect>
-								<g id="aX">
-									<text dy="0.75em" x="152" y="3" fill="#00b8d4">X</text>
-									<line x1="10" y1="10" x2="150" y2="10" style="stroke:#00b8d4 ; stroke-width:1;"></line>
-									<path d="M150 10 L141.3397459621556 15 L141.3397459621556 5.000000000000001  Z" fill="#00b8d4"></path>
-								</g>
-								<g id="aZ">
-									<text dy="0.75em" x="4" y="152" fill="#00b8d4">Z</text>
-									<line x1="10" y1="10" x2="10" y2="150" style="stroke:#00b8d4 ; stroke-width:1;"></line>
-									<path d="M10 150 L5.000000000000001 141.3397459621556 L14.999999999999998 141.3397459621556  Z" fill="#00b8d4"></path>
-								</g>
-								
-								<circle :cx="center.getMapX()" :cy="center.getMapZ()" r="6" :stroke="center.color" stroke-width="1" :fill="center.color"></circle>
-								<text dy="0.75em" :x="center.getMapTextX()" :y="center.getMapTextZ()" fill="white">{{center.name}}</text>
-								
-								<g v-show="userApp.locationValid">
-									<circle v-bind:cx="userPoint.mx" v-bind:cy="userPoint.mz" r="4" :stroke="userPoint.color" stroke-width="1" v-bind:fill="userPoint.color"></circle>
-									<text dy="0.75em" v-bind:x="userPoint.mxT" v-bind:y="userPoint.mzT" fill="white">{{userPoint.name}}</text>
-								</g>
-								
-								<template v-for="dest of destinations">
-									<circle :cx="dest.getMapX()" :cy="dest.getMapZ()" r="4" :stroke="dest.color" stroke-width="1" :fill="dest.color"></circle>
-									<text dy="0.75em" :x="dest.getMapTextX()" :y="dest.getMapTextZ()" fill="white">{{dest.name}}</text>
-								</template>
-								
-								<g v-show="showBlackHoleRing">
-									<ellipse :cx="center.getMapX()" :cy="center.getMapZ()" :rx="blackHoleRadius.rx" :ry="blackHoleRadius.ry" style="stroke:rgb(255,0,0);stroke-width:5px;stroke-opacity:0.3;fill:none;">
-								</g>
-								
-							 </svg>
+						<div class="fieldSet">
+							
+						
+							<div class="setting">
+								<div class="settingTitle">Max hyperjump distance (ly)</div>
+								<div class="settingText">Type or select the max hyperjump distance that your ship hyperdrives can handle.</div>
+								<div class="settingValues">
+									<input type="range" rv-value="common.jumpRange" min="100" max="9999" step="100"><br/>
+									<input type="text" rv-value="common.jumpRange">
+								</div>
+							</div>
+							
+							<div class="setting">
+								<div class="settingTitle">Local Mode grid size</div>
+								<div class="settingText">Type or select the grid size in regions (NxN) for the local map mode. You will appear there if you are in N/2 radius!</div>
+								<div class="settingValues">
+									<input type="range" rv-value="common.localRadarRange" min="15" max="50" step="10"><br/>
+									<input type="text" rv-value="common.localRadarRange">
+								</div>
+							</div>
+							
+							<div class="setting">
+								<div class="settingTitle">Galaxy Map height in pixels</div>
+								<div class="settingText">Type or select the height size of the galaxy map. Solves streched maps ;)</div>
+								<div class="settingValues">
+									<input type="range" rv-value="map.height" min="10" max="2000" step="10"><br/>
+									<input type="text" rv-value="map.height">
+								</div>
+							</div>
 						</div>
 						
-						<div class="c-badge c-badge--brand chipcenter">Galaxy center</div>
-						<div class="c-badge c-badge--brand chipdestination">Destination</div>
-						<div class="c-badge c-badge--brand chipuser">User Location</div>
-						<div class="c-badge c-badge--brand chiphub">Galactic Hub</div>
+						<div class="">
+							<button class="ph-btn ripple bigBtn" rv-on-click="applySettings"><i class="icon-sliders"></i>Save and apply settings</button>
+							<button class="ph-btn ripple bigBtn" rv-on-click="clearSettings"><i class="icon-trash"></i>Clear settings cache</button>
+						</div>
+						
 					</div>
-					<!-- / GalaxyMap APP -->
 					
-					<div id="directionsmap">
-						<div class="o-grid o-grid--wrap">
-
-							<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small">
-								<div id="heightMapApp">
-									<div v-show="userApp.locationValid"  style="display:none;">
-										<blockquote>Height map</blockquote>
-										<p>This is your height guidance towards the destinations<br/>Move as much regions as shown, in your ingame galaxy map, until it shows OK.<br/>
-										Selected destination is always the first</p>
-										
-										<div id="heightsvgp">
-											<span v-for="(dest, index) in destinations" class="c-badge c-badge--brand hmapbadge">{{dest.name}} : {{dest.diffTxt}}</span>										
-										</div>
-									</div>
-								</div>
+					<!-- / SettingsApp -->
+				</div>
+				
+				<div class="page" id="page4">
+					<!-- page 4 -->
+					<div class="ph-sectheader"><span class="ph-secticon">&gt;</span> Help</div>
+					<div id="helpApp">
+					
+						<div class="poweredBy" class="ph-inline">
+							<div class="ph-inline">	Powered by NMS Wiki at 
+								<a class="ph-inline" href="http://nomanssky.gamepedia.com">
+									<img src="http://nomanssky.gamepedia.com/skins/Hydra/images/netbar/logo-fallback.png" alt="Gamepedia wiki"/>
+								</a>
 							</div>
-
-							<div class="o-grid__cell o-grid__cell--width-100 o-grid__cell--width-50@small ">
-								<div id="compassApp">
-									<div v-show="userApp.locationValid"  style="display:none;">
-										<blockquote>Compass <span class="c-badge c-badge--success">BETA</span></blockquote>
-										<div id="compassp">
-											<div>To reach <strong>{{selectedDestinationName}}</strong> follow this direction:</div>
-											<div>Looking at the center, turn {{compassDegrees}} degrees to your {{compassDir}}</div>
-												<svg id="compasssvg" xmlns="http://www.w3.org/2000/svg" :width="width" :height="height">
-													<line x1="80" y1="80" x2="80" y2="30" style="stroke:rgb(123,123,230); stroke-width:2;"></line>
-													<text style="font-family:'nmsicons'; font-size:15pt;" x="75" y="15" fill="#7672E8">Center</text>
-													<g :transform="rotateStr">
-														<circle cx="80" cy="80" r="50" style="stroke:rgb(153,153,153); stroke-width:2; fill:none;"></circle>
-														<text style="font-family:'nmsicons'; font-size:15pt;" x="80" y="80" transform="rotate(-90 87 80)" stroke="#ffffff" stroke-width="1" fill="none"></text>
-														<line x1="80" y1="80" x2="80" y2="30" style="stroke:rgb(255,0,0); stroke-width:1; stroke-opacity:0.5"></line>
-													</g>
-												</svg>
-											</svg>
-										</div>
-									</div>
-								</div>
+						</div>
+					
+						<div class="ph-info" rv-show="wikiLoading">
+							<div id="errorMessageText">Loading info from wiki</div>
+						</div>	
+					
+						<div id="helpAppItems">
+							<div rv-each-item="helpItems" class="helpItem">
+								<div class="title" rv-rel="tag">{{item.title}}</div>
+								<div class="helpText">{{item.text}}</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</div>	
-
-			<!-- COLOR PICKER APP -->
-			<div id="colorPickerApp">
-				<div id="modalcolor" v-show="visible" style="display:none;">
-					<div class="c-overlay" style="position:fixed; width:100%;height:100%;"></div>
-				<div class="o-modal" style="color:black; position: fixed;">
-					<div class="c-card">
-						<header class="c-card__header">
-						<h2 class="c-heading">Pick a color</h2>
-						</header>
-						<div class="c-card__body">
-							<p>Changing <strong>{{destinationName}} color</strong></p>
-
-							<div>Select a predefined color: </div>
-							<div id="predefinedcolors" v-on:click="setColor">
-								<template v-for="(color, index) of colors">
-									<div class='pickcolor' :id='"#pc"+color' :style='getBgColor(index)' ></div>
-								</template>
-							</div>
-							
-							<div>Select one color with the ranges: </div>
-							
-							<div id="rgbranges">
-								<input type="range" id="colorr" v-model="newColor.r" class="c-range c-range--error" min="0" max="255" step="1">
-								<input type="range" id="colorg" v-model="newColor.g" class="c-range c-range--success" min="0" max="255" step="1">
-								<input type="range" id="colorb" v-model="newColor.b" class="c-range c-range--info" min="0" max="255" step="1">
-							</div>
-
-							<div class="o-grid o-grid--wrap">
-								<div class="o-grid__cell o-grid__cell--width-50 nopadding">
-									Current color: 
-									<div :style="getPrevBgStr()"></div>			
-								</div>
-								<div class="o-grid__cell o-grid__cell--width-50 nopadding">
-									New Color: 
-									<div id="colordemo" :style="getBgStr()"></div>			
-								</div>
-							</div>												
-						</div>
-
-						<footer class="c-card__footer">
-							<div class="c-input-group">
-								<button type="button" class="c-button c-button--block c-button--brand" v-on:click="apply">Apply</button>
-								<button type="button" class="c-button c-button--block" v-on:click="close">Cancel</button>
-							</div>
-						</footer>
-
-					</div>
-				</div>
 				</div>
 			</div>
-			<!-- COLOR PICKER APP -->
+
+			<!-- Content extra (be removed now) -->
 		</div>
+
 		<script type="text/javascript" src="./js/gdl.js"></script>
-		<script>
-			var clearAF = function(){
-			
-				$("#apfools").remove();
-				$("#content").removeAttr("style");
-				generateMap();
-			}
-		</script>
     </body>
 </html>

@@ -1,22 +1,9 @@
 @font-face {
   font-family: 'nmsicons';
-
-  src: url('../fonts/nmsicons.woff?28770366') format('woff'),
-       url('../fonts/nmsicons.ttf?28770366') format('truetype');
+  src: url('../fonts/nmsicons.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
-
-/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
-/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
-/*
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  @font-face {
-    font-family: 'nmsicons';
-    src: url('../font/nmsicons.svg?9312094#nmsicons') format('svg');
-  }
-}
-*/
  
  [class^="icon-"]:before, [class*=" icon-"]:before {
   font-family: "nmsicons";
@@ -60,18 +47,21 @@
 .icon-megaphone:before { content: '\e804'; } /* '' */
 .icon-palette:before { content: '\e805'; } /* '' */
 .icon-target:before { content: '\e806'; } /* '' */
-.icon-globe:before { content: '\e807'; } /* '' */
+.icon-target-1:before { content: '\e807'; } /* '' */
 .icon-reddit:before { content: '\e808'; } /* '' */
-.icon-target-1:before { content: '\e809'; } /* '' */
-.icon-trash:before { content: '\e80a'; } /* '' */
+.icon-trash:before { content: '\e809'; } /* '' */
+.icon-emo-coffee:before { content: '\e80a'; } /* '' */
+.icon-heart:before { content: '\e80b'; } /* '' */
+.icon-globe:before { content: '\e80c'; } /* '' */
 .icon-coffee:before { content: '\f0f4'; } /* '' */
 .icon-plus-squared:before { content: '\f0fe'; } /* '' */
+.icon-github:before { content: '\f113'; } /* '' */
 .icon-rocket:before { content: '\f135'; } /* '' */
 .icon-bullseye:before { content: '\f140'; } /* '' */
 .icon-minus-squared:before { content: '\f146'; } /* '' */
 .icon-space-shuttle:before { content: '\f197'; } /* '' */
 .icon-reddit-squared:before { content: '\f1a2'; } /* '' */
+.icon-sliders:before { content: '\f1de'; } /* '' */
 .icon-brush:before { content: '\f1fc'; } /* '' */
 .icon-street-view:before { content: '\f21d'; } /* '' */
 .icon-hand-pointer-o:before { content: '\f25a'; } /* '' */
-.icon-github:before { content: '\f300'; } /* '' */

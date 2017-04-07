@@ -1,137 +1,269 @@
 @font-face {
-  font-family: 'NmsFont';
-  src:url('../fonts/geonms-webfont.woff') format('woff');
+  font-family: 'LcdFont';
+  src:url('../fonts/font.woff2') format('woff2');
 }
 
 body{
-	background-color: #000000;
-	color:#ffffff;
-	font-family: GillSans, Calibri, Trebuchet, sans-serif;
+	font-family : LcdFont;
 }
 
-
-.visible{
-	
+#menu{
+	min-width:75px;			
+	align-items: center;
+	margin-top:10px;
+	padding-right:4px;
+	margin-right:4px;
+	border-right: 2px solid #555555;
 }
 
-.hidden{
-	display:none !important;
-}
-
-.mwidth_20p{
-	max-width:20%;
-}
-
-.noinline{
-	display:block !important;
-}
-
-.nopadding{
-	padding:0px !important;
-}
-
-blockquote{
-	margin: 10px 0px !important;
-	border-bottom: 1px solid #bebebe;
-}
-
-textarea{
-	width:100%;
-}
-
-
-#brand, .c-button{
-	font-family : NmsFont !important;
-}
-
-
-div .panelbutton{
-	margin:5px !important;	
-	font-size:15pt;
-}
-
-.tealbg{
-	background-color: #2bbbad !important;
-}
-
-.bluebg{
-	background-color: #546e7a;
-}
-
-
-#userlocation{
-	width:100%;
-}
-
-#destinationdata{
-	margin-top:8px;
-}
-
-#redditpanel{
-	margin-top:8px;
-	margin-bottom:8px;
-}
-
-#redditpanellabel{
-	background-color: #5f99cf;
-	font-family: NmsFont;
-}
-
-#redditpanelbg{
-	background-color: #cee3f8 !important;
-}
-
-.redditbtn{
-	background-color: #4980ae !important;
-}
-
-
-.destinationtemplaterow{
-	color: black;
-}
-
-.chipcenter{
-	background-color: #7672E8 !important;
-}
-
-.chipdestination{
-	background-color: #FFA500 !important;
-}
-
-.chipuser{
-	background-color: #36AC3A !important;
-}
-.chiphub{
-	background-color: #c0ca33 !important;
-}
-
-#heightsvg,#svgc{
-	border:1px solid #00b8d4;	
-}
-
-#destinationlist{
+.menuitem{
 	text-align:center;
-	color: black;
+	width:100%;
+	line-height:50px;
+	border-bottom: solid 3px transparent;
 }
 
-.targetSelect{
+.menuitem:hover{
+	border-bottom: solid 3px #cecece;
 	cursor:pointer;
 }
 
-.o-modal{
-	max-width: 500px;
+.menuitem.active{
+	border-bottom: solid 3px #039db5;
 }
 
-.pickcolor{
-	display:inline-block; width:20px; height:20px; margin:2px; 
+#userLocationApp{
+	margin-bottom:5px;
 }
 
-#rgbranges{
-	max-width:450px;
+#userLocation{
+	min-width:250px;
+	font-family: LcdFont;
+    font-size: 13pt;
+}
+
+@media (min-width : 1200px) { 
+	#userInputPanel{
+		max-width: 586px;
+	}
+}
+
+#userInputPanel{
+	background-color: #262626;
+    border: 1px solid #555555;
+    padding: 4px;  
+}
+
+#locationInfoTable{
+	background-color: #262626;
+    border: 1px solid #555555;
+    padding: 4px;
+}
+
+.locationInfoBlock{
+	border-top: 1px solid #555555;
+}
+
+#locationCalcTable{
+	background-color: #262626;
+    border: 1px solid #555555;
+    padding: 4px;
+}
+
+.page{
+	display:none;
+}
+
+.page.active{
+	display:inherit;
+}
+
+#content{ /* Big content landscape */
+	flex-grow: 2;
+	margin:5px;
+}
+
+#mainnav{
+	margin:4px;
+	padding: 0px;
+}
+
+#mainnav > li{
+	padding: 0px;
+	text-decoration: none;
+	display: inline-block;
+}
+
+#atlasLogo{
+	width: 25px;
+}
+
+#nameTag{
+	font-size:2rem;
+	text-shadow: 1px 1px 5px #666, -1px -1px 5px #dedede, 1px 1px #666, -1px -1px #dedede;
+}
+
+#version{
+	border: 1px solid #6c7169;
+    padding: 4px;
+    background-color: #4a7980;
+    border-radius: 5px;
+}
+
+#author{}
+
+#mapContainer{
+	position: relative;
+}
+
+#mapOverlayApp{
+	text-align:right;
+	width:100%;
+	position:absolute;
+	top:0;
+	left:0;
+}
+
+.destination{
+	border-radius: 2px;
+	background: #ffffff;
+	color: #000000;
+	padding:4px;
+	
+}
+
+#destinationdata{
+	margin-top:15px;
+}
+
+#destinationlocation{
+	max-width: 578px;
+}
+
+.destinationSection,
+.destination,
+.helpItem{
+    margin: 4px;
+}
+
+.helpItem + .helpItem{
+	margin-top:10px;
+}
+
+.title{
+    border-bottom: 1px solid #039db5;
+	color: #039db5;
+    font-size: 16pt;
+}
+
+.helpText{
+	margin-top: 5px;
+	font-size: 11pt;
+}
+
+.fieldSet{
+	margin-bottom:20px;
+}
+
+.setting{
+	border-radius: 4px;
+	max-width:550px;
+}
+
+.setting + .setting{
+	margin-top: 15px;
+}
+
+.settingTitle{
+	background-color:#2b5156;
 	text-align:center;
+	min-height:40px;
+	line-height: 40px;
 }
 
-.hmapbadge{
-	margin-right:6px !important;
-	margin-bottom:2px !important;
+.settingText{
+	padding: 8px;
+	color: #000000;
+	background-color:#ffffff;
+	border-bottom:1px solid #dedede;
 }
+
+.settingValues{
+	background-color:#ffffff;
+	padding: 4px 0 4px 14px;
+}
+
+.settingValues input[type='text']{
+	font-size:1rem;
+}
+
+
+.roundLabelP{
+    /* border: solid 1px #555555; */
+    border-radius: 4px 0 0 4px;
+    margin: 4px;
+}
+
+.roundLabel{
+    background-color: #2b5156;
+    border-radius: 4px;
+    text-align: center;
+	padding:2px;
+}
+
+.divider{
+	text-align: center;
+    width: 75%;
+    border: 1px dashed #5b666f;
+}
+
+.warning{
+	background-color: #c15e31;
+}
+
+.bigBtn{
+	min-height: 50px;
+}
+
+.poweredBy > div{
+	background-color: #333;
+    padding: 4px;
+    font-size: 10pt;
+}
+
+/* Portrait mode */
+@media (max-width : 600px) {
+	
+	#nameTag{
+		font-size:1.5rem;
+	}
+	
+	#menu{
+		border:none;
+		line-height:50px;
+		margin:0px 10px 5px 0px;
+	}
+	
+	#mainnav > li{
+		text-decoration: none;
+		text-align:center;
+		display: inherit;
+	}
+	
+	#author{
+		text-align:center;
+	}
+	
+	.menuitem{
+		flex-grow:1; 
+	}
+}
+
+/* Big screen */
+@media (min-width : 1200px) { 
+	#locationInfoTable{
+		max-width: 1100px;
+	}
+}
+
+

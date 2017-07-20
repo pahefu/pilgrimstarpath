@@ -350,7 +350,10 @@
 							<div rv-each-item="federations" class="federationItem" rv-rel="item.index" rv-on-click="selectFederation">
 								<img class="fedLogo" rv-src="item.fname" alt="logo"/>
 								<div class="fedName" rv-rel="tag">{{item.name}}</div>
-								<div class="fedCoords">{{item.coords}}</div>
+								<div class="fedCoords">{{item.coordsText}}</div>
+								<div class="fedDistance" rv-show="user.locationValid">{{item.distanceToUser}} ly to user</div>
+								<div class="fedJumps" rv-show="user.locationValid">{{item.jumpsToUser}} jumps distance</div>
+								
 							</div>
 							
 						</div>

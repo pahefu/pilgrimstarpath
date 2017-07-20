@@ -25,10 +25,10 @@ rivets.formatters.plus = function(item,plus) {return item+plus };
 
 function toHex(str, totalChars){
 	totalChars = (totalChars) ? totalChars : 2;
-	//str = ('0'.repeat(totalChars)+Number(str).toString(16)).slice(-totalChars).toUpperCase();	
 	str = (Array(totalChars).join("0")+Number(str).toString(16)).slice(-totalChars).toUpperCase();	
 	return str;
 }
+
 function fromHex(str){
 	return parseInt(str,16);
 }
@@ -237,6 +237,8 @@ var userLocationApp = {
 				
 				// Trigger waterfall events!
 				common.onLocationChange();
+				
+				federationsApp.syncDistanceToUser();
 			}, 
 			function(){
 				userLocationApp.locationValid = false;
@@ -721,6 +723,8 @@ var helpApp = {
 var helpAppBind = rivets.bind($("#helpNode")[0], helpApp);
 
 var federationsApp = {
+	common : commonData,
+	user : userLocationApp,
 	wikiLoading : false,
 	federations: [],
 	loadFederationsFromWiki : function(){
@@ -743,7 +747,8 @@ var federationsApp = {
 							if(splitData[0][0]=="["){
 								var fname = "";
 								var name = "";
-								var coords = "";
+								var coordsText = "";
+								var coords = null;
 								for(var j = 0;j<splitData.length;j++){
 									if(splitData[j].indexOf("[[")>=0){
 										if(splitData[j].indexOf("File:")>=0){
@@ -755,9 +760,18 @@ var federationsApp = {
 									}
 									
 									if (splitData[j].indexOf(":00")>0){
-										coords = splitData[j];
+										coordsText = splitData[j];
 									}
 								}
+								
+								// Parse it here
+								textHandler.parseLine(coordsText,
+									function(x,y,z,name,color){			
+										coords = [x,y,z];
+									},
+									function(){}
+									,name,'#c0ca33'
+								);
 								
 								if(fname!=""){
 									for(var j = 0;j<wikiImageNodes.length;j++){									
@@ -770,15 +784,27 @@ var federationsApp = {
 									fname="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
 								}
 
-								federationsApp.federations.push({fname :fname, name: name, coords: coords, index : federationsApp.federations.length});
+								federationsApp.federations.push({fname :fname, name: name, coordsText: coordsText, coords: coords, index : federationsApp.federations.length, distanceToUser: 0, jumpsToUser:0});
 							}
 						}
-					}catch(err){ /* Doh? Here */}
+					}catch(err){
+						console.log("ERR: ",err);
+						/* Doh? Here */
+					}
 				}
 				federationsApp.wikiLoading = false;
 				
 			});
 		}, true);
+	},
+	
+	syncDistanceToUser: function(){
+		var pThis = federationsApp;
+		for(var i = 0;i<pThis.federations.length;i++){
+			pThis.federations[i].distanceToUser = pThis.common.userLocation.calculateDistance(pThis.federations[i]).toFixed(3);
+			pThis.federations[i].jumpsToUser = Math.ceil(pThis.federations[i].distanceToUser / (pThis.common.jumpRange / 4.0));
+		}
+		
 	},
 	
 	selectFederation : function(){
@@ -788,14 +814,8 @@ var federationsApp = {
 
 		var currFed = null;
 		var destId = -1;
-		textHandler.parseLine(fedObj.coords,
-			function(x,y,z,name,color){			
-				destinationApp.setFederationDest(x,y,z,name, color, true);
-			},
-			function(){}
-			,fedObj.name,'#c0ca33'
-		);
-		
+
+		destinationApp.setFederationDest(fedObj.coords[0],fedObj.coords[1],fedObj.coords[2],fedObj.name,'#c0ca33', true);
 	}
 }
 var federationsAppBind = rivets.bind($("#federationsNode")[0], federationsApp);

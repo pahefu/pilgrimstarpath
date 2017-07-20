@@ -252,6 +252,7 @@ body{
 	cursor:pointer;
 	display: inline-table;
 	text-align:center;
+	padding: 5px;
 }
 
 @media all and ( max-width: 400px ) {.federationItem{width:100%;}}

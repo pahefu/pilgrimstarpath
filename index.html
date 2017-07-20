@@ -1,4 +1,4 @@
-
+<!--v071 Pahefu @ 2017 -->
 <!doctype html>
 <html>
 	<head>
@@ -22,7 +22,7 @@
 					<div class="ph-inline">
 						<img class="ph-inline" id="atlasLogo" src="./img/logo.svg"/>
 						<div class="ph-inline" id="nameTag">PILGRIM STAR PATH</div>
-						<div class="ph-inline" id="version">v0.7</div>
+						<div class="ph-inline" id="version">v0.7.1</div>
 					</div>
 				</li>
 			
@@ -35,10 +35,11 @@
 		<div id="layout" class="ph-flex ph-horz ph-vertmob">
 			
 			<div id="menu" class="ph-flex ph-vert ph-horzmob ph-mob100p">
-				<div class="menuitem active" rel="page1"><i class="icon-street-view"></i></div>
-				<div class="menuitem" rel="page2"><i class="icon-globe"></i></div>
-				<div class="menuitem" rel="page3"><i class="icon-sliders"></i></div>
-				<div class="menuitem" rel="page4"><i class="icon-help-circled"></i></div>
+				<div class="menuitem active" id="mainMenuItem" rel="page1"><i class="icon-street-view"></i></div>
+				<div class="menuitem" rel="page2"><i class="icon-users"></i></div>
+				<div class="menuitem" rel="page3"><i class="icon-globe"></i></div>
+				<div class="menuitem" rel="page4"><i class="icon-sliders"></i></div>
+				<div class="menuitem" rel="page5"><i class="icon-help-circled"></i></div>
 			</div>
 			
 			<div id="content" class="ph-grow2">
@@ -47,8 +48,8 @@
 				
 					<div class="ph-sectheader"><span class="ph-secticon">&gt;</span> User location</div>
 				
-					<!-- User Location APP -->
-					<div id="userLocationApp" class="ph-row">
+					<!-- User Location NODE -->
+					<div id="userLocationNode" class="ph-row">
 						
 						<div class="ph-c-1-3 ph-c-tab-1-1 ph-c-m-1-1">
 							<div id="userInputPanel" class="ph-100p">		
@@ -179,6 +180,10 @@
 								
 									<div rv-show="showBhHelper" class="ph-row">
 										<hr class="divider" />
+										<div id="bhHelperOptimal">
+											Your optimal jump distance to a target in <strong>red</strong> Black Hole ring is: {{common.selectedDestinationObj.distanceLineal}} ly
+										</div>
+										<hr class="divider" />
 										<div class="ph-c-2-4">
 											<input type="text" class="ph-100p" placeholder="Write your BH distance here" rv-value="lastJumpDistanceText"><br/>
 											<div class="ph-btn" rv-on-click="drawAreaHint">Draw hint</div>
@@ -201,21 +206,21 @@
 						</div>
 						<!-- EO UserToDest Panel -->
 					</div>
-					<!-- / UserLocation APP -->
+					<!-- / UserLocation Node -->
 					
 					
-					<!-- Map APPS -->
+					<!-- Map NODE -->
 					<div id="mapContainer">	
 					
-						<div id="mapOverlayApp">
+						<div id="mapOverlayNode">
 							<button class="ph-btn ripple" rv-on-click="toggleMode">
 								<span rv-hide="galaxyMode">Set Galaxy Mode</span>
 								<span rv-show="galaxyMode">Set Local Mode</span>
 							</button>
 						</div>
 					
-						<!-- GalaxyMap APP -->
-						<div id="galaxyMapApp">
+						<!-- GalaxyMap Node -->
+						<div id="galaxyMapNode">
 							<div id="galmapsvgp" rv-show="mapEnabled">
 								 <svg id="galmapsvg" xmlns="http://www.w3.org/2000/svg" rv-width="width" rv-height="height">
 									<defs>
@@ -258,10 +263,10 @@
 								 </svg>
 							</div>
 						</div>
-						<!-- / GalaxyMap APP -->	
+						<!-- / GalaxyMap Node -->	
 						
-						<!-- LocalRadar APP -->
-						<div id="localRadarApp"  rv-show="mapEnabled" style="display:none;">
+						<!-- LocalRadar Node -->
+						<div id="localRadarNode"  rv-show="mapEnabled" style="display:none;">
 							<svg id="localRadarSvg" xmlns="http://www.w3.org/2000/svg" rv-width="width" rv-height="height">
 								<defs>
 									<pattern id="localRadarPattern" x="0" y="0" rv-width="mapRelationW" rv-height="mapRelationH" patternUnits="userSpaceOnUse">
@@ -305,8 +310,6 @@
 									</g>
 								</g>
 								
-								
-								
 								<g id="destR">
 									<circle id="radarDest" rv-cx="dest.mx" rv-cy="dest.mz" r="6" rv-stroke="dest.color" stroke-width="1" rv-fill="dest.color"></circle>
 									<text dy="0.75em" rv-x="dest.mxT" rv-y="dest.mzT" fill="white">{{dest.name}}</text>
@@ -323,15 +326,41 @@
 								</g>
 							 </svg>
 						</div>
-						<!-- / LocalRadar APP -->
+						<!-- / LocalRadar Node -->
 					</div>
 					<!-- / Map APPS -->
 				</div>
-					
+				
 				<div class="page" id="page2">
-					<!-- Destinations APP -->
+					<div class="ph-sectheader"><span class="ph-secticon">&gt;</span> Federations</div>
+					<div id="federationsNode">
+						<div class="ph-info" rv-show="wikiLoading">
+							<div id="errorMessageText">Loading info from wiki</div>
+						</div>						
+						
+						<div id="federationIntro">
+							<div>This is a list of civilizations (communities) that belong to the NMS Federation. Click one to select it as target for your travels.</div>
+							<div>It will be saved as the default destination on further visits to this website.</div>
+						</div>
+						
+						<hr class="divider" />
+						
+						<div id="federationItems">
+							
+							<div rv-each-item="federations" class="federationItem" rv-rel="item.index" rv-on-click="selectFederation">
+								<img class="fedLogo" rv-src="item.fname" alt="logo"/>
+								<div class="fedName" rv-rel="tag">{{item.name}}</div>
+								<div class="fedCoords">{{item.coords}}</div>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				
+				<div class="page" id="page3">
+					<!-- Destinations NODE -->
 					<div class="ph-sectheader"><span class="ph-secticon">&gt;</span> Destinations</div>
-					<div id="destinationApp">
+					<div id="destinationNode">
 						
 						<div class="destinationSection">
 							<div class="title">Custom destinations</div>
@@ -414,14 +443,14 @@
 							</div>
 						</div>
 					</div>
-					<!-- / Destinations APP -->
+					<!-- / Destinations NODE -->
 				</div>  
 						
-				<div class="page" id="page3">
-					<!-- page 3 -->
+				<div class="page" id="page4">
+					<!-- page 4 -->
 					<div class="ph-sectheader"><span class="ph-secticon">&gt;</span> Settings</div>					
-					<!-- SettingsApp -->
-					<div id="settingsApp">
+					<!-- Settings NODE -->
+					<div id="settingsNode">
 
 						<div class="fieldSet">
 							
@@ -461,13 +490,13 @@
 						
 					</div>
 					
-					<!-- / SettingsApp -->
+					<!-- / Settings NODE -->
 				</div>
 				
-				<div class="page" id="page4">
-					<!-- page 4 -->
+				<div class="page" id="page5">
+					<!-- page 5 -->
 					<div class="ph-sectheader"><span class="ph-secticon">&gt;</span> Help</div>
-					<div id="helpApp">
+					<div id="helpNode">
 					
 						<div class="poweredBy" class="ph-inline">
 							<div class="ph-inline">	Powered by NMS Wiki at 
@@ -481,7 +510,7 @@
 							<div id="errorMessageText">Loading info from wiki</div>
 						</div>	
 					
-						<div id="helpAppItems">
+						<div id="helpNodeItems">
 							<div rv-each-item="helpItems" class="helpItem">
 								<div class="title" rv-rel="tag">{{item.title}}</div>
 								<div class="helpText">{{item.text}}</div>

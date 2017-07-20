@@ -1,3 +1,7 @@
+/* Pahefu @ 2017
+ Fixes, updates, performance checks, civilizations at Federation support
+ */
+
 @font-face {
   font-family: 'LcdFont';
   src:url('../fonts/font.woff2') format('woff2');
@@ -96,6 +100,7 @@ body{
 
 #atlasLogo{
 	width: 25px;
+	max-height: 42px;
 }
 
 #nameTag{
@@ -108,6 +113,7 @@ body{
     padding: 4px;
     background-color: #4a7980;
     border-radius: 5px;
+	font-size:0.8em;
 }
 
 #author{}
@@ -122,6 +128,10 @@ body{
 	position:absolute;
 	top:0;
 	left:0;
+}
+
+#bhHelperOptimal{
+	text-align:center;
 }
 
 .destination{
@@ -139,6 +149,8 @@ body{
 #destinationlocation{
 	max-width: 578px;
 }
+
+
 
 .destinationSection,
 .destination,
@@ -229,6 +241,34 @@ body{
 	background-color: #333;
     padding: 4px;
     font-size: 10pt;
+}
+
+#federationItems{
+	display: flex;
+  flex-wrap: wrap;
+}
+  
+.federationItem{
+	cursor:pointer;
+	
+	margin:5px;
+	text-align: center;
+	flex-basis: 0;
+    flex-grow: 1;
+}
+
+.fedName{
+	text-align:center;
+	/*max-width:200px;*/
+	color: #039db5;
+}
+
+.fedLogo{
+	height:100px;
+}
+
+.fedCoords{
+	font-size:0.85em;
 }
 
 /* Portrait mode */

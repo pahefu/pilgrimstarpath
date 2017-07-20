@@ -1,4 +1,5 @@
-// Class prototype
+// Pahefu @ 2017
+// Fixes, updates, performance checks, civilizations at Federation support
 
 var orangeColor = "#ffa500";
 var re = new RegExp("[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+");
@@ -20,38 +21,30 @@ rivets.configure({
 });
 rivets.formatters.plus = function(item,plus) {return item+plus };
 
-
 /* Aux functions */
 
-function isValueNull(variable){
-	return (variable == undefined || variable == null);
-}
-
-function setDefaultValueIfNull(variable, defaultVal){
-	if(isValueNull(variable)) { variable = defaultVal; }
-	return variable;
-}
-
 function toHex(str, totalChars){
-	totalChars = setDefaultValueIfNull(totalChars,2);
-	str = ('0'.repeat(totalChars)+Number(str).toString(16)).slice(-totalChars).toUpperCase();	
+	totalChars = (totalChars) ? totalChars : 2;
+	//str = ('0'.repeat(totalChars)+Number(str).toString(16)).slice(-totalChars).toUpperCase();	
+	str = (Array(totalChars).join("0")+Number(str).toString(16)).slice(-totalChars).toUpperCase();	
 	return str;
 }
 function fromHex(str){
 	return parseInt(str,16);
 }
 
-
 /* Code Functionality */
 
 function generateMap(){
+
 	galaxyMapApp.initialize(); // Init the map first to get W/H
+	settingsApp.initialize(); // Do the setting loading here... after maps can be tweaked
+	
 	destinationApp.initialize();
 	localRadarApp.initialize();
-	
-	settingsApp.initialize();
-	
+
 	helpApp.loadQuestionsFromWiki();
+	federationsApp.loadFederationsFromWiki();
 	
 	// Handle URL parameters <<< HERE
 	var re = new RegExp("to=[0-9A-F]+:[0-9A-F]+:[0-9A-F]+[:]*[0-9A-F]*");
@@ -69,49 +62,47 @@ function generateMap(){
 	}
 }
 
-function wikiAsync(page, okCallback){
+
+function wikiAsync(page, okCallback, justHtml){
+	var url = 'https://nomanssky.gamepedia.com/api.php?action=parse&format=json&prop=wikitext&page='+page;
+	
+	if(justHtml){
+		url = 'https://nomanssky.gamepedia.com/api.php?action=parse&format=json&page='+page;
+	}
 	$.ajax({ 
-		url: 'https://nomanssky.gamepedia.com/api.php?action=parse&format=json&prop=wikitext&page='+page,
+		url: url,
 		dataType: 'jsonp',
 		success: okCallback
 	});
 }
 
-var Class = function(methods) {   
-    var klass = function() {    
-        this.initialize.apply(this, arguments);          
-    };  
-    
-    for (var property in methods) { 
-       klass.prototype[property] = methods[property];
-    }
-          
-    if (!klass.prototype.initialize) klass.prototype.initialize = function(){};      
-    
-    return klass;    
-};
+function Region(x,y,z, name, color, index){
+	if (!(this instanceof Region)) return new Region(x,y,z, name, color, index);
 
-var Region = Class({ 
-    initialize: function(x,y,z, name, color, index) {
-		this.coords = [x,y,z];
-		this.mapCoords = [0,0,0];
-		this.name = name;	
-		this.enabled = false; // User Location Only
-		this.color = color;
-		this.index = index;
-		this.distance = "";
-		this.jumps = "";
-    },
-	updateCoords : function (x,y,z) { this.coords = [x,y,z];},
-	updateMapCoords : function(mapW, mapH){
+	this.coords = [x,y,z];
+	this.mapCoords = [0,0,0];
+	this.name = name;	
+	this.enabled = false; // User Location Only
+	this.color = color;
+	this.index = index;
+	this.distance = "";
+	this.distanceLineal = "";
+	this.jumps = "";
+	this.federation = false;
+    
+	this.updateCoords = function (x,y,z) { this.coords = [x,y,z];};
+	
+	this.updateMapCoords = function(mapW, mapH){
 		var mX = 4096;
 		var mZ = 4096;
 		this.mapCoords[0] = this.coords[0] * mapW / mX;
 		this.mapCoords[1] = this.coords[1];
 		this.mapCoords[2] = this.coords[2] * mapH / mZ;
-	},
-	getHexStr : function() { return toHex(this.coords[0],4)+":"+toHex(this.coords[1],4)+":"+toHex(this.coords[2],4)},
-	getVector : function (otherR){
+	};
+	
+	this.getHexStr = function() { return toHex(this.coords[0],4)+":"+toHex(this.coords[1],4)+":"+toHex(this.coords[2],4)};
+	
+	this.getVector = function (otherR){
 
 		var v = { a: 0, b:0, m: 0};
 		v.a = (otherR.coords[0] - this.coords[0]);
@@ -126,17 +117,17 @@ var Region = Class({
 			return radians;
 		}
 		return v;
-	},
-	calculateDistance : function(otherR){
+	};
+	this.calculateDistance = function(otherR){
 		var dX = otherR.coords[0] - this.coords[0];
 		var dY = otherR.coords[1] - this.coords[1];
 		var dZ = otherR.coords[2] - this.coords[2];
 	
 		var distance = Math.sqrt(dX*dX + dY*dY + dZ*dZ);
 		return distance*100; // NMS stuff
-	}
+	};
 	
-});
+};
 
 var textHandler = {
 	okLines : "",
@@ -185,6 +176,7 @@ var commonData = {
 	center: new Region(2047,127,2047,'Galaxy Center','#7672E8' ),
 	userLocation : new Region(0x0,0x0,0x0,'User Location','#36AC3A'), // This is region APP
 	destinations : [],
+	selectedFederation : null,
 	selectedDestination : 1,
 	selectedDestinationObj : undefined,
 	selectedDestinationName: "",
@@ -230,6 +222,7 @@ var userLocationApp = {
 	
 	
 	calculateLocation : function(){
+		
 		var pThis = userLocationApp;
 		pThis.firstPush = true;		
 		textHandler.parseLine(pThis.locationText, 
@@ -277,7 +270,7 @@ var userLocationApp = {
 	}
 };
 
-var userLocationAppBind = rivets.bind($("#userLocationApp")[0], userLocationApp);
+var userLocationAppBind = rivets.bind($("#userLocationNode")[0], userLocationApp);
 
 var destinationApp = {
 	el : '#destinationApp',
@@ -288,7 +281,12 @@ var destinationApp = {
 	initialize : function(){
 		// Initialize custom destinations here
 		this.addDest(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor);
-		this.addDest(0x469,0x0081,0x0D6D,'Galactic Hub','#c0ca33');
+		this.addDest(0x469,0x0081,0x0D6D,'Galactic Hub','#c0ca33'); this.destinations[1].federation = true; // trick here
+		
+		if(commonData.selectedFederation){
+			var s = commonData.selectedFederation;
+			this.setFederationDest(s.coords[0], s.coords[1],s.coords[2],s.name, s.color,false);
+		}
 		
 		this.changeDest(1); // Force it
 		
@@ -306,8 +304,8 @@ var destinationApp = {
 		commonData.selectedDestinationName = commonData.selectedDestinationObj.name;
 	},
 	addDest : function(x,y,z, name, color){
-		name = setDefaultValueIfNull(name,"Destination " + commonData.destinations.length);
-		color = setDefaultValueIfNull(color,orangeColor);
+		name = (name) ? name : ("Destination " + commonData.destinations.length);
+		color = (color) ? color : orangeColor;
 						
 		var totalSameCoords = commonData.destinations.filter(function(dest){ return (dest.coords[0]==x && dest.coords[1]==y && dest.coords[2]==z)});
 		if(totalSameCoords.length==0){
@@ -388,11 +386,51 @@ var destinationApp = {
 			destinationApp.wikiLoading = false;
 		});
 	},
+	setFederationDest : function( x,y,z, name, color, save){
+		
+		var currFed = null;
+		var pthis = destinationApp;
+		for(var i = 0;i<pthis.destinations.length;i++){
+			if (pthis.destinations[i].federation == true){
+				currFed = pthis.destinations[i];
+				destId = currFed.index;
+				currFed.coords = [x,y,z];
+				currFed.name = name;
+				break;
+			}
+		}
+		
+		if(currFed == null){ // No fed ON, lets create it
+			destId = pthis.destinations.length
+			pthis.addDest(x,y,z,fedObj.name,'#c0ca33');
+			pthis.selectedDestination+=1;
+			currFed = pthis.destinations[pthis.selectedDestination];
+		}
+		
+		// Save the selected federation option
+		commonData.selectedFederation = currFed;
+		if(save){
+			settingsApp.applySettings(); 
+		}
+		
+		pthis.changeDest(destId);
+		pthis.reSyncDistanceToUser();
+		localRadarApp.syncGrid();
+		commonData.onLocationChange();
+		galaxyMapApp.forceReDraw();
+		
+		$(".page").removeClass("active"); // Force gui refresh
+		$("#page1").addClass("active");
+		$(".menuitem").removeClass("active");
+		$("#mainMenuItem").addClass("active");
+		
+	},
 	reSyncDistanceToUser : function(){
 		var common = commonData;
 		for(var i = 0;i < common.destinations.length;i++){
 			var distance = common.userLocation.calculateDistance(common.destinations[i]);
 			common.destinations[i].distance = distance.toFixed(3);
+			common.destinations[i].distanceLineal = (distance*4).toFixed(3);
 			common.destinations[i].jumps = Math.ceil(distance/(common.jumpRange/4.0));
 		}
 		
@@ -428,7 +466,7 @@ var destinationApp = {
 	}
 };
 
-var destinationAppBind = rivets.bind($("#destinationApp")[0], destinationApp);
+var destinationAppBind = rivets.bind($("#destinationNode")[0], destinationApp);
 
 var mapOverlayApp = {
 	el : '#mapOverlayApp',
@@ -445,10 +483,9 @@ var mapOverlayApp = {
 		commonData.onLocationChange();
 	}
 }
-var mapOverlayAppBind = rivets.bind($("#mapOverlayApp")[0], mapOverlayApp);
+var mapOverlayAppBind = rivets.bind($("#mapOverlayNode")[0], mapOverlayApp);
 
 var galaxyMapApp = {
-	el : '#galaxyMapApp',
 	common: commonData,
 	width: 0,
 	height: 0,
@@ -465,9 +502,11 @@ var galaxyMapApp = {
 	destinations : destinationApp.destinations,
 
 	initialize : function(){
-		this.width = ($(this.el)[0]).getBoundingClientRect().width * 0.99;
+		this.width = ($("#galaxyMapNode")[0]).getBoundingClientRect().width * 0.991;
 		this.aspect = (document.documentElement.clientWidth*1.0/document.documentElement.clientHeight);
 		this.height =  this.width / this.aspect; 
+		this.height -= $("#mainnav")[0].clientHeight + $("#userInputPanel")[0].clientHeight +30;
+		
 		commonData.center.updateMapCoords(galaxyMapApp.width, galaxyMapApp.height);
 	},
 	
@@ -506,8 +545,7 @@ var galaxyMapApp = {
 	}
 	
 };
-
-var galaxyMapAppBind = rivets.bind($("#galaxyMapApp")[0], galaxyMapApp);
+var galaxyMapAppBind = rivets.bind($("#galaxyMapNode")[0], galaxyMapApp);
 
 var localRadarApp = {
 	el : '#localRadarApp',
@@ -595,15 +633,14 @@ var localRadarApp = {
 	}
 
 };
-var localRadarAppBind = rivets.bind($("#localRadarApp")[0], localRadarApp);
+var localRadarAppBind = rivets.bind($("#localRadarNode")[0], localRadarApp);
 
 
 var settingsApp = {
 	common : commonData,
 	map : galaxyMapApp,
 	tag : "nmspspset",
-	initialize: function(){
-		
+	initialize: function(){	
 		if(localStorage!=undefined){
 			try{
 				var rawData = localStorage.getItem(settingsApp.tag);
@@ -614,21 +651,23 @@ var settingsApp = {
 				
 				commonData.jumpRange = data.jumpRange;
 				commonData.localRadarRange = data.localRadarRange;
+				commonData.selectedFederation = data.selectedFederation;			
 				galaxyMapApp.height = data.height;
-				settingsApp.applySettings();
+
 			}catch(err){
 				console.log("Err restoring storage: ",err);
 			}
 			
 		}
-		
 	},
+	
 	applySettings : function(){
 		if(localStorage!=undefined){
 			try{
 				localStorage.setItem(settingsApp.tag, JSON.stringify({
 					jumpRange: commonData.jumpRange, 
 					localRadarRange: commonData.localRadarRange, 
+					selectedFederation : commonData.selectedFederation,
 					height: galaxyMapApp.height
 				}));
 				
@@ -647,7 +686,7 @@ var settingsApp = {
 		}
 	}
 }
-var settingsAppBind = rivets.bind($("#settingsApp")[0], settingsApp);
+var settingsAppBind = rivets.bind($("#settingsNode")[0], settingsApp);
 
 var helpApp = {
 	
@@ -655,6 +694,7 @@ var helpApp = {
 	helpItems : [],
 	loadQuestionsFromWiki : function (){
 		helpApp.wikiLoading = true;		
+			
 		wikiAsync("PSPathHelp", function(data){
 			var externalData = data.parse.wikitext["*"].split("\n\n");
 							
@@ -678,4 +718,84 @@ var helpApp = {
 		});
 	}	
 };
-var helpAppBind = rivets.bind($("#helpApp")[0], helpApp);
+var helpAppBind = rivets.bind($("#helpNode")[0], helpApp);
+
+var federationsApp = {
+	wikiLoading : false,
+	federations: [],
+	loadFederationsFromWiki : function(){
+		federationsApp.wikiLoading = true;
+		
+		wikiAsync("United_Federation_of_Travelers", function(rawData){
+			var externalRawData = rawData.parse.text["*"];
+			
+			var elements = $(externalRawData);
+			wikiImageNodes = $("img",elements);
+			
+			wikiAsync("United_Federation_of_Travelers", function(data){
+				var externalData = data.parse.wikitext["*"].split("\n");
+								
+				for(var i = 0; i< externalData.length;i++){
+					try{
+						
+						if(externalData[i].indexOf("| ")>=0){
+							var splitData = externalData[i].split("|").filter(function f(node) { return (node.indexOf("style")<0 && node.length>2) ; });
+							if(splitData[0][0]=="["){
+								var fname = "";
+								var name = "";
+								var coords = "";
+								for(var j = 0;j<splitData.length;j++){
+									if(splitData[j].indexOf("[[")>=0){
+										if(splitData[j].indexOf("File:")>=0){
+											fname = splitData[j].replace("[[File:","").replace("]]","");
+										}
+										else{
+											name = (name!="") ? name : splitData[j].split("]]")[0].replace("[[","");
+										}
+									}
+									
+									if (splitData[j].indexOf(":00")>0){
+										coords = splitData[j];
+									}
+								}
+								
+								if(fname!=""){
+									for(var j = 0;j<wikiImageNodes.length;j++){									
+										if(wikiImageNodes[j].alt == fname){
+											fname = wikiImageNodes[j].src;
+											break;
+										}
+									}									
+								}else{
+									fname="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
+								}
+
+								federationsApp.federations.push({fname :fname, name: name, coords: coords, index : federationsApp.federations.length});
+							}
+						}
+					}catch(err){ /* Doh? Here */}
+				}
+				federationsApp.wikiLoading = false;
+				
+			});
+		}, true);
+	},
+	
+	selectFederation : function(){
+		var pThis = federationsApp;
+		var index = Number($(this).attr("rel"));
+		var fedObj = pThis.federations[index];
+
+		var currFed = null;
+		var destId = -1;
+		textHandler.parseLine(fedObj.coords,
+			function(x,y,z,name,color){			
+				destinationApp.setFederationDest(x,y,z,name, color, true);
+			},
+			function(){}
+			,fedObj.name,'#c0ca33'
+		);
+		
+	}
+}
+var federationsAppBind = rivets.bind($("#federationsNode")[0], federationsApp);

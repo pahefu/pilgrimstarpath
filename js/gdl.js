@@ -57,12 +57,11 @@ function generateMap(){
 		new RegExp("FROM=[0-9A-F]+:[0-9A-F]+:[0-9A-F]+"),
 	];
 
-	console.log(window.location.search)
 	var urlContent = window.location.search.toUpperCase();
 	for(var i = 0;i<exprs.length;i++){
 		var res = exprs[i].exec(urlContent);
 		if(res!=null){
-			console.log(res);
+			
 			var isFrom = (urlContent.indexOf("FROM=") >0);
 			if(isFrom){
 				

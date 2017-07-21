@@ -47,18 +47,40 @@ function generateMap(){
 	federationsApp.loadFederationsFromWiki();
 	
 	// Handle URL parameters <<< HERE
-	var re = new RegExp("to=[0-9A-F]+:[0-9A-F]+:[0-9A-F]+[:]*[0-9A-F]*");
-	var res = re.exec(window.location.search);
 	
-	if(res!=null){
-		textHandler.parseLine(res[0].replace("to=",""),
-			function(x,y,z,name,color){
-				destinationApp.addDest(x,y,z,name,color);
-				destinationApp.selectedDestination+=1;
-			},
-			function(){}
-			,"Shared location",null
-		);
+	var exprs = [
+		new RegExp("TO=[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+"),
+		new RegExp("TO=[0-9A-F]+:[0-9A-F]+:[0-9A-F]+[:]*[0-9A-F]*"),
+		new RegExp("TO=[0-9A-F]+:[0-9A-F]+:[0-9A-F]+"),
+		new RegExp("FROM=[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+"),
+		new RegExp("FROM=[0-9A-F]+:[0-9A-F]+:[0-9A-F]+[:]*[0-9A-F]*"),
+		new RegExp("FROM=[0-9A-F]+:[0-9A-F]+:[0-9A-F]+"),
+	];
+
+	console.log(window.location.search)
+	var urlContent = window.location.search.toUpperCase();
+	for(var i = 0;i<exprs.length;i++){
+		var res = exprs[i].exec(urlContent);
+		if(res!=null){
+			console.log(res);
+			var isFrom = (urlContent.indexOf("FROM=") >0);
+			if(isFrom){
+				
+				userLocationApp.locationText = res[0].replace("FROM=","");
+				userLocationApp.calculateLocation();
+			}
+			else{
+				textHandler.parseLine(res[0].replace("TO=",""),
+					function(x,y,z,name,color){
+						destinationApp.addDest(x,y,z,name,color);
+						destinationApp.selectedDestination+=1;
+					},
+					function(){}
+					,"Shared location",null
+				);
+			}
+			break;
+		}
 	}
 }
 
@@ -804,7 +826,6 @@ var federationsApp = {
 			pThis.federations[i].distanceToUser = pThis.common.userLocation.calculateDistance(pThis.federations[i]).toFixed(3);
 			pThis.federations[i].jumpsToUser = Math.ceil(pThis.federations[i].distanceToUser / (pThis.common.jumpRange / 4.0));
 		}
-		
 	},
 	
 	selectFederation : function(){

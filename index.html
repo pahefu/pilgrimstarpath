@@ -279,10 +279,7 @@
 								<g id="bigWarning"  rv-hide="radarValid">
 									<rect x="8" y="0.6em" width="200" height="25" fill="#00b8d4"></rect>
 									<text y="10" fill="#00b8d4">
-										<tspan x="10" dy="1.2em" fill="#ffffff">
-										  
-										  WARNING, INTERLOPER.
-										</tspan>
+										<tspan x="10" dy="1.2em" fill="#ffffff">WARNING, INTERLOPER.</tspan>
 										<tspan x="10" dy="1.6em">
 											YOU ARE TOO FAR AWAY!
 										</tspan>
@@ -297,7 +294,6 @@
 								</g>
 								
 								<g id="arrows" rv-show="radarValid">
-								
 									<g id="aXR">
 										<text dy="0.75em" x="152" y="3" fill="#00b8d4">X</text>
 										<line x1="10" y1="10" x2="150" y2="10" style="stroke:#00b8d4 ; stroke-width:1;"></line>
@@ -322,7 +318,7 @@
 								<g rv-show="heightNotOK">
 									<rect id="radarHeightWarning" width="80" rv-x="20" rv-y="height | plus -22" height="18" stroke="#00b8d4" fill="#00b8d4"></rect>
 									<text dy="0.75em" rv-x="25" rv-y="height | plus -25" fill="#ffffff">WARNING</text>
-									<text dy="0.75em" rv-x="125" rv-y="height | plus -25" fill="#ffffff">You are {{heightDiff}} regions {{heightDir}} {{dest.name}} location</text>
+									<text dy="0.75em" rv-x="125" rv-y="height | plus -25" fill="#ffffff">You are {{heightDiff}} regions {{heightDir}} from {{dest.name}} location</text>
 								</g>
 							 </svg>
 						</div>
@@ -345,17 +341,14 @@
 						
 						<hr class="divider" />
 						
-						<div id="federationItems">
-							
+						<div id="federationItems">							
 							<div rv-each-item="federations" class="federationItem" rv-rel="item.index" rv-on-click="selectFederation">
 								<img class="fedLogo" rv-src="item.fname" alt="logo"/>
 								<div class="fedName" rv-rel="tag">{{item.name}}</div>
 								<div class="fedCoords">{{item.coordsText}}</div>
 								<div class="fedDistance" rv-show="user.locationValid">{{item.distanceToUser}} ly to user</div>
 								<div class="fedJumps" rv-show="user.locationValid">{{item.jumpsToUser}} jumps distance</div>
-								
 							</div>
-							
 						</div>
 					</div>
 				</div>

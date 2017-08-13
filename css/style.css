@@ -40,19 +40,24 @@ body{
 	margin-bottom:5px;
 }
 
-#userLocation{
+#userLocation , #glyphUserLocation{
 	min-width:250px;
 	font-family: LcdFont;
     font-size: 13pt;
 }
 
+#glyphPlanetLocation{
+	font-family: LcdFont;
+    font-size: 13pt;
+}
+
 @media (min-width : 1200px) { 
-	#userInputPanel{
+	#userInputPanel, #glyphUserInputPanel{
 		max-width: 586px;
 	}
 }
 
-#userInputPanel{
+#userInputPanel, #glyphUserInputPanel{
 	background-color: #262626;
     border: 1px solid #555555;
     padding: 4px;  
@@ -309,4 +314,7 @@ body{
 	}
 }
 
+#glyphNodesResult{
+	text-align: center;
+}
 

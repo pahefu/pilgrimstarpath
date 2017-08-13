@@ -80,13 +80,12 @@ var glyphHandlerApp = {
 
 		pthis.inputDone = true;
 		
-		
 		if(res){
 			pthis.humanGalAddr = res[0];
-			var x = padLeft(res[1],3,"");
-			var y = padLeft(res[2],2,"");
-			var z = padLeft(res[3],3,"");
-			var syst = padLeft(res[4],3,"")
+			var x = padLeft(res[1],4,"").substr(1,3);
+			var y = padLeft(res[2],4,"").substr(2,2);
+			var z = padLeft(res[3],4,"").substr(1,3);
+			var syst = padLeft(res[4],4,"").substr(1,3);
 			
 			var planet = Number(pthis.planet);
 			if(planet<1 || planet > 7 || isNaN(planet)) { planet = 1; } // Safeguard

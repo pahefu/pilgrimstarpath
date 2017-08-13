@@ -20,6 +20,7 @@ rivets.configure({
 	templateDelimiters: ['{{', '}}']
 });
 rivets.formatters.plus = function(item,plus) {return item+plus };
+rivets.formatters.byfour = function(item) {return item*4 };
 
 /* Aux functions */
 
@@ -839,3 +840,8 @@ var federationsApp = {
 	}
 }
 var federationsAppBind = rivets.bind($("#federationsNode")[0], federationsApp);
+
+
+/**/
+glyphHandlerApp.initialize();
+var glyphHandlerAppBind = rivets.bind($("#glyphHandlerNode")[0], glyphHandlerApp);

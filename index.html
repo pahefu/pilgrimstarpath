@@ -10,6 +10,7 @@
 		
 		<script src="./js/rivets.bundled.min.js"></script>
 		<script src="./js/zepto.min.js"></script>	
+		<script src="./js/nuportalglyphs.js"></script>
 		
 		<title>PILGRIM STAR PATH</title>
 	</head>
@@ -22,7 +23,7 @@
 					<div class="ph-inline">
 						<img class="ph-inline" id="atlasLogo" src="./img/logo.svg"/>
 						<div class="ph-inline" id="nameTag">PILGRIM STAR PATH</div>
-						<div class="ph-inline" id="version">v0.7.1</div>
+						<div class="ph-inline" id="version">v0.7.2</div>
 					</div>
 				</li>
 			
@@ -36,6 +37,7 @@
 			
 			<div id="menu" class="ph-flex ph-vert ph-horzmob ph-mob100p">
 				<div class="menuitem active" id="mainMenuItem" rel="page1"><i class="icon-street-view"></i></div>
+				<div class="menuitem" rel="page6"><i class="icon-target"></i></div>
 				<div class="menuitem" rel="page2"><i class="icon-users"></i></div>
 				<div class="menuitem" rel="page3"><i class="icon-globe"></i></div>
 				<div class="menuitem" rel="page4"><i class="icon-sliders"></i></div>
@@ -98,7 +100,7 @@
 										<div class="roundLabel">To center</div> 
 									</div>
 									<div class="ph-tc-100">
-										{{userLocation.distance}} ly
+										{{userLocation.distance | byfour}} ly
 									</div>
 								</div>	
 								<div class="ph-trow">
@@ -106,7 +108,7 @@
 										<div>To dest</div> 
 									</div>
 									<div class="ph-tc-100">
-										{{common.selectedDestinationObj.distance}} ly
+										{{common.selectedDestinationObj.distance | byfour}} ly
 									</div>
 								</div>
 							</div>
@@ -346,7 +348,7 @@
 								<img class="fedLogo" rv-src="item.fname" alt="logo"/>
 								<div class="fedName" rv-rel="tag">{{item.name}}</div>
 								<div class="fedCoords">{{item.coordsText}}</div>
-								<div class="fedDistance" rv-show="user.locationValid">{{item.distanceToUser}} ly to user</div>
+								<div class="fedDistance" rv-show="user.locationValid">{{item.distanceToUser | byfour}} ly to user</div>
 								<div class="fedJumps" rv-show="user.locationValid">{{item.jumpsToUser}} jumps distance</div>
 							</div>
 						</div>
@@ -512,6 +514,52 @@
 								<div class="helpText">{{item.text}}</div>
 							</div>
 						</div>
+					</div>
+				</div>
+				
+				<div class="page" id="page6">
+					<!-- portals glyphs -->
+					<div class="ph-sectheader"><span class="ph-secticon">&gt;</span> Portal glyph translations</div>
+					<div id="glyphHandlerNode">
+					
+						<div>Input your wanted destination in full 4-block format (ABCD:ABCD:ABCD:ABCD), and the selected planet to visit.</div>
+						<div>If you are unsure or dont have the 4th block, use value "79" which is always a black hole.</div>
+						<div>Value "1" for planet is always there</div>
+						
+						<hr class="divider" />
+						
+						<div class="ph-row">
+							<div id="glyphUserInputPanel">
+								<div class="ph-c-2-3 ph-c-tab-1-1 ph-c-m-1-1">
+									Destination: <input id="glyphUserLocation" type="text" class="ph-100p" rv-value="galAddr" placeholder="Write your coords here" text="1 2 3 4">
+								</div>
+								<div class="ph-c-1-3 ph-c-tab-1-1 ph-c-m-1-1">
+									Planet: <input id="glyphPlanetLocation" type="text" class="ph-100p" rv-value="planet" placeholder="Write your planet here">
+								</div>	
+										
+								<div class="ph-row">
+									<button class="ph-btn ripple ph-100p bigBtn" rv-on-click="parseAddress"><i class="icon-target"></i> Get glyphs for location</button>
+								</div>	
+							</div>	
+						</div>
+						
+						<div rv-show="inputDone" style="display:none;">
+							<hr class="divider" />
+							<div id="glypResults" rv-show="inputOk">
+							
+								
+								<div>This is your sequence to call the location <strong>{{humanGalAddr}}</strong> , planet index <strong>{{humanPlanet}}</strong></div>
+							
+								<div id="glyphNodesResult"></div>
+								
+							</div>
+							
+							<div id="errorMessage" class="ph-info ph-danger" rv-hide="inputOk">
+								<div id="errorMessageText">{{errorMessage}}</div>
+							</div>	
+							
+						</div>
+						
 					</div>
 				</div>
 			</div>

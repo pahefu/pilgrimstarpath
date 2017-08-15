@@ -11,71 +11,51 @@ var glyphHandlerApp = {
 	errorMessage : "",
 	
 	initialize : function () {
-
-		var items = new Object();
-		items["SUNRISE"] = {id:"SUNRISE", val : 0, img : "0.png", imgObj : null};
-		items["BIRD"] = {id:"BIRD", val : 1, img :  "1.png", imgObj : null};
-		items["ALIENFACE"] = {id:"ALIENFACE", val : 2, img :  "2.png", imgObj : null};
-		items["DIPLO"] = {id:"DIPLO", val : 3, img :  "3.png", imgObj : null};
-		items["MOON"] = {id:"MOON", val : 4, img :  "4.png", imgObj : null};
-		items["GMAPS"] = {id:"GMAPS", val : 5, img :  "5.png", imgObj : null};
-		items["BOAT"] = {id:"BOAT", val : 6, img :  "6.png", imgObj : null};
-		items["SPIDER"] = {id:"SPIDER", val : 7, img :  "7.png", imgObj : null};
-		items["DRAGONFLY"] = {id:"DRAGONFLY", val : 8, img :  "8.png", imgObj : null};
-		items["SPIRAL"] = {id:"SPIRAL", val : 9, img :  "9.png", imgObj : null};
-		items["HEXAGON"] = {id:"HEXAGON", val : 0xa, img :  "10.png", imgObj : null};
-		items["ORCA"] = {id:"ORCA", val : 0xb, img :  "11.png", imgObj : null};
-		items["TIPI"] = {id:"TIPI", val : 0xc, img :  "12.png", imgObj : null};
-		items["SPACESHIP"] = {id:"SPACESHIP", val : 0xd, img :  "13.png", imgObj : null};
-		items["ETARC"] = {id:"ETARC", val : 0xe, img :  "14.png", imgObj : null};
-		items["TRIFORCE"] = {id:"TRIFORCE", val : 0xf, img :  "15.png", imgObj : null};
-
-		for(var item in items){
-			items[item].imgObj = new Image();
-			items[item].img = "./img/glyphs/" + (items[item].img);
-			items[item].imgObj.src = (items[item].img);
-			items[item].imgObj.setAttribute("alt", (items[item].id));
-		}
-
-		this.items = items;
+		SUNRISE = {id:"SUNRISE", val : 0, img : "0.png", imgObj : null};
+		BIRD = {id:"BIRD", val : 1, img :  "1.png", imgObj : null};
+		ALIENFACE = {id:"ALIENFACE", val : 2, img :  "2.png", imgObj : null};
+		DIPLO = {id:"DIPLO", val : 3, img :  "3.png", imgObj : null};
+		MOON = {id:"MOON", val : 4, img :  "4.png", imgObj : null};
+		GMAPS = {id:"GMAPS", val : 5, img :  "5.png", imgObj : null};
+		BOAT = {id:"BOAT", val : 6, img :  "6.png", imgObj : null};
+		SPIDER = {id:"SPIDER", val : 7, img :  "7.png", imgObj : null};
+		DRAGONFLY = {id:"DRAGONFLY", val : 8, img :  "8.png", imgObj : null};
+		SPIRAL = {id:"SPIRAL", val : 9, img :  "9.png", imgObj : null};
+		HEXAGON = {id:"HEXAGON", val : 0xa, img :  "10.png", imgObj : null};
+		ORCA = {id:"ORCA", val : 0xb, img :  "11.png", imgObj : null};
+		TIPI = {id:"TIPI", val : 0xc, img :  "12.png", imgObj : null};
+		SPACESHIP = {id:"SPACESHIP", val : 0xd, img :  "13.png", imgObj : null};
+		ETARC = {id:"ETARC", val : 0xe, img :  "14.png", imgObj : null};
+		TRIFORCE = {id:"TRIFORCE", val : 0xf, img :  "15.png", imgObj : null};
 		
-		this.hexorder = [
-			items["SUNRISE"],items["BIRD"],items["ALIENFACE"],items["DIPLO"],items["MOON"],items["GMAPS"],items["BOAT"],items["SPIDER"],items["DRAGONFLY"]
-			,items["SPIRAL"],items["HEXAGON"],items["ORCA"],items["TIPI"],items["SPACESHIP"],items["ETARC"],items["TRIFORCE"]
-		];
+		this.hexorder = [SUNRISE,BIRD,ALIENFACE,DIPLO,MOON,GMAPS,BOAT,SPIDER,DRAGONFLY	,SPIRAL,HEXAGON,ORCA,TIPI,SPACESHIP,ETARC,TRIFORCE];
 		this.xzorder = [
-			[
-				items["DRAGONFLY"],items["SPIRAL"],items["HEXAGON"],items["ORCA"],items["TIPI"],items["SPACESHIP"],items["ETARC"],items["TRIFORCE"],items["SUNRISE"]
-				,items["BIRD"],items["ALIENFACE"],items["DIPLO"],items["MOON"],items["GMAPS"],items["BOAT"],items["SPIDER"]
-			],
+			[DRAGONFLY,SPIRAL,HEXAGON,ORCA,TIPI,SPACESHIP,ETARC,TRIFORCE,SUNRISE,BIRD,ALIENFACE,DIPLO,MOON,GMAPS,BOAT,SPIDER],
 			this.hexorder,
-			[
-				items["BIRD"],items["ALIENFACE"],items["DIPLO"],items["MOON"],items["GMAPS"],items["BOAT"],items["SPIDER"],items["DRAGONFLY"]
-				,items["SPIRAL"],items["HEXAGON"],items["ORCA"],items["TIPI"],items["SPACESHIP"],items["ETARC"],items["TRIFORCE"],items["SUNRISE"]
-			]
+			[BIRD,ALIENFACE,DIPLO,MOON,GMAPS,BOAT,SPIDER,DRAGONFLY,SPIRAL,HEXAGON,ORCA,TIPI,SPACESHIP,ETARC,TRIFORCE,SUNRISE]
 		]
 		this.yorder = [ 
-			[
-				items["DRAGONFLY"],items["SPIRAL"],items["HEXAGON"],items["ORCA"],items["TIPI"],items["SPACESHIP"],items["ETARC"],items["TRIFORCE"],items["SUNRISE"]
-				,items["BIRD"],items["ALIENFACE"],items["DIPLO"],items["MOON"],items["GMAPS"],items["BOAT"],items["SPIDER"]
-			],
-			[
-				items["BIRD"],items["ALIENFACE"],items["DIPLO"],items["MOON"],items["GMAPS"],items["BOAT"],items["SPIDER"],items["DRAGONFLY"]
-				,items["SPIRAL"],items["HEXAGON"],items["ORCA"],items["TIPI"],items["SPACESHIP"],items["ETARC"],items["TRIFORCE"],items["SUNRISE"]
-			]
+			[DRAGONFLY,SPIRAL,HEXAGON,ORCA,TIPI,SPACESHIP,ETARC,TRIFORCE,SUNRISE,BIRD,ALIENFACE,DIPLO,MOON,GMAPS,BOAT,SPIDER],
+			[BIRD,ALIENFACE,DIPLO,MOON,GMAPS,BOAT,SPIDER,DRAGONFLY,SPIRAL,HEXAGON,ORCA,TIPI,SPACESHIP,ETARC,TRIFORCE,SUNRISE]
 		]
+		
+		for(var i = 0;i<this.hexorder.length;i++){
+			var item = this.hexorder[i];
+			item.imgObj = new Image();
+			item.img = "./img/glyphs/" + (item.img);
+			item.imgObj.src = (item.img);
+			item.imgObj.setAttribute("alt", (item.id));
+		}
 	},
 	
 	parseAddress : function (){
-		// SPLIT
-		
 		function padLeft(nr, n, str){
 			return Array(n-String(nr).length+1).join(str||'0')+nr;
 		}
 		var pthis = glyphHandlerApp;
 		var fullGalAddrRe = new RegExp("([0-9A-F]+):([0-9A-F]+):([0-9A-F]+):([0-9A-F]+)");
 		pthis.humanGalAddr = pthis.galAddr.replace(/ /g, ':').toUpperCase();
-		
+
 		var res = fullGalAddrRe.exec(pthis.humanGalAddr);
 
 		pthis.inputDone = true;
@@ -86,19 +66,48 @@ var glyphHandlerApp = {
 			var y = padLeft(res[2],4,"").substr(2,2);
 			var z = padLeft(res[3],4,"").substr(1,3);
 			var syst = padLeft(res[4],4,"").substr(1,3);
-			
+				
 			var planet = Number(pthis.planet);
 			if(planet<1 || planet > 7 || isNaN(planet)) { planet = 1; } // Safeguard
 			pthis.result[0] = pthis.hexorder[planet];
 			pthis.humanPlanet = planet;
 			
-			for(var i = 0; i < 3;i++){
-				pthis.result[9+i] = ( pthis.xzorder[i][ parseInt(x[i],16)]);
-				pthis.result[6+i] = ( pthis.xzorder[i][ parseInt(z[i],16)]);
-				if(i<2){
-					pthis.result[4+i] = ( pthis.yorder[i][ parseInt(y[i],16)]);
+			var fullStr = "0"+(syst+y+z+x);
+
+			var getValues = function(fullStr, positionArray, tablesArray, usesCarry){
+				var localResult = new Array(positionArray.length);
+				
+				var trigger_last = (fullStr[positionArray[0]] == "F" ) && usesCarry;
+				var trigger_2nd = (fullStr[positionArray[1]]  == "F" ) && trigger_last;
+
+				var offset = 0;
+				for(var i = 0;i<positionArray.length;i++){
+					var chr = fullStr[positionArray[i]];
+					var glyphIndex = parseInt(chr,16); 
+					
+					if( (trigger_last && i ==1) || (trigger_2nd && i == 2)){
+						glyphIndex++;
+						if(glyphIndex>0x0F) {glyphIndex = 0;}
+					}
+					
+					localResult[i] = tablesArray[i][glyphIndex];
 				}
-				pthis.result[1+i] = ( pthis.hexorder[ parseInt(syst[i],16)]);
+				localResult.reverse();
+				return localResult;
+			}
+			
+			var xValues = getValues(fullStr,[11,10,9], [pthis.xzorder[2], pthis.xzorder[1],pthis.xzorder[0]],true);
+			var zValues = getValues(fullStr,[8,7,6], [pthis.xzorder[2], pthis.xzorder[1],pthis.xzorder[0]],true);
+			var yValues = getValues(fullStr,[5,4], [pthis.yorder[1],pthis.yorder[0]],true);
+			var systValues = getValues(fullStr,[3,2,1], [pthis.hexorder,pthis.hexorder,pthis.hexorder], false);
+
+			for(var i = 0; i < 3;i++){
+				pthis.result[9+i] = xValues[i];
+				pthis.result[6+i] = zValues[i];
+				if(i<2){
+					pthis.result[4+i] = yValues[i];
+				}
+				pthis.result[1+i] = systValues[i];
 			}
 			
 			var node = $("#glyphNodesResult")[0];
@@ -114,12 +123,13 @@ var glyphHandlerApp = {
 		}else{
 			pthis.inputOk = false;
 			pthis.errorMessage = "Invalid format for destination";
+			console.log("ERROR");
 		}
 	}
 	
 }
 
 
-//glyphHandlerApp.parseAddress("987 12 32b 01b",1);
+
 
 

@@ -305,7 +305,7 @@ var destinationApp = {
 	initialize : function(){
 		// Initialize custom destinations here
 		this.addDest(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor);
-		this.addDest(0x469,0x0081,0x0D6D,'Galactic Hub','#c0ca33'); this.destinations[1].federation = true; // trick here
+		this.addDest(0x44c,0x0082,0x0D55,'Galactic Hub','#c0ca33'); this.destinations[1].federation = true; // trick here
 		
 		if(commonData.selectedFederation){
 			var s = commonData.selectedFederation;
@@ -379,7 +379,7 @@ var destinationApp = {
 		destinationApp.addDest(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor);
 	},		
 	addRedHub: function(){
-		destinationApp.addDest(0x469,0x0081,0x0D6D,'Galactic Hub','#c0ca33');			
+		destinationApp.addDest(0x44c,0x0082,0x0D55,'Galactic Hub','#c0ca33');			
 	},
 	parseWikiLocations : function(data){
 		var wikiRows = data.parse.wikitext["*"].split("\n");

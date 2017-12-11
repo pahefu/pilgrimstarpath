@@ -63,11 +63,45 @@ body{
     padding: 4px;  
 }
 
+#tipTable{
+	background-color: #262626;
+    border: 1px solid #555555;
+    padding: 4px;
+	margin-top:8px;
+}
+
+@media (min-width : 1000px) {
+	#tipTable{
+	margin-top:0px;
+	}
+}
+
+#tipContent{
+	margin-bottom:25px;
+}
+
+#tipForm{
+	border: 1px solid #555555;
+	padding:4px;
+}
+
+#tipSelectbox{
+	width:100%;
+	height: 30px;
+	margin-top:10px;
+}
+
+#tipDisclaimer{
+	font-size: 10pt;
+}
+
 #locationInfoTable{
 	background-color: #262626;
     border: 1px solid #555555;
     padding: 4px;
 }
+
+
 
 .locationInfoBlock{
 	border-top: 1px solid #555555;
@@ -231,6 +265,11 @@ body{
 .divider{
 	text-align: center;
     width: 75%;
+    border: 1px dashed #5b666f;
+}
+
+.titleDivider{
+	text-align: center;
     border: 1px dashed #5b666f;
 }
 

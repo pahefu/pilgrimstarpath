@@ -16,6 +16,13 @@ $('.menuitem').click(function(){
    $("#"+$(this).attr("rel")).addClass("active");
 });
 
+$('#showTipButton').click(function(){
+   $(".menuitem").removeClass("active");
+   $(".page").removeClass("active");
+   $('.menuitem[rel="page5"]').addClass("active");
+   $("#page5").addClass("active");
+});
+
 rivets.configure({
 	templateDelimiters: ['{{', '}}']
 });
@@ -83,7 +90,6 @@ function generateMap(){
 		}
 	}
 }
-
 
 function wikiAsync(page, okCallback, justHtml){
 	var url = 'https://nomanssky.gamepedia.com/api.php?action=parse&format=json&prop=wikitext&page='+page;
@@ -234,6 +240,7 @@ var userLocationApp = {
 	userLocation: commonData.userLocation,
 	firstPush : false,
 	locationValid: false,
+	tipShowable : false,
 	locationText : "",
 	errorMessage : "",
 	center : commonData.center,
@@ -241,12 +248,19 @@ var userLocationApp = {
 	showCompass: false,
 	showBhHelper: false,
 	lastJumpDistanceText: "",
-	
+	disableTips :function(){
+		settingsApp.disableTips();
+	},
 	
 	calculateLocation : function(){
-		
+				
 		var pThis = userLocationApp;
 		pThis.firstPush = true;		
+		
+		if(pThis.tipShowable){ // No tips
+			pThis.tipShowable = false;
+		}
+		
 		textHandler.parseLine(pThis.locationText, 
 			function(x,y,z,name,color){ // OK Callback
 				var common = commonData;
@@ -269,6 +283,8 @@ var userLocationApp = {
 			null, null
 		);
 	},
+	
+	
 	toggleCompass : function(){
 		userLocationApp.showCompass = !userLocationApp.showCompass;
 	},
@@ -305,7 +321,8 @@ var destinationApp = {
 	initialize : function(){
 		// Initialize custom destinations here
 		this.addDest(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor);
-		this.addDest(0x44c,0x0082,0x0D55,'Galactic Hub','#c0ca33'); this.destinations[1].federation = true; // trick here
+		this.addDest(0x44c,0x0082,0x0D55,'Galactic Hub','#c0ca33'); 
+		this.destinations[1].federation = true; // trick here
 		
 		if(commonData.selectedFederation){
 			var s = commonData.selectedFederation;
@@ -664,8 +681,23 @@ var settingsApp = {
 	common : commonData,
 	map : galaxyMapApp,
 	tag : "nmspspset",
+	tagTips: "nmspsptips",
 	initialize: function(){	
 		if(localStorage!=undefined){
+			userLocationApp.tipShowable = false;
+			
+			// Tip try
+			try{
+				var rawData = localStorage.getItem(settingsApp.tagTips);
+				if(rawData==undefined || rawData == null || rawData !="0" ){
+					userLocationApp.tipShowable = true;
+				}
+
+			}catch(err){
+				console.log("Err restoring storage for tips: ",err);
+			}
+			
+			// Settings (normal)
 			try{
 				var rawData = localStorage.getItem(settingsApp.tag);
 				if(rawData==undefined || rawData == null){
@@ -682,6 +714,19 @@ var settingsApp = {
 				console.log("Err restoring storage: ",err);
 			}
 			
+			
+			
+		}
+	},
+	
+	disableTips : function(){
+		if(localStorage!=undefined){
+			try{
+				localStorage.setItem(settingsApp.tagTips, "0");
+				userLocationApp.tipShowable = false;
+			}catch(err){
+				console.log("Err saving storage: ",err);
+			}
 		}
 	},
 	

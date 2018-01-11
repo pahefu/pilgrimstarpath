@@ -208,6 +208,7 @@ var commonData = {
 	selectedDestination : 1,
 	selectedDestinationObj : undefined,
 	selectedDestinationName: "",
+	selectedGalaxy : 1,
 	localRadarRange: 25,
 	jumpRange : 1600,
 	degrees: 0,
@@ -260,9 +261,18 @@ var userLocationApp = {
 		if(pThis.tipShowable){ // No tips
 			pThis.tipShowable = false;
 		}
-		
+		userLocationApp.errorMessage2="";
 		textHandler.parseLine(pThis.locationText, 
 			function(x,y,z,name,color){ // OK Callback
+				
+				
+				if(x>0xfff || z>0xfff || y>0xff){
+					userLocationApp.locationValid = false;
+					userLocationApp.errorMessage = "Grah! Coords outside galaxy limits";
+					userLocationApp.errorMessage2 = "Are you waking titans?";
+					return;
+				}
+			
 				var common = commonData;
 				common.userLocation.updateCoords(x,y,z);
 				common.userLocation.updateMapCoords(galaxyMapApp.width, galaxyMapApp.height);
@@ -707,7 +717,8 @@ var settingsApp = {
 				
 				commonData.jumpRange = data.jumpRange;
 				commonData.localRadarRange = data.localRadarRange;
-				commonData.selectedFederation = data.selectedFederation;			
+				commonData.selectedFederation = data.selectedFederation;	
+				commonData.selectedGalaxy = data.selectedGalaxy;
 				galaxyMapApp.height = data.height;
 
 			}catch(err){
@@ -737,6 +748,7 @@ var settingsApp = {
 					jumpRange: commonData.jumpRange, 
 					localRadarRange: commonData.localRadarRange, 
 					selectedFederation : commonData.selectedFederation,
+					selectedGalaxy : commonData.selectedGalaxy,
 					height: galaxyMapApp.height
 				}));
 				

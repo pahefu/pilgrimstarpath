@@ -68,7 +68,12 @@
 								</div>
 								<div rv-show="firstPush" style="display:none;">
 									<div id="errorMessage" class="ph-info ph-danger" rv-hide="locationValid">
-										<div id="errorMessageText">{{errorMessage}}</div>
+										<div id="errorMessageText">
+											{{errorMessage}}
+											<br/>
+											{{errorMessage2}}
+										</div>
+										
 									</div>	
 								</div>
 							</div>
@@ -467,14 +472,22 @@
 					<div id="settingsNode">
 
 						<div class="fieldSet">
-							
-						
+
 							<div class="setting">
 								<div class="settingTitle">Max hyperjump distance (ly)</div>
 								<div class="settingText">Type or select the max hyperjump distance that your ship hyperdrives can handle.</div>
 								<div class="settingValues">
 									<input type="range" rv-value="common.jumpRange" min="100" max="9999" step="100"><br/>
 									<input type="text" rv-value="common.jumpRange">
+								</div>
+							</div>
+							
+							<div class="setting">
+								<div class="settingTitle">Current Galaxy</div>
+								<div class="settingText">Type or select the current Galaxy you are in (with Euclid being number 1).</div>
+								<div class="settingValues">
+									<input type="range" rv-value="common.selectedGalaxy" min="1" max="256" step="1"><br/>
+									<input type="text" rv-value="common.selectedGalaxy">
 								</div>
 							</div>
 							

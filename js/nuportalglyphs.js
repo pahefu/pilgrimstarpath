@@ -62,11 +62,24 @@ var glyphHandlerApp = {
 		
 		if(res){
 			pthis.humanGalAddr = res[0];
+			
+			var test_x = parseInt(res[1],16)<=0x1000;
+			var test_y = parseInt(res[2],16)<=0x100;
+			var test_z = parseInt(res[3],16)<=0x1000;
+			var test_syst = parseInt(res[4],16)<=0x300;
+			
+			if(!test_x || !test_y || !test_z || !test_syst){
+				pthis.inputOk = false;
+				pthis.errorMessage = "Coords outside galaxy limits!";
+				return;
+			}
+			
 			var x = padLeft(res[1],4,"").substr(1,3);
 			var y = padLeft(res[2],4,"").substr(2,2);
 			var z = padLeft(res[3],4,"").substr(1,3);
 			var syst = padLeft(res[4],4,"").substr(1,3);
-				
+			
+			
 			var planet = Number(pthis.planet);
 			if(planet<1 || planet > 7 || isNaN(planet)) { planet = 1; } // Safeguard
 			pthis.result[0] = pthis.hexorder[planet];
@@ -123,7 +136,6 @@ var glyphHandlerApp = {
 		}else{
 			pthis.inputOk = false;
 			pthis.errorMessage = "Invalid format for destination";
-			console.log("ERROR");
 		}
 	}
 	

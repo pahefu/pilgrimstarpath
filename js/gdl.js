@@ -56,6 +56,8 @@ function generateMap(){
 	
 	// Handle URL parameters <<< HERE
 	
+	showPopup(); // Do the popup here!
+	
 	var exprs = [
 		new RegExp("TO=[A-Z]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+:[0-9A-F]+"),
 		new RegExp("TO=[0-9A-F]+:[0-9A-F]+:[0-9A-F]+[:]*[0-9A-F]*"),
@@ -219,6 +221,7 @@ var commonData = {
 	heightNotOK : false,
 	heightDiff: 0,
 	heightDir: "",
+	popup: true,
 	
 	locationChangeCallbacks : [],
 	destinationsChangeCallbacks : [],
@@ -331,15 +334,16 @@ var destinationApp = {
 	initialize : function(){
 		// Initialize custom destinations here
 		this.addDest(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor);
-		this.addDest(0x44c,0x0082,0x0D55,'Galactic Hub','#c0ca33'); 
-		this.destinations[1].federation = true; // trick here
+		this.changeDest(0); // Force it
+		
+		//this.addDest(0x44c,0x0082,0x0D55,'Galactic Hub','#c0ca33'); 
+		//this.destinations[1].federation = true; // trick here
 		
 		if(commonData.selectedFederation){
 			var s = commonData.selectedFederation;
 			this.setFederationDest(s.coords[0], s.coords[1],s.coords[2],s.name, s.color,false);
 		}
-		
-		this.changeDest(1); // Force it
+
 		
 		// Initialize stuff
 		commonData.selectedDestinationObj = commonData.destinations[commonData.selectedDestination];
@@ -405,9 +409,6 @@ var destinationApp = {
 	addPilgrim : function(){
 		destinationApp.addDest(0x64a,0x082,0x1b9,'Pilgrim Star',orangeColor);
 	},		
-	addRedHub: function(){
-		destinationApp.addDest(0x44c,0x0082,0x0D55,'Galactic Hub','#c0ca33');			
-	},
 	parseWikiLocations : function(data){
 		var wikiRows = data.parse.wikitext["*"].split("\n");
 		for(var i = 0;i<wikiRows.length;i++){
@@ -439,8 +440,11 @@ var destinationApp = {
 	},
 	setFederationDest : function( x,y,z, name, color, save){
 		
+		
+		
 		var currFed = null;
 		var pthis = destinationApp;
+		
 		for(var i = 0;i<pthis.destinations.length;i++){
 			if (pthis.destinations[i].federation == true){
 				currFed = pthis.destinations[i];
@@ -453,9 +457,10 @@ var destinationApp = {
 		
 		if(currFed == null){ // No fed ON, lets create it
 			destId = pthis.destinations.length
-			pthis.addDest(x,y,z,fedObj.name,'#c0ca33');
-			pthis.selectedDestination+=1;
-			currFed = pthis.destinations[pthis.selectedDestination];
+			//pthis.addDest(x,y,z,fedObj.name,'#c0ca33');
+			pthis.addDest(x,y,z,name,color);
+			commonData.selectedDestination+=1;
+			currFed = pthis.destinations[commonData.selectedDestination];
 		}
 		
 		// Save the selected federation option
@@ -720,6 +725,7 @@ var settingsApp = {
 				commonData.selectedFederation = data.selectedFederation;	
 				commonData.selectedGalaxy = data.selectedGalaxy;
 				galaxyMapApp.height = data.height;
+				commonData.popup = data.popup;
 
 			}catch(err){
 				console.log("Err restoring storage: ",err);
@@ -749,7 +755,8 @@ var settingsApp = {
 					localRadarRange: commonData.localRadarRange, 
 					selectedFederation : commonData.selectedFederation,
 					selectedGalaxy : commonData.selectedGalaxy,
-					height: galaxyMapApp.height
+					height: galaxyMapApp.height,
+					popup:commonData.popup
 				}));
 				
 			}catch(err){
@@ -892,6 +899,7 @@ var federationsApp = {
 
 		var currFed = null;
 		var destId = -1;
+		console.log(fedObj);
 
 		destinationApp.setFederationDest(fedObj.coords[0],fedObj.coords[1],fedObj.coords[2],fedObj.name,'#c0ca33', true);
 	}
@@ -902,3 +910,24 @@ var federationsAppBind = rivets.bind($("#federationsNode")[0], federationsApp);
 /**/
 glyphHandlerApp.initialize();
 var glyphHandlerAppBind = rivets.bind($("#glyphHandlerNode")[0], glyphHandlerApp);
+
+
+function showPopup(){
+
+	if(!commonData.popup){
+		return;
+	}
+	
+	// Get the snackbar DIV
+    var x = document.getElementById("snackbar");
+
+    // Add the "show" class to DIV
+    x.className = "show";
+}
+
+function hidePopup(){
+	var x = document.getElementById("snackbar");
+	x.className = x.className.replace("show", ""); 
+	commonData.popup = false;
+	settingsApp.applySettings();
+}
